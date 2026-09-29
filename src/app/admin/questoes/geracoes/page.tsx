@@ -7,10 +7,12 @@ import { aprovarTodasDaGeracao, verificarGeracoes } from "../gerar/actions";
 
 type LinhaGeracao = {
   id: string;
+  alvo: "questoes" | "flashcards";
+  item_id: string | null;
   status: "processando" | "importando" | "concluida" | "erro";
   tipo_material: "conteudo" | "prova";
   arquivos: { nome: string }[];
-  config: { objetivas: number; discursivas: number; tema: string };
+  config: { objetivas: number; discursivas: number; cards?: number; tema: string };
   erro: string | null;
   observacoes: string | null;
   questoes_geradas: number;
@@ -31,21 +33,32 @@ export default async function Geracoes() {
   const { data } = await supabase
     .from("geracoes_questoes")
     .select(
-      "id, status, tipo_material, arquivos, config, erro, observacoes, questoes_geradas, questoes_descartadas, criado_em, disciplinas(nome)",
+      "id, alvo, item_id, status, tipo_material, arquivos, config, erro, observacoes, questoes_geradas, questoes_descartadas, criado_em, disciplinas(nome)",
     )
     .order("criado_em", { ascending: false })
     .limit(50)
     .overrideTypes<LinhaGeracao[], { merge: false }>();
   const geracoes = data ?? [];
 
-  const { data: rascunhos } = await supabase
-    .from("questoes")
-    .select("geracao_id")
-    .in("geracao_id", geracoes.filter((g) => g.status === "concluida").map((g) => g.id))
-    .eq("status", "rascunho")
-    .overrideTypes<{ geracao_id: string }[], { merge: false }>();
+  const concluidas = geracoes.filter((g) => g.status === "concluida");
+  const [{ data: questoesRascunho }, { data: cardsRascunho }] = await Promise.all([
+    supabase
+      .from("questoes")
+      .select("geracao_id")
+      .in("geracao_id", concluidas.filter((g) => g.alvo === "questoes").map((g) => g.id))
+      .eq("status", "rascunho")
+      .overrideTypes<{ geracao_id: string }[], { merge: false }>(),
+    supabase
+      .from("flashcards")
+      .select("geracao_id")
+      .in("geracao_id", concluidas.filter((g) => g.alvo === "flashcards").map((g) => g.id))
+      .eq("status", "rascunho")
+      .overrideTypes<{ geracao_id: string }[], { merge: false }>(),
+  ]);
   const pendentesRevisao = new Map<string, number>();
-  for (const r of rascunhos ?? []) pendentesRevisao.set(r.geracao_id, (pendentesRevisao.get(r.geracao_id) ?? 0) + 1);
+  for (const r of [...(questoesRascunho ?? []), ...(cardsRascunho ?? [])]) {
+    pendentesRevisao.set(r.geracao_id, (pendentesRevisao.get(r.geracao_id) ?? 0) + 1);
+  }
 
   const emAndamento = geracoes.some((g) => g.status === "processando" || g.status === "importando");
 
@@ -56,7 +69,7 @@ export default async function Geracoes() {
           <Link href="/admin/questoes" className="text-sm text-slate-600 hover:text-slate-900">
             ← Banco de questões
           </Link>
-          <h1 className="text-2xl font-bold text-slate-900">Gerações de questões</h1>
+          <h1 className="text-2xl font-bold text-slate-900">Gerações por IA</h1>
         </div>
         <div className="flex gap-2">
           <form action={verificarGeracoes}>
@@ -79,6 +92,8 @@ export default async function Geracoes() {
         {geracoes.length === 0 && <li className="text-sm text-slate-600">Nenhuma geração ainda.</li>}
         {geracoes.map((g) => {
           const aRevisar = pendentesRevisao.get(g.id) ?? 0;
+          const flashcards = g.alvo === "flashcards";
+          const unidade = flashcards ? "cards" : "questões";
           return (
             <li key={g.id} className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
               <div className="flex flex-wrap items-start justify-between gap-2">
@@ -88,7 +103,10 @@ export default async function Geracoes() {
                     {g.config.tema && ` · ${g.config.tema}`}
                   </p>
                   <p className="text-xs text-slate-500">
-                    {formatarData(g.criado_em)} · pedido: {g.config.objetivas} objetivas, {g.config.discursivas} discursivas
+                    {formatarData(g.criado_em)} · pedido:{" "}
+                    {flashcards
+                      ? `${g.config.cards ?? 0} flashcards`
+                      : `${g.config.objetivas} objetivas, ${g.config.discursivas} discursivas`}
                     {g.tipo_material === "prova" && " · a partir de prova antiga"}
                   </p>
                   <p className="text-xs text-slate-500">
@@ -103,8 +121,8 @@ export default async function Geracoes() {
               {g.status === "concluida" && (
                 <div className="space-y-2 text-sm">
                   <p className="text-slate-700">
-                    {g.questoes_geradas} questões criadas
-                    {g.questoes_descartadas > 0 && ` · ${g.questoes_descartadas} descartadas por formato inválido`}
+                    {g.questoes_geradas} {flashcards ? "cards criados" : "questões criadas"}
+                    {g.questoes_descartadas > 0 && ` · ${g.questoes_descartadas} descartados (inválidos ou repetidos)`}
                     {aRevisar > 0 ? ` · ${aRevisar} aguardando revisão` : " · todas revisadas"}
                   </p>
                   {g.observacoes && (
@@ -114,14 +132,18 @@ export default async function Geracoes() {
                   )}
                   {g.questoes_geradas > 0 && (
                     <div className="flex flex-wrap gap-2">
-                      <Link href={`/admin/questoes?geracao=${g.id}`} className={botaoPrimario}>
-                        Revisar questões
+                      <Link
+                        href={flashcards ? `/admin/itens/${g.item_id}` : `/admin/questoes?geracao=${g.id}`}
+                        className={botaoPrimario}
+                      >
+                        Revisar {unidade}
                       </Link>
                       {aRevisar > 0 && (
                         <form action={aprovarTodasDaGeracao}>
                           <input type="hidden" name="geracao_id" value={g.id} />
+                          <input type="hidden" name="alvo" value={g.alvo} />
                           <button className={botaoSecundario + " px-4 py-2 text-sm"}>
-                            Aprovar todas ({aRevisar})
+                            {flashcards ? "Publicar todos" : "Aprovar todas"} ({aRevisar})
                           </button>
                         </form>
                       )}

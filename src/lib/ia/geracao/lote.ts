@@ -1,12 +1,16 @@
 import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
+import { removerRepetidos, validarCard, type CardNovo } from "@/lib/flashcards/cards";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 import { montarBlocosMaterial, type ArquivoMaterial } from "./material";
 import {
   converterQuestoesGeradas,
+  INSTRUCOES_FLASHCARDS,
   INSTRUCOES_GERACAO,
+  montarPedidoFlashcards,
   montarPedidoGeracao,
+  SaidaFlashcardsSchema,
   SaidaGeracaoSchema,
   type ConfigGeracao,
   type TipoMaterial,
@@ -21,12 +25,15 @@ const EFFORT_GERACAO: Effort = EFFORTS.includes(process.env.IA_EFFORT_GERACAO as
   ? (process.env.IA_EFFORT_GERACAO as Effort)
   : "medium";
 
-const FORMATO_SAIDA = zodOutputFormat(SaidaGeracaoSchema);
+const FORMATO_QUESTOES = zodOutputFormat(SaidaGeracaoSchema);
+const FORMATO_FLASHCARDS = zodOutputFormat(SaidaFlashcardsSchema);
 
 export type Geracao = {
   id: string;
   disciplina_id: string;
   criado_por: string | null;
+  alvo: "questoes" | "flashcards";
+  item_id: string | null;
   arquivos: { caminho: string; nome: string; tipo: string; tamanho: number }[];
   texto: string;
   tipo_material: TipoMaterial;
@@ -39,6 +46,57 @@ let cliente: Anthropic | null = null;
 function anthropic() {
   cliente ??= new Anthropic();
   return cliente;
+}
+
+async function montarPedido(geracao: Geracao) {
+  const admin = criarClienteAdmin();
+  const { data: disciplina } = await admin
+    .from("disciplinas")
+    .select("nome")
+    .eq("id", geracao.disciplina_id)
+    .single<{ nome: string }>();
+
+  if (geracao.alvo === "flashcards") {
+    const [{ data: deck }, { data: existentes }] = await Promise.all([
+      admin.from("itens").select("titulo").eq("id", geracao.item_id!).single<{ titulo: string }>(),
+      admin
+        .from("flashcards")
+        .select("frente")
+        .eq("item_id", geracao.item_id!)
+        .limit(300)
+        .overrideTypes<{ frente: string }[], { merge: false }>(),
+    ]);
+    return {
+      system: INSTRUCOES_FLASHCARDS,
+      schema: FORMATO_FLASHCARDS.schema,
+      pedido: montarPedidoFlashcards({
+        disciplina: disciplina?.nome ?? "",
+        deck: deck?.titulo ?? "",
+        tipoMaterial: geracao.tipo_material,
+        config: geracao.config,
+        frentesExistentes: (existentes ?? []).map((c) => c.frente.replace(/\s+/g, " ").slice(0, 160)),
+      }),
+    };
+  }
+
+  const { data: existentes } = await admin
+    .from("questoes")
+    .select("tema, enunciado")
+    .eq("disciplina_id", geracao.disciplina_id)
+    .order("criado_em", { ascending: false })
+    .limit(150)
+    .overrideTypes<{ tema: string; enunciado: string }[], { merge: false }>();
+  return {
+    system: INSTRUCOES_GERACAO,
+    schema: FORMATO_QUESTOES.schema,
+    pedido: montarPedidoGeracao({
+      disciplina: disciplina?.nome ?? "",
+      tipoMaterial: geracao.tipo_material,
+      config: geracao.config,
+      temasExistentes: [...new Set((existentes ?? []).map((q) => q.tema).filter(Boolean))],
+      enunciadosExistentes: (existentes ?? []).map((q) => q.enunciado.replace(/\s+/g, " ").slice(0, 160)),
+    }),
+  };
 }
 
 /** Baixa o material, monta o pedido e envia o lote. Grava o batch_id na geração. */
@@ -54,25 +112,7 @@ export async function enviarLoteGeracao(geracao: Geracao) {
   const material = await montarBlocosMaterial(arquivos, geracao.texto);
   if (!material.length) throw new Error("O material enviado está vazio.");
 
-  const [{ data: disciplina }, { data: existentes }] = await Promise.all([
-    admin.from("disciplinas").select("nome").eq("id", geracao.disciplina_id).single<{ nome: string }>(),
-    admin
-      .from("questoes")
-      .select("tema, enunciado")
-      .eq("disciplina_id", geracao.disciplina_id)
-      .order("criado_em", { ascending: false })
-      .limit(150)
-      .overrideTypes<{ tema: string; enunciado: string }[], { merge: false }>(),
-  ]);
-
-  const pedido = montarPedidoGeracao({
-    disciplina: disciplina?.nome ?? "",
-    tipoMaterial: geracao.tipo_material,
-    config: geracao.config,
-    temasExistentes: [...new Set((existentes ?? []).map((q) => q.tema).filter(Boolean))],
-    enunciadosExistentes: (existentes ?? []).map((q) => q.enunciado.replace(/\s+/g, " ").slice(0, 160)),
-  });
-
+  const { system, schema, pedido } = await montarPedido(geracao);
   const lote = await anthropic().messages.batches.create({
     requests: [
       {
@@ -80,11 +120,8 @@ export async function enviarLoteGeracao(geracao: Geracao) {
         params: {
           model: MODELO_GERACAO,
           max_tokens: 32000,
-          system: INSTRUCOES_GERACAO,
-          output_config: {
-            effort: EFFORT_GERACAO,
-            format: { type: "json_schema", schema: FORMATO_SAIDA.schema },
-          },
+          system,
+          output_config: { effort: EFFORT_GERACAO, format: { type: "json_schema", schema } },
           // Material primeiro, pedido no fim: melhor desempenho com documentos longos.
           messages: [{ role: "user", content: [...material, { type: "text", text: pedido }] }],
         },
@@ -103,6 +140,61 @@ async function falhar(geracaoId: string, mensagem: string) {
     .from("geracoes_questoes")
     .update({ status: "erro", erro: mensagem, concluido_em: new Date().toISOString() })
     .eq("id", geracaoId);
+}
+
+/** Salva o que a IA gerou como rascunho. Retorna quantos entraram e quantos foram descartados. */
+async function salvarResultado(geracao: Geracao, texto: string) {
+  const admin = criarClienteAdmin();
+
+  if (geracao.alvo === "flashcards") {
+    const saida = FORMATO_FLASHCARDS.parse(texto);
+    const validos: CardNovo[] = [];
+    let descartados = 0;
+    for (const c of saida.cards) {
+      const validacao = validarCard(c);
+      if ("erro" in validacao) descartados++;
+      else validos.push(validacao.card);
+    }
+    const { data: existentes } = await admin
+      .from("flashcards")
+      .select("frente, ordem")
+      .eq("item_id", geracao.item_id!)
+      .order("ordem", { ascending: false })
+      .overrideTypes<{ frente: string; ordem: number }[], { merge: false }>();
+    const { unicos, repetidos } = removerRepetidos(validos, (existentes ?? []).map((c) => c.frente));
+    const ultimaOrdem = existentes?.[0]?.ordem ?? 0;
+
+    if (unicos.length) {
+      const { error } = await admin.from("flashcards").insert(
+        unicos.map((c, i) => ({
+          ...c,
+          item_id: geracao.item_id,
+          ordem: ultimaOrdem + i + 1,
+          status: "rascunho",
+          origem: "ia",
+          geracao_id: geracao.id,
+        })),
+      );
+      if (error) throw new Error(`Erro ao salvar os flashcards: ${error.message}`);
+    }
+    return { gerados: unicos.length, descartados: descartados + repetidos, observacoes: saida.observacoes };
+  }
+
+  const saida = FORMATO_QUESTOES.parse(texto);
+  const { questoes, descartadas } = converterQuestoesGeradas(saida.questoes);
+  if (questoes.length) {
+    const { error } = await admin.from("questoes").insert(
+      questoes.map((q) => ({
+        ...q,
+        disciplina_id: geracao.disciplina_id,
+        status: "rascunho",
+        origem: "ia",
+        geracao_id: geracao.id,
+      })),
+    );
+    if (error) throw new Error(`Erro ao salvar as questões: ${error.message}`);
+  }
+  return { gerados: questoes.length, descartados: descartadas.length, observacoes: saida.observacoes };
 }
 
 /** Importa o resultado de um lote terminado. Idempotente: só uma execução "reivindica" a geração. */
@@ -126,7 +218,7 @@ async function importarResultado(geracao: Geracao) {
       const mensagem = item.result.message;
       await admin.from("uso_ia").insert({
         usuario_id: geracao.criado_por,
-        tipo: "geracao",
+        tipo: geracao.alvo === "flashcards" ? "geracao_flashcards" : "geracao",
         modelo: mensagem.model,
         tokens_entrada: mensagem.usage.input_tokens,
         tokens_saida: mensagem.usage.output_tokens,
@@ -136,34 +228,20 @@ async function importarResultado(geracao: Geracao) {
         return falhar(geracao.id, "A IA recusou este material. Revise o conteúdo e tente de novo.");
       }
       if (mensagem.stop_reason === "max_tokens") {
-        return falhar(geracao.id, "A resposta ficou longa demais. Peça menos questões por geração.");
+        return falhar(geracao.id, "A resposta ficou longa demais. Peça menos itens por geração.");
       }
 
       const texto = mensagem.content.find((b) => b.type === "text");
-      const saida = texto?.type === "text" ? FORMATO_SAIDA.parse(texto.text) : null;
-      if (!saida) return falhar(geracao.id, "Resposta da IA em formato inválido. Tente novamente.");
-
-      const { questoes, descartadas } = converterQuestoesGeradas(saida.questoes);
-      if (questoes.length) {
-        const { error } = await admin.from("questoes").insert(
-          questoes.map((q) => ({
-            ...q,
-            disciplina_id: geracao.disciplina_id,
-            status: "rascunho",
-            origem: "ia",
-            geracao_id: geracao.id,
-          })),
-        );
-        if (error) return falhar(geracao.id, `Erro ao salvar as questões: ${error.message}`);
-      }
+      if (texto?.type !== "text") return falhar(geracao.id, "Resposta da IA vazia. Tente novamente.");
+      const { gerados, descartados, observacoes } = await salvarResultado(geracao, texto.text);
 
       await admin
         .from("geracoes_questoes")
         .update({
           status: "concluida",
-          questoes_geradas: questoes.length,
-          questoes_descartadas: descartadas.length,
-          observacoes: saida.observacoes.trim() || null,
+          questoes_geradas: gerados,
+          questoes_descartadas: descartados,
+          observacoes: observacoes.trim() || null,
           concluido_em: new Date().toISOString(),
         })
         .eq("id", geracao.id);

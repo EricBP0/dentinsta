@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BotaoRenovar } from "@/components/cadeado";
+import { SessaoEstudo } from "@/app/aluno/flashcards/sessao-estudo";
 import { exigirLogin } from "@/lib/auth";
+import { carregarResumo, carregarSessao } from "@/lib/flashcards/sessao";
 import { COLUNAS_ITEM, NOME_TIPO_ITEM, type ConfigItem, type Item } from "@/lib/tipos";
 import { marcarConcluido } from "./actions";
 
@@ -40,7 +42,9 @@ export default async function PaginaItem({ params }: PageProps<"/aluno/itens/[id
         <h1 className="text-2xl font-bold text-slate-900">{item.titulo}</h1>
       </header>
 
-      {config ? (
+      {config && item.tipo === "flashcards" ? (
+        <Deck itemId={item.id} usuarioId={perfil.id} concluido={concluido} />
+      ) : config ? (
         <>
           <ConteudoItem tipo={item.tipo} config={config} />
           <form action={marcarConcluido}>
@@ -61,6 +65,25 @@ export default async function PaginaItem({ params }: PageProps<"/aluno/itens/[id
           <BotaoRenovar />
         </div>
       )}
+    </div>
+  );
+}
+
+async function Deck({ itemId, usuarioId, concluido }: { itemId: string; usuarioId: string; concluido: boolean }) {
+  const { supabase } = await exigirLogin();
+  const [cards, [resumo]] = await Promise.all([
+    carregarSessao(supabase, usuarioId, itemId),
+    carregarResumo(supabase, itemId),
+  ]);
+  if (!resumo) return <p className="rounded-xl bg-slate-100 p-6 text-slate-600">Este deck ainda não tem cards.</p>;
+
+  return (
+    <div className="mx-auto max-w-2xl space-y-4">
+      <p className="text-sm text-slate-600">
+        {resumo.vistos} de {resumo.total} cards vistos
+        {concluido ? " · ✅ deck concluído" : " · veja todos os cards pelo menos uma vez para concluir"}
+      </p>
+      <SessaoEstudo cards={cards} />
     </div>
   );
 }

@@ -22,6 +22,9 @@ Plataforma de estudos para graduação em Odontologia. Planejamento completo em
     **fonte** no material. Roda em lote (metade do custo) e as questões entram como
     **rascunho** para revisão. Provas antigas podem ser enviadas só como
     referência de assuntos e estilo — a IA não copia as questões;
+  - **flashcards**: em cada item do tipo flashcards, o professor monta o deck
+    adicionando cards, importando planilha (frente;verso) ou **gerando com IA** a
+    partir do material (cards da IA entram como rascunho);
   - **contestações**: o professor revisa correções da IA e pode corrigir a nota.
 - **Área do aluno** (`/aluno`):
   - catálogo com cards "Em breve" e cadeado **"Renove para liberar"**;
@@ -31,7 +34,11 @@ Plataforma de estudos para graduação em Odontologia. Planejamento completo em
     priorizando questões não respondidas e as que o aluno errou;
   - **correção**: objetivas na hora (no banco); discursivas pela IA com nota por
     critério da rubrica, comentários e "faltou citar", em segundo plano;
-  - cota de **60 correções por IA/mês**, botão "Discorda da correção?".
+  - cota de **60 correções por IA/mês**, botão "Discorda da correção?";
+  - **flashcards com repetição espaçada** (SM-2): o aluno avalia cada card
+    (errei, difícil, bom, fácil) e ele volta no dia certo. "Revisão do dia" junta
+    todos os decks; o deck conta como concluído para o certificado quando todos os
+    cards foram vistos pelo menos uma vez.
 - **Regras de acesso** (janela de 12 meses de novidades e IA; acesso vitalício ao
   que já foi publicado) aplicadas **no banco** (RLS + `conteudo_item()`) e na interface.
 
@@ -39,13 +46,14 @@ Segurança do banco de questões: o aluno nunca lê gabarito, explicação ou ru
 antes de enviar o simulado, e não consegue gravar a própria nota — objetivas são
 corrigidas por função do banco e discursivas pelo servidor com a chave secreta.
 
-Ainda não existe: pagamento Stripe, flashcards, emissão do PDF do certificado e dashboard.
+Ainda não existe: pagamento Stripe, emissão do PDF do certificado e dashboard.
 
 ## Configuração
 
 1. Crie um projeto em [supabase.com](https://supabase.com).
 2. No **SQL Editor**, rode os arquivos de `supabase/migrations/` em ordem
-   (`0001_base.sql`, `0002_questoes_simulados.sql`, `0003_geracao_questoes.sql`),
+   (`0001_base.sql`, `0002_questoes_simulados.sql`, `0003_geracao_questoes.sql`,
+   `0004_flashcards.sql`),
    ou `supabase db push` com a CLI. A 0003 cria o bucket privado `materiais` no Storage.
 3. Copie `.env.example` para `.env.local` e preencha:
    - URL e chave *publishable* do Supabase (**Project Settings → API Keys**);
@@ -105,6 +113,7 @@ src/lib/catalogo.ts      Monta o catálogo do aluno com cadeados e progresso
 src/lib/ia/              Correção por IA: prompt, rubrica → nota, cota, chamada à API
 src/lib/ia/geracao/      Geração de questões: leitura do material, prompt, lote e importação
 src/lib/questoes/        Validação de questões e importação CSV
+src/lib/flashcards/      Repetição espaçada, importação de cards e sessão de estudo
 src/app/admin/           Backoffice
 src/app/aluno/           Área do aluno
 ```

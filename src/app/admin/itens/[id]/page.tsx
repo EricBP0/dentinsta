@@ -4,6 +4,7 @@ import { botaoPrimario, campo, Rotulo } from "@/components/admin-ui";
 import { exigirEquipe } from "@/lib/auth";
 import { isoParaLocal } from "@/lib/datas";
 import { COLUNAS_ITEM, NOME_TIPO_ITEM, type ConfigItem, type Item } from "@/lib/tipos";
+import { GerenciarCards } from "../../flashcards/gerenciar-cards";
 import { salvarItem } from "../../actions";
 
 export default async function AdminItem({ params }: PageProps<"/admin/itens/[id]">) {
@@ -73,7 +74,8 @@ export default async function AdminItem({ params }: PageProps<"/admin/itens/[id]
 
         {item.tipo === "flashcards" && (
           <p className="rounded-lg bg-slate-50 p-3 text-sm text-slate-600">
-            O cadastro dos cards chega na etapa de flashcards.
+            Os cards deste deck ficam logo abaixo. O deck conta como concluído quando o aluno revisa todos os cards
+            publicados pelo menos uma vez.
           </p>
         )}
 
@@ -97,6 +99,8 @@ export default async function AdminItem({ params }: PageProps<"/admin/itens/[id]
           <button className={botaoPrimario}>Salvar item</button>
         </div>
       </form>
+
+      {item.tipo === "flashcards" && <GerenciarCards itemId={item.id} />}
     </div>
   );
 }

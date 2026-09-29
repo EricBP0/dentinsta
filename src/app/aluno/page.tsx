@@ -3,10 +3,15 @@ import { BarraProgresso, BotaoRenovar } from "@/components/cadeado";
 import { iaAtiva } from "@/lib/acesso";
 import { exigirLogin } from "@/lib/auth";
 import { carregarCatalogo, formatarData } from "@/lib/catalogo";
+import { carregarResumo } from "@/lib/flashcards/sessao";
 
 export default async function Catalogo() {
   const { supabase, perfil } = await exigirLogin();
-  const { acesso, disciplinas } = await carregarCatalogo(supabase, perfil);
+  const [{ acesso, disciplinas }, resumoFlashcards] = await Promise.all([
+    carregarCatalogo(supabase, perfil),
+    carregarResumo(supabase),
+  ]);
+  const flashcardsParaRevisar = resumoFlashcards.reduce((soma, r) => soma + r.vencidos, 0);
   const equipe = perfil.papel !== "aluno";
 
   const itensBloqueados = disciplinas
@@ -35,6 +40,18 @@ export default async function Catalogo() {
               <BotaoRenovar texto="Renove para usar a IA" />
             )}
           </div>
+        )}
+
+        {flashcardsParaRevisar > 0 && (
+          <Link
+            href="/aluno/flashcards?estudar=1"
+            className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-sky-200 bg-sky-50 p-4 text-sm text-sky-900 hover:bg-sky-100"
+          >
+            <span>
+              🧠 {flashcardsParaRevisar} {flashcardsParaRevisar === 1 ? "flashcard" : "flashcards"} para revisar hoje
+            </span>
+            <span className="font-medium">Revisar →</span>
+          </Link>
         )}
 
         {itensBloqueados > 0 && (

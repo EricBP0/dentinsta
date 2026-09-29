@@ -22,9 +22,12 @@ function nomeSeguro(nome: string) {
 export function FormularioGeracao({
   disciplinas,
   disciplinaPadrao,
+  deck,
 }: {
   disciplinas: { id: string; nome: string }[];
   disciplinaPadrao?: string;
+  /** Quando informado, gera flashcards para este deck em vez de questões. */
+  deck?: { id: string; titulo: string };
 }) {
   const router = useRouter();
   const [arquivos, setArquivos] = useState<File[]>([]);
@@ -57,12 +60,15 @@ export function FormularioGeracao({
 
       setEtapa("Enviando para a IA…");
       const resultado = await criarGeracao({
+        alvo: deck ? "flashcards" : "questoes",
+        itemId: deck?.id,
+        cards: Number(form.get("cards")),
         disciplinaId: String(form.get("disciplina_id") ?? ""),
         tipoMaterial: form.get("tipo_material") === "prova" ? "prova" : "conteudo",
         arquivos: enviados,
         texto: String(form.get("texto") ?? ""),
-        objetivas: Number(form.get("objetivas")),
-        discursivas: Number(form.get("discursivas")),
+        objetivas: Number(form.get("objetivas") ?? 0),
+        discursivas: Number(form.get("discursivas") ?? 0),
         dificuldade: form.get("dificuldade") ? Number(form.get("dificuldade")) : null,
         tema: String(form.get("tema") ?? ""),
         instrucoes: String(form.get("instrucoes") ?? ""),
@@ -78,14 +84,20 @@ export function FormularioGeracao({
   return (
     <form onSubmit={enviar} className="space-y-5 rounded-xl border border-slate-200 bg-white p-6">
       <div className="grid gap-4 sm:grid-cols-2">
-        <Rotulo texto="Disciplina">
-          <select name="disciplina_id" defaultValue={disciplinaPadrao ?? ""} required className={campo}>
-            <option value="">Escolha…</option>
-            {disciplinas.map((d) => (
-              <option key={d.id} value={d.id}>{d.nome}</option>
-            ))}
-          </select>
-        </Rotulo>
+        {deck ? (
+          <Rotulo texto="Deck">
+            <p className={`${campo} bg-slate-50`}>{deck.titulo}</p>
+          </Rotulo>
+        ) : (
+          <Rotulo texto="Disciplina">
+            <select name="disciplina_id" defaultValue={disciplinaPadrao ?? ""} required className={campo}>
+              <option value="">Escolha…</option>
+              {disciplinas.map((d) => (
+                <option key={d.id} value={d.id}>{d.nome}</option>
+              ))}
+            </select>
+          </Rotulo>
+        )}
         <Rotulo texto="O que é este material?">
           <select name="tipo_material" defaultValue="conteudo" className={campo}>
             <option value="conteudo">Conteúdo (livro, apostila, aula, resumo)</option>
@@ -117,25 +129,36 @@ export function FormularioGeracao({
         <textarea name="texto" rows={5} className={campo} />
       </Rotulo>
 
-      <div className="grid gap-4 sm:grid-cols-4">
-        <Rotulo texto="Objetivas">
-          <input name="objetivas" type="number" min={0} max={30} defaultValue={10} className={campo} />
-        </Rotulo>
-        <Rotulo texto="Discursivas">
-          <input name="discursivas" type="number" min={0} max={10} defaultValue={2} className={campo} />
-        </Rotulo>
-        <Rotulo texto="Dificuldade">
-          <select name="dificuldade" className={campo}>
-            <option value="">Variada</option>
-            <option value="1">Fácil</option>
-            <option value="2">Média</option>
-            <option value="3">Difícil</option>
-          </select>
-        </Rotulo>
-        <Rotulo texto="Tema (opcional)">
-          <input name="tema" placeholder="Ex.: Irrigação" className={campo} />
-        </Rotulo>
-      </div>
+      {deck ? (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Rotulo texto="Quantidade de cards">
+            <input name="cards" type="number" min={1} max={60} defaultValue={20} className={campo} />
+          </Rotulo>
+          <Rotulo texto="Tema (opcional)">
+            <input name="tema" placeholder="Ex.: Irrigação" className={campo} />
+          </Rotulo>
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-4">
+          <Rotulo texto="Objetivas">
+            <input name="objetivas" type="number" min={0} max={30} defaultValue={10} className={campo} />
+          </Rotulo>
+          <Rotulo texto="Discursivas">
+            <input name="discursivas" type="number" min={0} max={10} defaultValue={2} className={campo} />
+          </Rotulo>
+          <Rotulo texto="Dificuldade">
+            <select name="dificuldade" className={campo}>
+              <option value="">Variada</option>
+              <option value="1">Fácil</option>
+              <option value="2">Média</option>
+              <option value="3">Difícil</option>
+            </select>
+          </Rotulo>
+          <Rotulo texto="Tema (opcional)">
+            <input name="tema" placeholder="Ex.: Irrigação" className={campo} />
+          </Rotulo>
+        </div>
+      )}
 
       <Rotulo texto="Orientações para a IA (opcional)" dica='Ex.: "Priorize casos clínicos", "Cobre as indicações e contraindicações".'>
         <textarea name="instrucoes" rows={2} maxLength={2000} className={campo} />
@@ -143,12 +166,12 @@ export function FormularioGeracao({
 
       <div className="flex flex-wrap items-center gap-3">
         <button disabled={etapa !== null} className={`${botaoPrimario} disabled:opacity-60`}>
-          {etapa ?? "Gerar questões"}
+          {etapa ?? (deck ? "Gerar flashcards" : "Gerar questões")}
         </button>
         {erro && <p className="text-sm text-red-600">{erro}</p>}
       </div>
       <p className="text-xs text-slate-500">
-        A geração roda em lote (metade do custo) e costuma levar de alguns minutos até 1 hora. As questões entram
+        A geração roda em lote (metade do custo) e costuma levar de alguns minutos até 1 hora. O que a IA criar entra
         como rascunho para você revisar antes de liberar.
       </p>
     </form>

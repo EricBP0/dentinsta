@@ -4,10 +4,13 @@ import { z } from "zod";
 import { rubricaParaTexto, validarQuestao, type QuestaoNova } from "@/lib/questoes/questao";
 
 export const MAX_QUESTOES_POR_GERACAO = 30;
+export const MAX_CARDS_POR_GERACAO = 60;
 
 export type ConfigGeracao = {
   objetivas: number;
   discursivas: number;
+  /** Só quando a geração é de flashcards. */
+  cards?: number;
   dificuldade: 1 | 2 | 3 | null; // null = variada
   tema: string;
   instrucoes: string;
@@ -121,4 +124,55 @@ export function converterQuestoesGeradas(geradas: QuestaoGerada[]): {
     }
   }
   return { questoes, descartadas };
+}
+
+// -----------------------------------------------------------------------------
+// Flashcards
+// -----------------------------------------------------------------------------
+
+export const SaidaFlashcardsSchema = z.object({
+  cards: z.array(z.object({ frente: z.string(), verso: z.string(), fonte: z.string() })),
+  observacoes: z.string(),
+});
+
+export const INSTRUCOES_FLASHCARDS = `Você é professor de uma faculdade de Odontologia no Brasil e cria flashcards de revisão para alunos da graduação, a partir do material enviado pelo professor responsável.
+
+Regras:
+- Baseie cada card no material enviado. Não invente conteúdo que não esteja nele; se o material não render a quantidade pedida, crie menos e explique em "observacoes".
+- Um conceito por card. Frente: uma pergunta direta ou um termo a definir (até ~20 palavras). Verso: a resposta objetiva (até ~50 palavras), só o essencial para memorizar.
+- Priorize o que costuma cair em prova: definições, classificações, indicações e contraindicações, valores de referência, sequências de técnica, diferenças entre conceitos parecidos.
+- Frente e verso precisam fazer sentido sozinhos, sem depender de outros cards ("qual a segunda etapa?" não serve).
+- Precisão clínica e científica acima de tudo. Terminologia técnica da Odontologia em português do Brasil. Não copie frases longas do material.
+- Não repita cards que já existem no deck (lista enviada) nem crie dois cards sobre o mesmo ponto.
+- Em "fonte", indique onde o card se apoia no material (ex.: "Apostila, p. 12").`;
+
+export function montarPedidoFlashcards(params: {
+  disciplina: string;
+  deck: string;
+  tipoMaterial: TipoMaterial;
+  config: ConfigGeracao;
+  frentesExistentes: string[];
+}): string {
+  const { config } = params;
+  const partes = [
+    `Disciplina: ${params.disciplina}. Deck: ${params.deck}.`,
+    `Crie ${config.cards ?? 20} flashcards a partir do material acima.`,
+  ];
+  if (config.tema) partes.push(`Foque no tema: ${config.tema}.`);
+  if (params.tipoMaterial === "prova") {
+    partes.push(
+      "O material é uma prova antiga: use-a só para identificar os assuntos cobrados e crie cards sobre esses assuntos, sem copiar as questões.",
+    );
+  }
+  if (config.instrucoes) {
+    partes.push(`Orientações do professor:\n<orientacoes>\n${config.instrucoes}\n</orientacoes>`);
+  }
+  if (params.frentesExistentes.length) {
+    partes.push(
+      `Cards que já existem no deck (não repita):\n<existentes>\n${params.frentesExistentes
+        .map((f) => `- ${f}`)
+        .join("\n")}\n</existentes>`,
+    );
+  }
+  return partes.join("\n\n");
 }

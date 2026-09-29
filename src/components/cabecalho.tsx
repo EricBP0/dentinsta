@@ -6,6 +6,7 @@ const MENU = {
   aluno: [
     { href: "/aluno", texto: "Disciplinas" },
     { href: "/aluno/simulados", texto: "Simulados" },
+    { href: "/aluno/flashcards", texto: "Flashcards" },
   ],
   admin: [
     { href: "/admin", texto: "Disciplinas" },
