@@ -16,8 +16,10 @@ com nota e comentários.
 | Público | Graduação em Odontologia |
 | Conteúdo | Produzido e publicado pelo sócio dentista, **100% via backoffice** |
 | Disciplinas | **Dinâmicas** — criadas e publicadas pelo backoffice, sem depender de dev |
-| Monetização | **Pagamento único**: R$ 297,90 à vista ou **12x de R$ 32,90** (R$ 394,80) |
+| Monetização | **Pagamento único**: R$ 297,90 à vista ou **12x de R$ 32,90 sem juros** (R$ 394,80, taxas embutidas) |
 | Acesso | **Vitalício** ao que foi publicado até 12 meses após a compra; **novidades e IA por 12 meses** |
+| Após a janela | Conteúdo novo aparece com cadeado **"Renove para liberar"** |
+| Cota de IA | **60 correções discursivas/mês** por aluno |
 | Gateway | **Stripe** (cartão parcelado, Pix, boleto) |
 | Certificado | Emitido ao concluir **100% dos itens marcados como obrigatórios** |
 | Escopo do MVP | Inclui vídeos, mapas mentais, flashcards e certificados |
@@ -110,8 +112,25 @@ Se só as 8 videoaulas forem obrigatórias, assistir às 8 já emite o certifica
 
 ### 4.1 Oferta
 - **Um único produto**: acesso à plataforma.
-- **À vista (Pix ou cartão 1x): R$ 297,90**
-- **Parcelado: 12x de R$ 32,90** no cartão (total R$ 394,80)
+- **À vista (Pix ou cartão 1x): R$ 297,90** ← preço real do produto
+- **Parcelado: 12x de R$ 32,90 sem juros** no cartão (total R$ 394,80)
+
+A diferença (R$ 96,90, ~32,5%) cobre as taxas do parcelamento e da antecipação.
+Para o aluno, a comunicação é **"à vista com desconto"**. Cobrar preços diferentes
+por forma de pagamento é permitido (Lei 13.455/2017), desde que os dois preços
+estejam claros na página de venda.
+
+**Como fica no Stripe:** o Checkout cobra um valor fixo por sessão, então a
+escolha acontece **na nossa página de venda, antes do checkout**:
+
+| Botão na página | Sessão de Checkout |
+|---|---|
+| "À vista R$ 297,90" | valor 297,90 · Pix + cartão · **sem** parcelamento |
+| "12x de R$ 32,90" | valor 394,80 · só cartão · **parcelamento ativado** |
+
+Verificar com a Stripe: se é possível **fixar só a opção de 12x** (senão o
+aluno do parcelado pode escolher menos parcelas, pagando os mesmos R$ 394,80) e
+se a diferença cobre de fato as taxas.
 
 ### 4.1.1 Regra de acesso
 
@@ -121,7 +140,7 @@ A partir da data do pagamento (`compra_em`), o aluno tem uma janela de
 | | Durante os 12 meses | Depois dos 12 meses |
 |---|---|---|
 | Conteúdo publicado **até** `novidades_ate` | ✅ | ✅ **vitalício** |
-| Conteúdo publicado **depois** de `novidades_ate` | — | ❌ não aparece (ou aparece com cadeado "renove para liberar") |
+| Conteúdo publicado **depois** de `novidades_ate` | — | 🔒 aparece com cadeado **"Renove para liberar"** |
 | IA (gerar simulados, correção discursiva) | ✅ | ❌ |
 | Flashcards, provas objetivas do banco, dashboard, certificados | ✅ | ✅ (não custam IA) |
 
@@ -132,8 +151,22 @@ A partir da data do pagamento (`compra_em`), o aluno tem uma janela de
   (não mudam `primeira_publicacao_em`).
 - **Certificado depois da janela**: calculado só sobre os itens obrigatórios que
   o aluno enxerga — senão ele nunca conseguiria completar.
-- **Renovação** (sugestão): oferta "Renove novidades + IA por mais 12 meses"
-  com preço menor — vira receita recorrente sem mudar o modelo de venda.
+- **Renovação**: oferta "Renove novidades + IA por mais 12 meses" com preço
+  menor — vira receita recorrente sem mudar o modelo de venda.
+
+### 4.1.2 "Renove para liberar" (vitrine)
+
+Conteúdo publicado depois da janela **aparece**, mas bloqueado — funciona como
+vitrine para a renovação.
+
+- **Catálogo**: disciplina nova aparece com selo **🔒 Novo** e botão "Renove para liberar".
+- **Dentro de disciplina que o aluno já tem**: módulos/itens novos aparecem na
+  lista com cadeado, título visível e conteúdo bloqueado.
+- **IA**: botões de gerar simulado / enviar discursiva mostram "Renove para usar a IA".
+- **Contador** no dashboard: "12 novas aulas e 2 disciplinas desde o seu acesso".
+- Clique em qualquer cadeado → página de renovação (Stripe Checkout).
+- **Avisos antes do fim da janela**: e-mail e banner 30 dias e 7 dias antes.
+- Itens bloqueados **não contam** para o certificado (seção 3).
 
 ### 4.2 Implementação
 - **Stripe Checkout** (página de pagamento hospedada pela Stripe — menos código,
@@ -235,7 +268,7 @@ para algo que pode ser feito uma vez e reaproveitado por todos os alunos.
   corrigidas pelo sócio, comparando modelos maiores e menores (e níveis de
   "effort"). Ficar com o mais barato que concorde com a nota do professor.
 - **Não corrigir de novo** a mesma resposta (resultado salvo).
-- **Cota por aluno** (ex.: 60 correções discursivas/mês), exibida no dashboard.
+- **Cota por aluno: 60 correções discursivas/mês**, exibida no dashboard.
 - **Painel de custo** no backoffice: gasto de IA por dia e por aluno, alerta se
   alguém fugir do padrão.
 
@@ -367,10 +400,8 @@ sócio já começa a cadastrar conteúdo real enquanto o resto é desenvolvido.
 ## 10. Pendências de decisão
 
 - [ ] **Nome e domínio**
-- [ ] Parcelado com ou sem juros para o aluno (quem absorve a taxa da Stripe)
-- [ ] Conteúdo novo após a janela: **esconder** ou **mostrar com cadeado** (vitrine para renovação)?
-- [ ] Oferta de **renovação** (novidades + IA por mais 12 meses) e preço
-- [ ] Cota mensal de correções discursivas por aluno
+- [ ] **Preço da renovação** (novidades + IA por mais 12 meses) — à vista e parcelado
+- [ ] Confirmar com a Stripe: taxas do parcelamento e se dá para oferecer só 12x
 - [ ] Nota mínima padrão para provas obrigatórias (ou só exigir envio)
 - [ ] **Disciplinas do lançamento**
 - [ ] Ferramenta para os mapas mentais (Xmind, Whimsical, Canva…)
