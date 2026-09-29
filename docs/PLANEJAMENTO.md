@@ -16,7 +16,8 @@ com nota e comentários.
 | Público | Graduação em Odontologia |
 | Conteúdo | Produzido e publicado pelo sócio dentista, **100% via backoffice** |
 | Disciplinas | **Dinâmicas** — criadas e publicadas pelo backoffice, sem depender de dev |
-| Monetização | **Pagamento único**, parcelável em **até 12x de R$ 32,90** |
+| Monetização | **Pagamento único**: R$ 297,90 à vista ou **12x de R$ 32,90** (R$ 394,80) |
+| Acesso | **Vitalício** ao que foi publicado até 12 meses após a compra; **novidades e IA por 12 meses** |
 | Gateway | **Stripe** (cartão parcelado, Pix, boleto) |
 | Certificado | Emitido ao concluir **100% dos itens marcados como obrigatórios** |
 | Escopo do MVP | Inclui vídeos, mapas mentais, flashcards e certificados |
@@ -109,8 +110,30 @@ Se só as 8 videoaulas forem obrigatórias, assistir às 8 já emite o certifica
 
 ### 4.1 Oferta
 - **Um único produto**: acesso à plataforma.
-- **Até 12x de R$ 32,90** no cartão (total R$ 394,80).
-- **À vista (Pix ou cartão 1x) com desconto** — valor a definir.
+- **À vista (Pix ou cartão 1x): R$ 297,90**
+- **Parcelado: 12x de R$ 32,90** no cartão (total R$ 394,80)
+
+### 4.1.1 Regra de acesso
+
+A partir da data do pagamento (`compra_em`), o aluno tem uma janela de
+**12 meses** (`novidades_ate = compra_em + 12 meses`):
+
+| | Durante os 12 meses | Depois dos 12 meses |
+|---|---|---|
+| Conteúdo publicado **até** `novidades_ate` | ✅ | ✅ **vitalício** |
+| Conteúdo publicado **depois** de `novidades_ate` | — | ❌ não aparece (ou aparece com cadeado "renove para liberar") |
+| IA (gerar simulados, correção discursiva) | ✅ | ❌ |
+| Flashcards, provas objetivas do banco, dashboard, certificados | ✅ | ✅ (não custam IA) |
+
+- A regra vale **por item**, usando a data da **primeira publicação**
+  (`primeira_publicacao_em`). Assim: disciplina antiga que ganhou um módulo novo
+  depois da janela → o aluno vê a disciplina, mas não o módulo novo.
+- **Correções/edições** de um item que o aluno já tinha **continuam visíveis**
+  (não mudam `primeira_publicacao_em`).
+- **Certificado depois da janela**: calculado só sobre os itens obrigatórios que
+  o aluno enxerga — senão ele nunca conseguiria completar.
+- **Renovação** (sugestão): oferta "Renove novidades + IA por mais 12 meses"
+  com preço menor — vira receita recorrente sem mudar o modelo de venda.
 
 ### 4.2 Implementação
 - **Stripe Checkout** (página de pagamento hospedada pela Stripe — menos código,
@@ -189,9 +212,50 @@ Se só as 8 videoaulas forem obrigatórias, assistir às 8 já emite o certifica
   anotações no texto do aluno e o que faltou citar.
 - Toda correção pode ser **contestada** → backoffice → melhora rubrica/prompt.
 
-### 6.3 Custos
-- Limite de simulados/correções por dia por aluno.
-- Reaproveitar questões geradas e aprovadas entre alunos.
+### 6.3 Estratégia para a IA custar pouco
+
+A regra de ouro: **só chamar a IA quando não há outro jeito**, e nunca em tempo real
+para algo que pode ser feito uma vez e reaproveitado por todos os alunos.
+
+| Funcionalidade | Usa IA em tempo real? | Como |
+|---|---|---|
+| Montar simulado | **Não** | Seleção inteligente do banco (tema, dificuldade, questões que o aluno errou, que ainda não viu). Custo zero. |
+| Gerar questões novas | **Não** (lote) | Feito no backoffice pelo sócio, via **Batch API (50% mais barato)**, revisado e salvo no banco. Custo único, usado por todos. |
+| Corrigir objetivas | **Não** | Comparação com gabarito. Custo zero. |
+| Corrigir discursivas | **Sim** | Única chamada em tempo real. Ver otimizações abaixo. |
+| Flashcards a partir dos erros (fase 2) | **Não** (lote) | Gerados em lote à noite, via Batch API. |
+
+**Otimizações na correção discursiva:**
+- **Prompt caching**: instruções + rubrica da questão ficam num prefixo fixo
+  cacheado; só a resposta do aluno muda. Leitura de cache custa uma fração do preço normal.
+- **Resposta curta e estruturada** (JSON: nota por critério + 2–4 comentários),
+  com `max_tokens` controlado.
+- **Limite de tamanho** da resposta do aluno (ex.: 1.500 caracteres).
+- **Modelo certo para a tarefa**: testar a correção num lote de ~50 respostas reais
+  corrigidas pelo sócio, comparando modelos maiores e menores (e níveis de
+  "effort"). Ficar com o mais barato que concorde com a nota do professor.
+- **Não corrigir de novo** a mesma resposta (resultado salvo).
+- **Cota por aluno** (ex.: 60 correções discursivas/mês), exibida no dashboard.
+- **Painel de custo** no backoffice: gasto de IA por dia e por aluno, alerta se
+  alguém fugir do padrão.
+
+**Ordem de grandeza** (estimativa, a validar com medição real): uma correção
+discursiva usa ~2.000 tokens de entrada e ~400 de saída. Com os preços de
+setembro/2026 da API da Anthropic, isso fica entre **menos de US$ 0,01** (Haiku 4.5
+/ Sonnet 5.5) e **~US$ 0,02–0,03** (Opus 5.5), antes do desconto do cache. Com cota de
+60 correções/mês, o pior caso por aluno fica entre **~R$ 2 e R$ 10/mês**, e a maioria
+dos alunos não usa a cota inteira.
+
+### 6.4 Estratégia para o servidor custar pouco
+- **Vídeo é o maior custo** — fica no provedor de vídeo (Panda), nunca no nosso servidor.
+- **Páginas de catálogo e conteúdo em cache** (geração estática/ISR + CDN):
+  o servidor só é chamado quando o conteúdo muda.
+- **Progresso em lote**: o player envia o progresso a cada 30s, não a cada segundo.
+- **Flashcards calculados no navegador** e sincronizados ao fim da sessão.
+- **PDFs gerados uma vez** (certificados) e guardados no storage.
+- **Sem servidor sempre ligado**: Vercel (serverless) + Supabase. Custo inicial
+  estimado de ~US$ 45/mês (planos pagos básicos), subindo só com o uso.
+- Trabalhos pesados (lotes de IA, e-mails) em **fila/cron**, fora da requisição do aluno.
 
 ---
 
@@ -221,7 +285,7 @@ disciplinas (id, slug, nome, descricao, capa_url, periodo_sugerido, carga_horari
              status[rascunho|em_breve|publicada|arquivada], publicar_em, ordem, criado_por)
 modulos     (id, disciplina_id, titulo, ordem, status, publicar_em)
 itens       (id, modulo_id, tipo[video|resumo|mapa_mental|flashcards|prova], titulo, ordem,
-             obrigatorio bool, status[rascunho|publicado], config_json)
+             obrigatorio bool, status[rascunho|publicado], primeira_publicacao_em, config_json)
   -- config_json por tipo:
   --   video:       { video_id, duracao_seg }
   --   resumo:      { conteudo_md, pdf_url }
@@ -232,7 +296,8 @@ itens       (id, modulo_id, tipo[video|resumo|mapa_mental|flashcards|prova], tit
 -- Acesso e pagamento
 compras  (id, usuario_id, stripe_checkout_id, stripe_payment_intent_id, metodo[cartao|pix|boleto],
           parcelas, valor_total, status[pendente|pago|reembolsado|contestado], criado_em)
-acessos  (usuario_id, inicio, fim?, origem[compra|manual|cortesia], compra_id?)
+acessos  (usuario_id, compra_em, novidades_ate, ia_ate, origem[compra|renovacao|manual|cortesia], compra_id?)
+  -- novidades_ate = ia_ate = compra_em + 12 meses (renovação estende as duas)
 
 -- Progresso
 progresso_item (usuario_id, item_id, percentual, concluido, concluido_em, atualizado_em)
@@ -255,13 +320,22 @@ flashcard_revisoes (usuario_id, flashcard_id, facilidade, intervalo_dias, repeti
 certificados (id, usuario_id, disciplina_id, codigo_validacao, carga_horaria_h, emitido_em, pdf_url)
 
 feedbacks (id, usuario_id, item_id?, tipo, mensagem, nota, criado_em)
+
+uso_ia (id, usuario_id, tipo[correcao|geracao_lote], modelo, tokens_entrada, tokens_saida,
+        tokens_cache, custo_usd, criado_em)          -- cota por aluno e painel de custo
+```
+
+**Visibilidade de um item para o aluno:**
+
+```
+item publicado e item.primeira_publicacao_em <= acesso.novidades_ate
 ```
 
 **Cálculo do certificado** (roda sempre que um item é concluído ou quando o
 backoffice altera itens obrigatórios):
 
 ```
-obrigatorios = itens publicados e obrigatórios da disciplina
+obrigatorios = itens publicados, obrigatórios e VISÍVEIS para o aluno
 concluidos   = progresso_item concluído do aluno nesses itens
 se concluidos == obrigatorios e não existe certificado → emite
 ```
@@ -293,21 +367,14 @@ sócio já começa a cadastrar conteúdo real enquanto o resto é desenvolvido.
 ## 10. Pendências de decisão
 
 - [ ] **Nome e domínio**
-- [ ] **Validade do acesso**: vitalício ou 12 meses? (ver nota abaixo)
-- [ ] **O pagamento único inclui disciplinas lançadas no futuro?**
-- [ ] **Preço à vista** (com desconto sobre R$ 394,80)
-- [ ] Parcelado com ou sem juros para o aluno
+- [ ] Parcelado com ou sem juros para o aluno (quem absorve a taxa da Stripe)
+- [ ] Conteúdo novo após a janela: **esconder** ou **mostrar com cadeado** (vitrine para renovação)?
+- [ ] Oferta de **renovação** (novidades + IA por mais 12 meses) e preço
+- [ ] Cota mensal de correções discursivas por aluno
 - [ ] Nota mínima padrão para provas obrigatórias (ou só exigir envio)
 - [ ] **Disciplinas do lançamento**
 - [ ] Ferramenta para os mapas mentais (Xmind, Whimsical, Canva…)
 - [ ] Termos de uso e política de privacidade (LGPD)
-
-> **Nota sobre validade do acesso:** com pagamento único e conteúdo sendo
-> adicionado continuamente, acesso **vitalício a tudo** gera custo recorrente
-> (vídeo, IA, servidor) sem receita recorrente. Sugestão: **acesso de 12 meses a
-> todas as disciplinas publicadas no período** (casa com o 12x) e renovação com
-> desconto — ou vitalício ao conteúdo, mas com a IA (simulados/correção) limitada
-> a 12 meses.
 
 ---
 
