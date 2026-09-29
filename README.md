@@ -3,7 +3,7 @@
 Plataforma de estudos para graduação em Odontologia. Planejamento completo em
 [`docs/PLANEJAMENTO.md`](docs/PLANEJAMENTO.md).
 
-**Stack:** Next.js 16 (App Router) · Supabase (Postgres, Auth, RLS) · Tailwind CSS 4 · Vitest
+**Stack:** Next.js 16 (App Router) · Supabase (Postgres, Auth, RLS) · API da Anthropic (Claude) · Tailwind CSS 4 · Vitest
 
 ## O que já existe
 
@@ -12,24 +12,40 @@ Plataforma de estudos para graduação em Odontologia. Planejamento completo em
 - **Backoffice** (`/admin`, só `professor` e `admin`):
   - disciplinas dinâmicas: rascunho → em breve → publicada → arquivada, com agendamento;
   - módulos e itens (vídeo, resumo, mapa mental, flashcards, prova) com ordem,
-    publicação e marcação de **obrigatório**.
+    publicação e marcação de **obrigatório**;
+  - **banco de questões** (objetivas e discursivas com gabarito, explicação e
+    rubrica), com cadastro manual e **importação por planilha CSV**
+    ([modelo](public/modelo-questoes.csv));
+  - **contestações**: o professor revisa correções da IA e pode corrigir a nota.
 - **Área do aluno** (`/aluno`):
   - catálogo com cards "Em breve" e cadeado **"Renove para liberar"**;
   - disciplina com progresso "X de Y itens obrigatórios";
-  - visualização de vídeo, resumo e mapa mental, e "marcar como concluído".
+  - visualização de vídeo, resumo e mapa mental, e "marcar como concluído";
+  - **simulados** montados do banco, sem IA: filtros de tema, dificuldade e tipo,
+    priorizando questões não respondidas e as que o aluno errou;
+  - **correção**: objetivas na hora (no banco); discursivas pela IA com nota por
+    critério da rubrica, comentários e "faltou citar", em segundo plano;
+  - cota de **60 correções por IA/mês**, botão "Discorda da correção?".
 - **Regras de acesso** (janela de 12 meses de novidades e IA; acesso vitalício ao
   que já foi publicado) aplicadas **no banco** (RLS + `conteudo_item()`) e na interface.
 
-Ainda não existe: pagamento Stripe, questões e simulados com IA, flashcards,
-emissão do PDF do certificado e dashboard. Essas são as próximas etapas do roadmap.
+Segurança do banco de questões: o aluno nunca lê gabarito, explicação ou rubrica
+antes de enviar o simulado, e não consegue gravar a própria nota — objetivas são
+corrigidas por função do banco e discursivas pelo servidor com a chave secreta.
+
+Ainda não existe: pagamento Stripe, geração de questões por IA (em lote, no
+backoffice), flashcards, emissão do PDF do certificado e dashboard.
 
 ## Configuração
 
 1. Crie um projeto em [supabase.com](https://supabase.com).
-2. No **SQL Editor**, rode `supabase/migrations/0001_base.sql`
-   (ou `supabase db push` com a CLI).
-3. Copie `.env.example` para `.env.local` e preencha com a URL e a chave
-   *publishable* (ou *anon*) do projeto (**Project Settings → API**).
+2. No **SQL Editor**, rode os arquivos de `supabase/migrations/` em ordem
+   (`0001_base.sql`, `0002_questoes_simulados.sql`), ou `supabase db push` com a CLI.
+3. Copie `.env.example` para `.env.local` e preencha:
+   - URL e chave *publishable* do Supabase (**Project Settings → API Keys**);
+   - chave *secret* do Supabase (só no servidor — grava as notas da IA);
+   - `ANTHROPIC_API_KEY` ([console.anthropic.com](https://console.anthropic.com)).
+   `IA_MODELO`, `IA_EFFORT` e `IA_COTA_MENSAL` são opcionais.
 4. Instale e rode:
 
    ```bash
@@ -61,7 +77,15 @@ emissão do PDF do certificado e dashboard. Essas são as próximas etapas do ro
 | `npm run build` | Build de produção |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | Checagem de tipos |
-| `npm test` | Testes unitários (regras de acesso, certificado, datas) |
+| `npm test` | Testes unitários (acesso, certificado, datas, correção, CSV) |
+
+## Correção por IA: calibrar antes de lançar
+
+O modelo e o esforço da correção são configuráveis (`IA_MODELO`, `IA_EFFORT`;
+padrão `claude-opus-5-5` com esforço `low`). Antes do lançamento, corrija ~50
+respostas reais com o professor, rode as mesmas com a IA e compare as notas
+(docs/PLANEJAMENTO.md, seção 6.3). Ajuste rubricas e configuração até as notas
+ficarem próximas. O consumo de tokens de cada correção fica na tabela `uso_ia`.
 
 ## Estrutura
 
@@ -71,6 +95,8 @@ src/proxy.ts             Renova a sessão e protege /aluno e /admin
 src/lib/acesso.ts        Janela de 12 meses (espelha pode_acessar_item() no SQL)
 src/lib/certificado.ts   Regra "100% dos itens obrigatórios"
 src/lib/catalogo.ts      Monta o catálogo do aluno com cadeados e progresso
+src/lib/ia/              Correção por IA: prompt, rubrica → nota, cota, chamada à API
+src/lib/questoes/        Validação de questões e importação CSV
 src/app/admin/           Backoffice
 src/app/aluno/           Área do aluno
 ```
