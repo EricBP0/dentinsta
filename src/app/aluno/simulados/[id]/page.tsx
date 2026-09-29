@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Feedback } from "@/lib/ia/rubrica";
+import { Confete, NumeroAnimado } from "@/components/movimento";
 import { exigirLogin } from "@/lib/auth";
 import type { Alternativa } from "@/lib/questoes/questao";
 import { contestar, enviarSimulado, tentarCorrigirDeNovo } from "../actions";
@@ -138,9 +139,14 @@ async function Resultado({ simulado }: { simulado: Simulado }) {
         </div>
         <div className="text-right">
           {simulado.nota !== null ? (
-            <p className={`text-4xl font-bold ${Number(simulado.nota) >= 6 ? "text-teal-700" : "text-red-600"}`}>
-              {Number(simulado.nota).toFixed(1)}
-            </p>
+            <div className="relative">
+              {/* Comemoração para nota a partir de 7 */}
+              {Number(simulado.nota) >= 7 && <Confete />}
+              <p className={`text-4xl font-bold ${Number(simulado.nota) >= 6 ? "text-teal-700" : "text-red-600"}`}>
+                <NumeroAnimado valor={Number(simulado.nota)} />
+              </p>
+              {Number(simulado.nota) >= 7 && <p className="text-xs font-medium text-teal-700">Mandou bem!</p>}
+            </div>
           ) : (
             <p className="text-sm text-slate-500">Nota final após a correção</p>
           )}

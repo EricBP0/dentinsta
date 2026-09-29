@@ -1,7 +1,9 @@
 "use client";
 
+import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
+import { Confete } from "@/components/movimento";
 import { rotuloIntervalo, type Avaliacao } from "@/lib/flashcards/repeticao";
 import type { CardSessao } from "@/lib/flashcards/sessao";
 import { registrarRevisao } from "./actions";
@@ -62,7 +64,12 @@ export function SessaoEstudo({ cards, nomesDecks }: { cards: CardSessao[]; nomes
 
   if (!atual) {
     return (
-      <div className="space-y-3 rounded-xl border border-teal-200 bg-teal-50 p-8 text-center">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="relative space-y-3 rounded-xl border border-teal-200 bg-teal-50 p-8 text-center"
+      >
+        {revisados > 0 && <Confete />}
         <p className="text-2xl">🎉</p>
         <p className="font-medium text-teal-900">
           {revisados > 0 ? `Sessão concluída: ${revisados} revisões.` : "Nada para revisar agora."}
@@ -72,7 +79,7 @@ export function SessaoEstudo({ cards, nomesDecks }: { cards: CardSessao[]; nomes
         <button onClick={() => router.refresh()} className="text-sm font-medium text-teal-700 underline">
           Atualizar
         </button>
-      </div>
+      </motion.div>
     );
   }
 
@@ -86,17 +93,48 @@ export function SessaoEstudo({ cards, nomesDecks }: { cards: CardSessao[]; nomes
         {nomesDecks?.[atual.item_id] && <span>{nomesDecks[atual.item_id]}</span>}
       </div>
 
-      <div className="min-h-64 space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-10">
-        <p className="whitespace-pre-wrap text-center text-lg font-medium text-slate-900">{atual.frente}</p>
-        {mostrandoVerso && (
-          <div className="space-y-4 border-t border-slate-100 pt-6">
-            <p className="whitespace-pre-wrap text-center text-slate-800">{atual.verso}</p>
-            {atual.imagem_url && (
-              // eslint-disable-next-line @next/next/no-img-element -- imagem de origem externa configurável
-              <img src={atual.imagem_url} alt="" className="mx-auto max-h-80 rounded-lg" />
-            )}
-          </div>
-        )}
+      <div style={{ perspective: 1200 }}>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            // A chave muda a cada revisão: o card sai para a esquerda e o próximo entra pela direita.
+            key={`${atual.id}-${revisados}`}
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -40 }}
+            transition={{ duration: 0.2 }}
+          >
+            <motion.button
+              type="button"
+              onClick={() => setMostrandoVerso(true)}
+              disabled={mostrandoVerso}
+              aria-label={mostrandoVerso ? "Resposta" : "Mostrar resposta"}
+              animate={{ rotateY: mostrandoVerso ? 180 : 0 }}
+              transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+              className="grid w-full text-left [&>*]:[grid-area:1/1]"
+              style={{ transformStyle: "preserve-3d" }}
+            >
+              {/* frente */}
+              <div
+                className="flex min-h-64 items-center justify-center rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-10"
+                style={{ backfaceVisibility: "hidden" }}
+              >
+                <p className="whitespace-pre-wrap text-center text-lg font-medium text-slate-900">{atual.frente}</p>
+              </div>
+              {/* verso */}
+              <div
+                className="flex min-h-64 flex-col justify-center gap-4 rounded-2xl border border-teal-200 bg-gradient-to-br from-white to-teal-50 p-6 shadow-sm sm:p-10"
+                style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+              >
+                <p className="whitespace-pre-wrap text-center text-sm text-slate-500">{atual.frente}</p>
+                <p className="whitespace-pre-wrap text-center text-lg text-slate-900">{atual.verso}</p>
+                {atual.imagem_url && (
+                  // eslint-disable-next-line @next/next/no-img-element -- imagem de origem externa configurável
+                  <img src={atual.imagem_url} alt="" className="mx-auto max-h-80 rounded-lg" />
+                )}
+              </div>
+            </motion.button>
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       {mostrandoVerso ? (
@@ -123,7 +161,7 @@ export function SessaoEstudo({ cards, nomesDecks }: { cards: CardSessao[]; nomes
       )}
       {erro && <p className="text-center text-sm text-red-600">{erro}</p>}
       <p className="hidden text-center text-xs text-slate-400 sm:block">
-        Atalhos: espaço mostra a resposta · 1 a 4 avaliam
+        Toque no card ou aperte espaço para ver a resposta · 1 a 4 avaliam
       </p>
     </div>
   );

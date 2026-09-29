@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AtualizarPeriodicamente } from "@/components/atualizar-periodicamente";
+import { Confete, Movimento } from "@/components/movimento";
 import { exigirLogin } from "@/lib/auth";
 
 type Compra = { id: string; status: string; tipo: "compra" | "renovacao" };
@@ -24,8 +25,11 @@ export default async function PagamentoConcluido({ searchParams }: PageProps<"/p
   return (
     <main className="mx-auto flex w-full max-w-lg flex-1 flex-col items-center justify-center gap-4 px-4 py-16 text-center">
       {pago ? (
-        <>
-          <p className="text-4xl">🎉</p>
+        <Movimento>
+          <div className="relative">
+            <Confete quantidade={40} />
+            <p className="text-4xl">🎉</p>
+          </div>
           <h1 className="text-2xl font-bold text-slate-900">
             {compra.tipo === "renovacao" ? "Renovação confirmada!" : "Pagamento confirmado!"}
           </h1>
@@ -33,7 +37,7 @@ export default async function PagamentoConcluido({ searchParams }: PageProps<"/p
           <Link href="/aluno" className="rounded-lg bg-teal-700 px-6 py-3 font-medium text-white hover:bg-teal-800">
             Começar a estudar
           </Link>
-        </>
+        </Movimento>
       ) : pendente ? (
         <>
           <h1 className="text-2xl font-bold text-slate-900">Confirmando seu pagamento…</h1>

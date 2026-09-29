@@ -3,11 +3,16 @@
 Plataforma de estudos para graduação em Odontologia. Planejamento completo em
 [`docs/PLANEJAMENTO.md`](docs/PLANEJAMENTO.md).
 
-**Stack:** Next.js 16 (App Router) · Supabase (Postgres, Auth, RLS) · API da Anthropic (Claude) · Tailwind CSS 4 · Vitest
+**Stack:** Next.js 16 (App Router) · Supabase (Postgres, Auth, RLS) · API da Anthropic (Claude) · Tailwind CSS 4 · shadcn/ui (Radix) · Motion · Vitest
 
 ## O que já existe
 
-- **Landing page** com preço (12x R$ 32,90 ou R$ 297,90 à vista).
+- **Landing page** com hero animado (prévia da correção por IA e flashcard),
+  recursos, como funciona, preço e dúvidas frequentes.
+- **Design system**: shadcn/ui (`src/components/ui`) com as cores da marca em
+  `src/app/globals.css`, e animações com Motion (`src/components/movimento.tsx`),
+  que respeitam a opção "reduzir movimento" do sistema. Componentes do
+  [21st.dev](https://21st.dev) podem ser adicionados com o CLI do shadcn.
 - **Pagamento pelo Asaas** (`/assinar`, `/renovar`): à vista (Pix ou cartão 1x) ou
   parcelado em até 12x no cartão, pelo checkout hospedado do Asaas. O webhook
   libera o acesso ao confirmar, soma 12 meses na renovação e desfaz em estorno ou
@@ -44,7 +49,10 @@ Plataforma de estudos para graduação em Odontologia. Planejamento completo em
   - **flashcards com repetição espaçada** (SM-2): o aluno avalia cada card
     (errei, difícil, bom, fácil) e ele volta no dia certo. "Revisão do dia" junta
     todos os decks; o deck conta como concluído para o certificado quando todos os
-    cards foram vistos pelo menos uma vez.
+    cards foram vistos pelo menos uma vez;
+  - animações: cards do catálogo entrando em sequência, barras de progresso,
+    flashcard que vira em 3D, nota do simulado contando e comemoração (nota a
+    partir de 7, fim da sessão de flashcards e pagamento confirmado).
 - **Regras de acesso** (janela de 12 meses de novidades e IA; acesso vitalício ao
   que já foi publicado) aplicadas **no banco** (RLS + `conteudo_item()`) e na interface.
 

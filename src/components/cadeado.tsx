@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BarraAnimada } from "@/components/movimento";
 
 export function BotaoRenovar({ texto = "Renove para liberar" }: { texto?: string }) {
   return (
@@ -15,9 +16,7 @@ export function BarraProgresso({ feitos, total }: { feitos: number; total: numbe
   const pct = total === 0 ? 0 : Math.round((feitos / total) * 100);
   return (
     <div>
-      <div className="h-2 rounded-full bg-slate-200">
-        <div className="h-2 rounded-full bg-teal-600" style={{ width: `${pct}%` }} />
-      </div>
+      <BarraAnimada porcentagem={pct} />
       <p className="mt-1 text-xs text-slate-600">
         {feitos} de {total} itens obrigatórios
       </p>

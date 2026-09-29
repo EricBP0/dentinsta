@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BarraProgresso, BotaoRenovar } from "@/components/cadeado";
+import { SurgirItem, SurgirLista } from "@/components/movimento";
 import { iaAtiva } from "@/lib/acesso";
 import { exigirLogin } from "@/lib/auth";
 import { carregarCatalogo, formatarData } from "@/lib/catalogo";
@@ -68,9 +69,12 @@ export default async function Catalogo() {
       <section>
         <h2 className="mb-4 text-lg font-semibold text-slate-900">Disciplinas</h2>
         {disciplinas.length === 0 && <p className="text-slate-600">Nenhuma disciplina disponível ainda.</p>}
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <SurgirLista className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {disciplinas.map((d) => (
-            <li key={d.id} className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4">
+            <SurgirItem
+              key={d.id}
+              className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 transition-shadow hover:shadow-md"
+            >
               <div className="flex items-start justify-between gap-2">
                 <h3 className="font-semibold text-slate-900">{d.nome}</h3>
                 {d.periodo_sugerido && (
@@ -100,9 +104,9 @@ export default async function Catalogo() {
                   </Link>
                 )}
               </div>
-            </li>
+            </SurgirItem>
           ))}
-        </ul>
+        </SurgirLista>
       </section>
     </div>
   );
