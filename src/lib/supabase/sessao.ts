@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const ROTAS_PROTEGIDAS = ["/aluno", "/admin"];
+const ROTAS_PROTEGIDAS = ["/aluno", "/admin", "/assinar", "/renovar", "/pagamento"];
 
 // Renova a sessão do Supabase a cada navegação e protege as áreas logadas.
 export async function atualizarSessao(request: NextRequest) {

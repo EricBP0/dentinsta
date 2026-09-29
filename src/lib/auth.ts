@@ -29,6 +29,13 @@ export async function exigirEquipe() {
   return sessao;
 }
 
+/** Vendas e acessos: só admin (professor não vê faturamento). */
+export async function exigirAdmin() {
+  const sessao = await exigirLogin();
+  if (sessao.perfil.papel !== "admin") redirect(sessao.perfil.papel === "professor" ? "/admin" : "/aluno");
+  return sessao;
+}
+
 export function ehEquipe(perfil: Perfil | null) {
   return perfil !== null && perfil.papel !== "aluno";
 }

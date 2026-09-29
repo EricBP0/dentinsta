@@ -64,7 +64,7 @@ export default async function Simulados() {
 
       {!acesso && !equipe ? (
         <p className="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm text-teal-900">
-          Você ainda não tem acesso. <Link href="/#precos" className="font-medium underline">Ver planos</Link>
+          Você ainda não tem acesso. <Link href="/assinar" className="font-medium underline">Liberar acesso</Link>
         </p>
       ) : (
         <NovoSimulado disciplinas={temasPorDisciplina} iaAtiva={comIa} />

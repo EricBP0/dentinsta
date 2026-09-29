@@ -20,7 +20,7 @@ com nota e comentários.
 | Acesso | **Vitalício** ao que foi publicado até 12 meses após a compra; **novidades e IA por 12 meses** |
 | Após a janela | Conteúdo novo aparece com cadeado **"Renove para liberar"** |
 | Cota de IA | **60 correções discursivas/mês** por aluno |
-| Gateway | **Stripe** (cartão parcelado, Pix, boleto) |
+| Gateway | **Asaas** (Pix, cartão à vista e parcelado em até 12x, todas as bandeiras, NFS-e automática) |
 | Certificado | Emitido ao concluir **100% dos itens marcados como obrigatórios** |
 | Escopo do MVP | Inclui vídeos, mapas mentais, flashcards e certificados |
 
@@ -108,7 +108,11 @@ Se só as 8 videoaulas forem obrigatórias, assistir às 8 já emite o certifica
 
 ---
 
-## 4. Pagamento (Stripe)
+## 4. Pagamento (Asaas)
+
+> Trocado da Stripe para o Asaas: a Stripe não oferece parcelamento de cartão para
+> contas brasileiras nem aceita Elo/Hipercard. O Asaas parcela, aceita todas as
+> bandeiras e emite nota fiscal de serviço automaticamente.
 
 ### 4.1 Oferta
 - **Um único produto**: acesso à plataforma.
@@ -120,17 +124,17 @@ Para o aluno, a comunicação é **"à vista com desconto"**. Cobrar preços dif
 por forma de pagamento é permitido (Lei 13.455/2017), desde que os dois preços
 estejam claros na página de venda.
 
-**Como fica no Stripe:** o Checkout cobra um valor fixo por sessão, então a
-escolha acontece **na nossa página de venda, antes do checkout**:
+**Como fica no Asaas:** cada checkout cobra um valor fixo, então a escolha
+acontece **na nossa página de pagamento (/assinar), antes do checkout**:
 
-| Botão na página | Sessão de Checkout |
+| Botão na página | Checkout do Asaas |
 |---|---|
-| "À vista R$ 297,90" | valor 297,90 · Pix + cartão · **sem** parcelamento |
-| "12x de R$ 32,90" | valor 394,80 · só cartão · **parcelamento ativado** |
+| "À vista R$ 297,90" | valor 297,90 · Pix + cartão · cobrança avulsa |
+| "12x de R$ 32,90" | valor 394,80 · só cartão · parcelamento de até 12x |
 
-Verificar com a Stripe: se é possível **fixar só a opção de 12x** (senão o
-aluno do parcelado pode escolher menos parcelas, pagando os mesmos R$ 394,80) e
-se a diferença cobre de fato as taxas.
+O checkout do Asaas define o **máximo** de parcelas; o aluno do parcelado pode
+escolher menos parcelas, pagando os mesmos R$ 394,80. Conferir as taxas de
+parcelamento/antecipação no Asaas para garantir que a diferença cobre os custos.
 
 ### 4.1.1 Regra de acesso
 
@@ -164,26 +168,26 @@ vitrine para a renovação.
   lista com cadeado, título visível e conteúdo bloqueado.
 - **IA**: botões de gerar simulado / enviar discursiva mostram "Renove para usar a IA".
 - **Contador** no dashboard: "12 novas aulas e 2 disciplinas desde o seu acesso".
-- Clique em qualquer cadeado → página de renovação (Stripe Checkout).
+- Clique em qualquer cadeado → página de renovação (checkout do Asaas).
 - **Avisos antes do fim da janela**: e-mail e banner 30 dias e 7 dias antes.
 - Itens bloqueados **não contam** para o certificado (seção 3).
 
-### 4.2 Implementação
-- **Stripe Checkout** (página de pagamento hospedada pela Stripe — menos código,
-  menos responsabilidade com dados de cartão).
-- Meios: **cartão com parcelamento** (installments, disponível para contas Stripe
-  no Brasil), **Pix** e, opcionalmente, **boleto**.
-- **Webhook** `checkout.session.completed` / `payment_intent.succeeded` → libera o
-  acesso automaticamente. Reembolso/chargeback → revoga o acesso.
-- Cupons de desconto via Stripe (úteis para parcerias com ligas acadêmicas).
+### 4.2 Implementação (feita)
+- **Checkout do Asaas** (página de pagamento hospedada — menos código e nenhum
+  dado de cartão passa pelo nosso servidor). Pix e cartão; o checkout do Asaas
+  não oferece boleto.
+- **Webhook** `CHECKOUT_PAID` → libera o acesso (ou soma 12 meses na renovação).
+  `PAYMENT_REFUNDED` / `PAYMENT_CHARGEBACK_REQUESTED` → desfaz os 12 meses dessa
+  compra (sem nenhuma compra paga, o acesso é removido). `CHECKOUT_EXPIRED` /
+  `CHECKOUT_CANCELED` → encerra a compra pendente. Tudo idempotente.
+- Backoffice **Vendas** (só admin): pagamentos, vendas do mês, busca de alunos,
+  liberação manual (cortesia) e revogação.
 
-### 4.3 Pontos a verificar com a Stripe antes de fechar
-- Taxas do parcelamento e **quem absorve os juros** (parcelado "sem juros" para o
-  aluno significa que a taxa sai da margem de vocês) e **prazo de recebimento**
-  das parcelas.
-- Taxa do Pix e do boleto.
-- Emissão de nota fiscal: a Stripe **não** emite NF-e/NFS-e no Brasil — será
-  preciso uma integração à parte (ex.: eNotas, NFE.io, Focus NFe).
+### 4.3 Pontos a verificar no Asaas antes de lançar
+- Taxas do cartão parcelado e da antecipação, e **prazo de recebimento**.
+- Taxa do Pix.
+- **Nota fiscal**: configurar a emissão automática de NFS-e no painel do Asaas
+  (dados da empresa, código de serviço do município).
 
 ---
 
@@ -212,15 +216,15 @@ vitrine para a renovação.
 - Upload de vídeo (direto para o provedor de vídeo), resumo, mapa mental.
 - **Importação em lote** de questões/flashcards via planilha (CSV).
 - **Revisão de conteúdo gerado por IA** (fica em rascunho até aprovação).
-- **Alunos e vendas**: lista de alunos, pagamentos (espelho da Stripe), status do acesso,
+- **Alunos e vendas**: lista de alunos, pagamentos (espelho do Asaas), status do acesso,
   liberar/revogar acesso manualmente.
 - **Feedback**: contestações de correção, avaliações de aulas, mensagens.
 - **Certificados**: modelo, assinatura, carga horária, lista de emitidos.
 - **Papéis**: `admin` (tudo) e `professor` (só conteúdo e feedback).
 
 ### 5.3 Fora do MVP (fase 2+)
-- Programa de afiliados (Stripe não tem nativo — construir ou usar ferramenta
-  externa como Rewardful/FirstPromoter)
+- Programa de afiliados (o Asaas permite dividir o pagamento — split — com a
+  carteira do afiliado; falta a parte de links e comissões)
 - Tutor de IA para tirar dúvidas (RAG sobre o conteúdo)
 - App mobile nativo (MVP é web responsivo / PWA)
 - Casos clínicos interativos com imagens
@@ -300,8 +304,8 @@ dos alunos não usa a cota inteira.
 | Banco + Auth + Storage | **Supabase** (Postgres) | Auth pronto, relacional, storage para PDFs/imagens |
 | Vídeo | **Panda Video** (ou Vimeo) | Player protegido, marca d'água, CDN no Brasil, upload via API |
 | IA | **API da Anthropic (Claude)** | Geração e correção de questões em português |
-| Pagamento | **Stripe** (Checkout + Webhooks) | Parcelamento, Pix, boleto |
-| Nota fiscal | eNotas / NFE.io / Focus NFe | Stripe não emite NF no Brasil |
+| Pagamento | **Asaas** (Checkout + Webhooks) | Parcelamento, Pix, todas as bandeiras |
+| Nota fiscal | Asaas (NFS-e automática) | Configurada no painel, sem código |
 | PDF de certificado | Geração server-side (ex.: `@react-pdf/renderer`) | |
 | Hospedagem | Vercel + Supabase | Custo baixo no início |
 | E-mail | Resend | Boas-vindas, senha, lembrete de revisão, novidades |
@@ -327,7 +331,8 @@ itens       (id, modulo_id, tipo[video|resumo|mapa_mental|flashcards|prova], tit
   --   prova:       { nota_minima?, qtd_questoes }
 
 -- Acesso e pagamento
-compras  (id, usuario_id, stripe_checkout_id, stripe_payment_intent_id, metodo[cartao|pix|boleto],
+compras  (id, usuario_id, tipo[compra|renovacao], modalidade[a_vista|parcelado], checkout_id,
+          gateway_cliente_id, metodo[cartao|pix|boleto],
           parcelas, valor_total, status[pendente|pago|reembolsado|contestado], criado_em)
 acessos  (usuario_id, compra_em, novidades_ate, ia_ate, origem[compra|renovacao|manual|cortesia], compra_id?)
   -- novidades_ate = ia_ate = compra_em + 12 meses (renovação estende as duas)
@@ -384,7 +389,7 @@ se concluidos == obrigatorios e não existe certificado → emite
 | 2. Área do aluno | Catálogo, player de itens, progresso, resumo, mapa mental | 2–3 semanas |
 | 3. Prática | Questões, simulados, correção objetiva + IA, contestação | 3–4 semanas |
 | 4. Retenção | Flashcards com repetição espaçada, dashboard, streak | 2–3 semanas |
-| 5. Venda e certificado | Stripe (parcelado/Pix), liberação de acesso, NF, certificados, landing page | 2–3 semanas |
+| 5. Venda e certificado | Asaas (parcelado/Pix), liberação de acesso, NF, certificados, landing page | 2–3 semanas |
 | 6. Beta | Turma piloto (1–2 faculdades), ajustes | 2–4 semanas |
 
 \* Para 1–2 devs em tempo integral. **O backoffice vem cedo de propósito**: assim o
@@ -401,7 +406,7 @@ sócio já começa a cadastrar conteúdo real enquanto o resto é desenvolvido.
 
 - [ ] **Nome e domínio**
 - [ ] **Preço da renovação** (novidades + IA por mais 12 meses) — à vista e parcelado
-- [ ] Confirmar com a Stripe: taxas do parcelamento e se dá para oferecer só 12x
+- [ ] Conferir no Asaas: taxas do parcelamento/antecipação e configurar a NFS-e automática
 - [ ] Nota mínima padrão para provas obrigatórias (ou só exigir envio)
 - [ ] **Disciplinas do lançamento**
 - [ ] Ferramenta para os mapas mentais (Xmind, Whimsical, Canva…)
@@ -416,4 +421,4 @@ sócio já começa a cadastrar conteúdo real enquanto o resto é desenvolvido.
 - **Pirataria** → player protegido, marca d'água, limite de sessões simultâneas.
 - **Certificado** → deixar claro que é curso livre (não é reconhecido pelo MEC).
 - **LGPD** → consentimento, exclusão de conta, dados de desempenho protegidos.
-- **Nota fiscal** → Stripe não emite; integrar emissor desde o lançamento.
+- **Nota fiscal** → configurar a emissão automática de NFS-e no Asaas antes da primeira venda.

@@ -32,7 +32,7 @@ export async function cadastrar(_: EstadoForm, formData: FormData): Promise<Esta
   });
   if (error) return { erro: "Não foi possível criar a conta. Verifique os dados." };
   if (!data.session) return { mensagem: "Conta criada! Confirme seu e-mail para entrar." };
-  redirect("/aluno");
+  redirect(destinoSeguro(formData.get("proximo")));
 }
 
 export async function sair() {

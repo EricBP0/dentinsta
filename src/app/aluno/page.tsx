@@ -26,7 +26,7 @@ export default async function Catalogo() {
 
         {!acesso && !equipe && (
           <div className="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm text-teal-900">
-            Você ainda não tem acesso ao conteúdo. <Link href="/#precos" className="font-medium underline">Ver planos</Link>
+            Você ainda não tem acesso ao conteúdo. <Link href="/assinar" className="font-medium underline">Liberar acesso</Link>
           </div>
         )}
 
@@ -89,7 +89,7 @@ export default async function Catalogo() {
                   </div>
                 )}
                 {d.situacao === "sem_acesso" && (
-                  <Link href="/#precos" className="text-sm font-medium text-teal-700 underline">
+                  <Link href="/assinar" className="text-sm font-medium text-teal-700 underline">
                     Liberar acesso
                   </Link>
                 )}

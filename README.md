@@ -8,6 +8,10 @@ Plataforma de estudos para graduação em Odontologia. Planejamento completo em
 ## O que já existe
 
 - **Landing page** com preço (12x R$ 32,90 ou R$ 297,90 à vista).
+- **Pagamento pelo Asaas** (`/assinar`, `/renovar`): à vista (Pix ou cartão 1x) ou
+  parcelado em até 12x no cartão, pelo checkout hospedado do Asaas. O webhook
+  libera o acesso ao confirmar, soma 12 meses na renovação e desfaz em estorno ou
+  chargeback. Renovação fica desligada até o preço ser configurado.
 - **Login e cadastro** (Supabase Auth, e-mail e senha).
 - **Backoffice** (`/admin`, só `professor` e `admin`):
   - disciplinas dinâmicas: rascunho → em breve → publicada → arquivada, com agendamento;
@@ -25,7 +29,9 @@ Plataforma de estudos para graduação em Odontologia. Planejamento completo em
   - **flashcards**: em cada item do tipo flashcards, o professor monta o deck
     adicionando cards, importando planilha (frente;verso) ou **gerando com IA** a
     partir do material (cards da IA entram como rascunho);
-  - **contestações**: o professor revisa correções da IA e pode corrigir a nota.
+  - **contestações**: o professor revisa correções da IA e pode corrigir a nota;
+  - **vendas** (só admin): pagamentos, vendas do mês, busca de alunos, liberação
+    manual de acesso (cortesia) e revogação.
 - **Área do aluno** (`/aluno`):
   - catálogo com cards "Em breve" e cadeado **"Renove para liberar"**;
   - disciplina com progresso "X de Y itens obrigatórios";
@@ -46,19 +52,21 @@ Segurança do banco de questões: o aluno nunca lê gabarito, explicação ou ru
 antes de enviar o simulado, e não consegue gravar a própria nota — objetivas são
 corrigidas por função do banco e discursivas pelo servidor com a chave secreta.
 
-Ainda não existe: pagamento Stripe, emissão do PDF do certificado e dashboard.
+Ainda não existe: emissão do PDF do certificado e dashboard.
 
 ## Configuração
 
 1. Crie um projeto em [supabase.com](https://supabase.com).
 2. No **SQL Editor**, rode os arquivos de `supabase/migrations/` em ordem
    (`0001_base.sql`, `0002_questoes_simulados.sql`, `0003_geracao_questoes.sql`,
-   `0004_flashcards.sql`),
+   `0004_flashcards.sql`, `0005_pagamentos_asaas.sql`),
    ou `supabase db push` com a CLI. A 0003 cria o bucket privado `materiais` no Storage.
 3. Copie `.env.example` para `.env.local` e preencha:
    - URL e chave *publishable* do Supabase (**Project Settings → API Keys**);
    - chave *secret* do Supabase (só no servidor — grava as notas da IA);
    - `ANTHROPIC_API_KEY` ([console.anthropic.com](https://console.anthropic.com)).
+   - Asaas: `ASAAS_API_KEY`, `ASAAS_AMBIENTE` (`sandbox` para testar,
+     `producao` para cobrar), `ASAAS_WEBHOOK_TOKEN` e `NEXT_PUBLIC_SITE_URL`.
    `IA_MODELO`, `IA_EFFORT`, `IA_COTA_MENSAL`, `IA_MODELO_GERACAO` e
    `IA_EFFORT_GERACAO` são opcionais.
 4. Instale e rode:
@@ -76,13 +84,16 @@ Ainda não existe: pagamento Stripe, emissão do PDF do certificado e dashboard.
 
    Para o professor use `papel = 'professor'` (gerencia conteúdo).
 
-6. Enquanto o Stripe não está integrado, libere o acesso de um aluno de teste manualmente:
+6. **Asaas**: crie a conta (use o [sandbox](https://sandbox.asaas.com) para
+   testar), gere a chave de API e cadastre o webhook em **Integrações → Webhooks**:
+   - URL: `https://SEU-SITE/api/asaas/webhook`
+   - Token de autenticação: o mesmo valor de `ASAAS_WEBHOOK_TOKEN`
+   - Eventos: `CHECKOUT_PAID`, `CHECKOUT_CANCELED`, `CHECKOUT_EXPIRED`,
+     `PAYMENT_CONFIRMED`, `PAYMENT_RECEIVED`, `PAYMENT_REFUNDED`,
+     `PAYMENT_CHARGEBACK_REQUESTED`
 
-   ```sql
-   insert into acessos (usuario_id, compra_em, novidades_ate, ia_ate, origem)
-   select id, now(), now() + interval '12 months', now() + interval '12 months', 'manual'
-   from perfis where email = 'aluno@teste.com';
-   ```
+   Para emitir nota fiscal automaticamente, configure a NFS-e no painel do Asaas.
+   Em desenvolvimento, dá para liberar acesso de teste em **Backoffice → Vendas**.
 
 ## Scripts
 

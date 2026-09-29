@@ -56,7 +56,8 @@ export default function Inicio() {
             <li>✓ Todas as novidades e a IA por 12 meses</li>
             <li>✓ Certificado por disciplina</li>
           </ul>
-          <Link href="/entrar" className="mt-6 block rounded-lg bg-teal-700 py-3 font-medium text-white hover:bg-teal-800">
+          <p className="mt-4 text-xs text-slate-500">Pix ou cartão · Elo, Visa, Mastercard e outras bandeiras</p>
+          <Link href="/assinar" className="mt-6 block rounded-lg bg-teal-700 py-3 font-medium text-white hover:bg-teal-800">
             Quero começar
           </Link>
         </div>

@@ -12,6 +12,7 @@ const MENU = {
     { href: "/admin", texto: "Disciplinas" },
     { href: "/admin/questoes", texto: "Questões" },
     { href: "/admin/contestacoes", texto: "Contestações" },
+    { href: "/admin/vendas", texto: "Vendas", soAdmin: true },
   ],
 };
 
@@ -24,7 +25,9 @@ export function Cabecalho({ perfil, area }: { perfil: Perfil; area: "aluno" | "a
             dentinsta{area === "admin" && <span className="ml-2 text-sm font-normal text-slate-500">backoffice</span>}
           </Link>
           <nav className="flex flex-wrap gap-4 text-sm">
-            {MENU[area].map((item) => (
+            {MENU[area]
+              .filter((item) => !("soAdmin" in item) || perfil.papel === "admin")
+              .map((item) => (
               <Link key={item.href} href={item.href} className="text-slate-600 hover:text-slate-900">
                 {item.texto}
               </Link>
