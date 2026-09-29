@@ -14,7 +14,7 @@ export default async function PaginaDisciplina({ params }: PageProps<"/aluno/dis
 
   return (
     <div className="space-y-6">
-      <Link href="/aluno" className="text-sm text-slate-600 hover:text-slate-900">
+      <Link href="/aluno/disciplinas" className="text-sm text-slate-600 hover:text-slate-900">
         ← Disciplinas
       </Link>
       <header className="space-y-3">

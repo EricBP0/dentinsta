@@ -4,7 +4,8 @@ import type { Perfil } from "@/lib/tipos";
 
 const MENU = {
   aluno: [
-    { href: "/aluno", texto: "Disciplinas" },
+    { href: "/aluno", texto: "Painel" },
+    { href: "/aluno/disciplinas", texto: "Disciplinas" },
     { href: "/aluno/simulados", texto: "Simulados" },
     { href: "/aluno/flashcards", texto: "Flashcards" },
   ],

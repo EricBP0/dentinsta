@@ -38,7 +38,12 @@ Plataforma de estudos para graduação em Odontologia. Planejamento completo em
   - **vendas** (só admin): pagamentos, vendas do mês, busca de alunos, liberação
     manual de acesso (cortesia) e revogação.
 - **Área do aluno** (`/aluno`):
-  - catálogo com cards "Em breve" e cadeado **"Renove para liberar"**;
+  - **painel**: "continue de onde parou", flashcards do dia, média nos
+    simulados (7 dias, com variação), tempo de estudo, sequência de dias,
+    disciplinas concluídas, gráfico de notas (30 dias) e de tempo por dia (14
+    dias), temas para reforçar e progresso rumo aos certificados. O tempo conta
+    só enquanto o aluno está ativo numa página de estudo;
+  - catálogo (`/aluno/disciplinas`) com cards "Em breve" e cadeado **"Renove para liberar"**;
   - disciplina com progresso "X de Y itens obrigatórios";
   - visualização de vídeo, resumo e mapa mental, e "marcar como concluído";
   - **simulados** montados do banco, sem IA: filtros de tema, dificuldade e tipo,
@@ -60,14 +65,14 @@ Segurança do banco de questões: o aluno nunca lê gabarito, explicação ou ru
 antes de enviar o simulado, e não consegue gravar a própria nota — objetivas são
 corrigidas por função do banco e discursivas pelo servidor com a chave secreta.
 
-Ainda não existe: emissão do PDF do certificado e dashboard.
+Ainda não existe: emissão do PDF do certificado.
 
 ## Configuração
 
 1. Crie um projeto em [supabase.com](https://supabase.com).
 2. No **SQL Editor**, rode os arquivos de `supabase/migrations/` em ordem
    (`0001_base.sql`, `0002_questoes_simulados.sql`, `0003_geracao_questoes.sql`,
-   `0004_flashcards.sql`, `0005_pagamentos_asaas.sql`),
+   `0004_flashcards.sql`, `0005_pagamentos_asaas.sql`, `0006_painel_aluno.sql`),
    ou `supabase db push` com a CLI. A 0003 cria o bucket privado `materiais` no Storage.
 3. Copie `.env.example` para `.env.local` e preencha:
    - URL e chave *publishable* do Supabase (**Project Settings → API Keys**);
