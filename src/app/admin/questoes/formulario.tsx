@@ -5,7 +5,13 @@ import { botaoPrimario, campo, Rotulo } from "@/components/admin-ui";
 import { LETRAS, rubricaParaTexto, type QuestaoNova } from "@/lib/questoes/questao";
 import { salvarQuestao, type EstadoQuestao } from "./actions";
 
-export type QuestaoExistente = QuestaoNova & { id: string; disciplina_id: string; status: string };
+export type QuestaoExistente = QuestaoNova & {
+  id: string;
+  disciplina_id: string;
+  status: string;
+  origem?: string;
+  fonte?: string;
+};
 
 export function FormularioQuestao({
   disciplinas,
@@ -22,6 +28,12 @@ export function FormularioQuestao({
   return (
     <form action={acao} className="space-y-4 rounded-xl border border-slate-200 bg-white p-6">
       <input type="hidden" name="id" value={questao?.id ?? ""} />
+      {questao?.origem === "ia" && (
+        <p className="rounded-lg bg-sky-50 p-3 text-sm text-sky-900">
+          Gerada por IA — confira o conteúdo clínico antes de aprovar.
+          {questao.fonte && <span className="block text-xs">Fonte no material: {questao.fonte}</span>}
+        </p>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-3">
         <Rotulo texto="Disciplina">

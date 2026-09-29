@@ -12,10 +12,12 @@ type LinhaQuestao = {
   dificuldade: 1 | 2 | 3;
   status: "rascunho" | "aprovada";
   origem: string;
+  fonte: string;
 };
 
 export default async function AdminQuestoes({ searchParams }: PageProps<"/admin/questoes">) {
-  const { disciplina, status, tipo } = await searchParams;
+  const { disciplina, status, tipo, geracao } = await searchParams;
+  const geracaoId = typeof geracao === "string" ? geracao : null;
   const { supabase } = await exigirEquipe();
 
   const { data: disciplinas } = await supabase
@@ -23,15 +25,16 @@ export default async function AdminQuestoes({ searchParams }: PageProps<"/admin/
     .select("id, nome")
     .order("ordem")
     .overrideTypes<{ id: string; nome: string }[], { merge: false }>();
-  const disciplinaId = typeof disciplina === "string" ? disciplina : disciplinas?.[0]?.id;
+  const disciplinaId = geracaoId ? undefined : typeof disciplina === "string" ? disciplina : disciplinas?.[0]?.id;
 
   let consulta = supabase
     .from("questoes")
-    .select("id, tema, tipo, enunciado, dificuldade, status, origem")
+    .select("id, tema, tipo, enunciado, dificuldade, status, origem, fonte")
     .order("tema")
     .order("criado_em", { ascending: false })
     .limit(500);
   if (disciplinaId) consulta = consulta.eq("disciplina_id", disciplinaId);
+  if (geracaoId) consulta = consulta.eq("geracao_id", geracaoId);
   if (status === "aprovada" || status === "rascunho") consulta = consulta.eq("status", status);
   if (tipo === "objetiva" || tipo === "discursiva") consulta = consulta.eq("tipo", tipo);
   const { data: questoes } = await consulta.overrideTypes<LinhaQuestao[], { merge: false }>();
@@ -48,7 +51,13 @@ export default async function AdminQuestoes({ searchParams }: PageProps<"/admin/
             {lista.length} questões · {aprovadas} aprovadas (entram nos simulados)
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <Link href={`/admin/questoes/gerar?disciplina=${disciplinaId ?? ""}`} className={botaoSecundario + " px-4 py-2 text-sm"}>
+            ✨ Gerar com IA
+          </Link>
+          <Link href="/admin/questoes/geracoes" className={botaoSecundario + " px-4 py-2 text-sm"}>
+            Gerações
+          </Link>
           <Link href={`/admin/questoes/importar?disciplina=${disciplinaId ?? ""}`} className={botaoSecundario + " px-4 py-2 text-sm"}>
             Importar planilha
           </Link>
@@ -57,6 +66,13 @@ export default async function AdminQuestoes({ searchParams }: PageProps<"/admin/
           </Link>
         </div>
       </header>
+
+      {geracaoId && (
+        <p className="rounded-xl border border-sky-200 bg-sky-50 p-3 text-sm text-sky-900">
+          Mostrando as questões de uma geração por IA. Abra cada uma para revisar e aprove (clique em
+          &quot;Rascunho&quot;) as que estiverem boas. <Link href="/admin/questoes" className="underline">Ver todas</Link>
+        </p>
+      )}
 
       <form className="flex flex-wrap gap-2">
         <select name="disciplina" defaultValue={disciplinaId} className={`${campo} w-auto`}>
@@ -94,6 +110,7 @@ export default async function AdminQuestoes({ searchParams }: PageProps<"/admin/
                 {q.tema && ` · ${q.tema}`}
                 {q.origem === "ia" && " · gerada por IA"}
               </p>
+              {q.fonte && <p className="text-xs text-slate-400">Fonte: {q.fonte}</p>}
             </Link>
             <div className="flex items-center gap-1">
               <form action={alternarStatusQuestao}>

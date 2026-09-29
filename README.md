@@ -16,6 +16,12 @@ Plataforma de estudos para graduação em Odontologia. Planejamento completo em
   - **banco de questões** (objetivas e discursivas com gabarito, explicação e
     rubrica), com cadastro manual e **importação por planilha CSV**
     ([modelo](public/modelo-questoes.csv));
+  - **geração de questões por IA**: o professor envia o material (PDF, Word,
+    texto, fotos das páginas ou texto colado), escolhe quantas objetivas e
+    discursivas quer, e a IA cria questões com gabarito, explicação, rubrica e a
+    **fonte** no material. Roda em lote (metade do custo) e as questões entram como
+    **rascunho** para revisão. Provas antigas podem ser enviadas só como
+    referência de assuntos e estilo — a IA não copia as questões;
   - **contestações**: o professor revisa correções da IA e pode corrigir a nota.
 - **Área do aluno** (`/aluno`):
   - catálogo com cards "Em breve" e cadeado **"Renove para liberar"**;
@@ -33,19 +39,20 @@ Segurança do banco de questões: o aluno nunca lê gabarito, explicação ou ru
 antes de enviar o simulado, e não consegue gravar a própria nota — objetivas são
 corrigidas por função do banco e discursivas pelo servidor com a chave secreta.
 
-Ainda não existe: pagamento Stripe, geração de questões por IA (em lote, no
-backoffice), flashcards, emissão do PDF do certificado e dashboard.
+Ainda não existe: pagamento Stripe, flashcards, emissão do PDF do certificado e dashboard.
 
 ## Configuração
 
 1. Crie um projeto em [supabase.com](https://supabase.com).
 2. No **SQL Editor**, rode os arquivos de `supabase/migrations/` em ordem
-   (`0001_base.sql`, `0002_questoes_simulados.sql`), ou `supabase db push` com a CLI.
+   (`0001_base.sql`, `0002_questoes_simulados.sql`, `0003_geracao_questoes.sql`),
+   ou `supabase db push` com a CLI. A 0003 cria o bucket privado `materiais` no Storage.
 3. Copie `.env.example` para `.env.local` e preencha:
    - URL e chave *publishable* do Supabase (**Project Settings → API Keys**);
    - chave *secret* do Supabase (só no servidor — grava as notas da IA);
    - `ANTHROPIC_API_KEY` ([console.anthropic.com](https://console.anthropic.com)).
-   `IA_MODELO`, `IA_EFFORT` e `IA_COTA_MENSAL` são opcionais.
+   `IA_MODELO`, `IA_EFFORT`, `IA_COTA_MENSAL`, `IA_MODELO_GERACAO` e
+   `IA_EFFORT_GERACAO` são opcionais.
 4. Instale e rode:
 
    ```bash
@@ -96,6 +103,7 @@ src/lib/acesso.ts        Janela de 12 meses (espelha pode_acessar_item() no SQL)
 src/lib/certificado.ts   Regra "100% dos itens obrigatórios"
 src/lib/catalogo.ts      Monta o catálogo do aluno com cadeados e progresso
 src/lib/ia/              Correção por IA: prompt, rubrica → nota, cota, chamada à API
+src/lib/ia/geracao/      Geração de questões: leitura do material, prompt, lote e importação
 src/lib/questoes/        Validação de questões e importação CSV
 src/app/admin/           Backoffice
 src/app/aluno/           Área do aluno
