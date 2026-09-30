@@ -14,19 +14,19 @@ pagamento de teste e depois virar a chave para vender de verdade.
 
 | Serviço | Para quê | Plano |
 |---|---|---|
-| **GitHub** | Código (repositório `dentinsta` (o nome do repositório pode continuar o mesmo)) | Gratuito |
+| **GitHub** | Código (repositório `dentinsta`; o nome do repositório não precisa mudar) | Gratuito |
 | **Vercel** | Hospedar o site | **Pro obrigatório**: o plano gratuito (Hobby) é só para uso pessoal e **proíbe uso comercial**, e a plataforma cobra dos alunos |
 | **Supabase** | Banco de dados, login e arquivos | Comece no gratuito para testar. Para lançar, **Pro**: o gratuito pode pausar o projeto por inatividade e não tem backup diário |
 | **Resend** (ou outro SMTP) | E-mails de confirmação de cadastro e de senha | Plano gratuito atende o começo |
 | **Asaas** | Pagamentos (Pix, cartão, parcelado) e nota fiscal | Sem mensalidade; taxa por transação |
 | **Anthropic** | IA (correção de discursivas e geração de questões e flashcards) | Pré-pago por uso |
-| **Domínio** | Ex.: `odontolab.com.br` (registro.br) | Anual |
+| **Domínio** | Comprado na **Hostinger**. O DNS é configurado lá (seção 4.1) | Anual |
 
 ### O código
 
-Todo o trabalho está no branch `claude/nifty-euler-ywoua0`. Antes de publicar,
-junte esse branch ao `main` (por um pull request no GitHub). A Vercel publica o
-`main` como produção.
+O `main` é o branch padrão e a Vercel publica ele como produção. Antes de
+publicar, faça o merge do pull request do branch `claude/nifty-euler-ywoua0`
+no `main` (enquanto isso, o `main` só tem o planejamento).
 
 ---
 
@@ -72,8 +72,8 @@ junte esse branch ao `main` (por um pull request no GitHub). A Vercel publica o
 ## 2. E-mail (Resend)
 
 1. Crie a conta em [resend.com](https://resend.com) e adicione o seu domínio.
-2. Cadastre no registro.br (ou onde o domínio estiver) os registros DNS que o
-   Resend mostrar (SPF/DKIM). Espere o domínio ficar **verificado**.
+2. Cadastre na Hostinger os registros DNS que o Resend mostrar (veja a seção
+   4.1, "Registros do Resend"). Espere o domínio ficar **verificado**.
 3. Gere uma chave de API (SMTP) e preencha no Supabase (passo 1.5):
    - Host `smtp.resend.com`, porta `465`, usuário `resend`, senha = a chave.
    - Remetente: por exemplo `nao-responda@SEU-DOMINIO`, nome `OdontoLab`.
@@ -94,7 +94,7 @@ junte esse branch ao `main` (por um pull request no GitHub). A Vercel publica o
 ## 4. Vercel (site)
 
 1. Em [vercel.com](https://vercel.com), assine o **Pro** e clique em
-   **Add New → Project** → importe o repositório `dentinsta` (o nome do repositório pode continuar o mesmo) do GitHub.
+   **Add New → Project** → importe o repositório `dentinsta` do GitHub.
    A Vercel detecta Next.js sozinha; não mude os comandos de build.
 2. Antes do primeiro deploy, abra **Environment Variables** e cadastre (em
    **Production** e **Preview**):
@@ -118,11 +118,65 @@ junte esse branch ao `main` (por um pull request no GitHub). A Vercel publica o
 
 3. Clique em **Deploy**. As funções rodam na região de São Paulo (`gru1`),
    definida no `vercel.json`.
-4. **Domínio**: **Settings → Domains** → adicione o domínio e crie no
-   registro.br os registros que a Vercel indicar.
+4. **Domínio**: **Settings → Domains** → adicione o domínio (ex.:
+   `odontolab.com.br`) e também o `www`. Escolha um dos dois como principal e
+   deixe o outro redirecionando para ele. Depois crie na Hostinger os
+   registros que a Vercel indicar (seção 4.1).
 5. Quando o domínio estiver ativo, confira se `NEXT_PUBLIC_SITE_URL` e a **Site
    URL** do Supabase usam o domínio final e faça **Redeploy**. Variáveis que
    começam com `NEXT_PUBLIC_` só mudam depois de um novo deploy.
+
+### 4.1 DNS na Hostinger
+
+O domínio fica registrado na Hostinger; só os registros de DNS apontam para a
+Vercel (site) e para o Resend (e-mail). **Não troque os nameservers**: manter o
+DNS na Hostinger é o mais simples e não mexe em outros serviços que você
+tenha lá (como um e-mail da Hostinger).
+
+No **hPanel**: **Domínios → seu domínio → DNS / Nameservers → Gerenciar
+registros DNS**. No campo **Nome**, a Hostinger usa `@` para o domínio raiz e
+só o prefixo para subdomínios (`www`, e não `www.odontolab.com.br`).
+
+**1. Apague os registros que apontam para a Hostinger.** Um domínio novo vem
+com um registro `A` em `@` (página de "domínio estacionado") e um `CNAME` em
+`www`. Se ficarem, conflitam com os da Vercel. Apague só esses dois: não apague
+`MX`, `TXT` ou `CAA` que já existam.
+
+**2. Registros da Vercel (site).** Use exatamente os valores que a Vercel
+mostrar em **Settings → Domains**. Normalmente são:
+
+| Tipo | Nome | Valor | TTL |
+|---|---|---|---|
+| `A` | `@` | o IP que a Vercel mostrar (hoje costuma ser `76.76.21.21`) | 3600 |
+| `CNAME` | `www` | o endereço que a Vercel mostrar (ex.: `cname.vercel-dns.com`) | 3600 |
+
+Se a Vercel pedir um registro `TXT` com nome `_vercel` para confirmar a posse
+do domínio, crie também.
+
+**3. Registros do Resend (e-mail).** Em **Resend → Domains → seu domínio**,
+copie cada registro para a Hostinger. Eles ficam em subdomínios próprios
+(`send`, `resend._domainkey`), então **não atrapalham um e-mail da Hostinger**
+que use o domínio raiz. São parecidos com:
+
+| Tipo | Nome | Valor |
+|---|---|---|
+| `MX` | `send` | `feedback-smtp….amazonses.com` (prioridade 10) |
+| `TXT` | `send` | `v=spf1 include:amazonses.com ~all` |
+| `TXT` | `resend._domainkey` | a chave DKIM longa que o Resend mostrar |
+| `TXT` | `_dmarc` | `v=DMARC1; p=none;` (recomendado; crie só se ainda não existir) |
+
+Cuidado ao colar o nome: se o Resend mostrar `send.odontolab.com.br`, na
+Hostinger escreva só `send`, senão o registro vira
+`send.odontolab.com.br.odontolab.com.br`.
+
+**4. Espere e confira.** Costuma propagar em minutos, mas pode levar até 24h.
+A Vercel mostra **Valid Configuration** e emite o certificado HTTPS sozinha; o
+Resend mostra **Verified**. Se o certificado não sair, veja se há registros
+`CAA` na Hostinger: eles precisam permitir `letsencrypt.org` (ou apague os
+`CAA`).
+
+Depois disso, siga o passo 5 da seção 4 (atualizar `NEXT_PUBLIC_SITE_URL` e a
+Site URL do Supabase e fazer Redeploy).
 
 ---
 
