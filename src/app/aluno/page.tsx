@@ -371,7 +371,9 @@ export default async function Painel() {
             <p className="rounded-xl bg-slate-50 p-6 text-center text-sm text-slate-500">Nenhuma disciplina liberada ainda.</p>
           )}
           {concluidas.length > 0 && (
-            <p className="mt-4 text-xs text-slate-500">O PDF do certificado das disciplinas concluídas chega em breve.</p>
+            <Button variant="outline" className="mt-4" asChild>
+              <Link href="/aluno/certificados">Ver certificados</Link>
+            </Button>
           )}
         </div>
       </section>

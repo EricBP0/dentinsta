@@ -58,6 +58,12 @@ Plataforma de estudos para graduação em Odontologia. Planejamento completo em
   - animações: cards do catálogo entrando em sequência, barras de progresso,
     flashcard que vira em 3D, nota do simulado contando e comemoração (nota a
     partir de 7, fim da sessão de flashcards e pagamento confirmado).
+  - **certificados** (`/aluno/certificados`): ao concluir 100% dos itens
+    obrigatórios, o aluno confirma o nome completo e emite o certificado em PDF
+    (A4, com código e QR de validação). O banco confere a conclusão e guarda o
+    nome, a disciplina e a carga horária da emissão.
+- **Validação pública** (`/certificado/CODIGO`): qualquer pessoa confere se um
+  certificado é autêntico, sem login.
 - **Regras de acesso** (janela de 12 meses de novidades e IA; acesso vitalício ao
   que já foi publicado) aplicadas **no banco** (RLS + `conteudo_item()`) e na interface.
 
@@ -65,14 +71,13 @@ Segurança do banco de questões: o aluno nunca lê gabarito, explicação ou ru
 antes de enviar o simulado, e não consegue gravar a própria nota — objetivas são
 corrigidas por função do banco e discursivas pelo servidor com a chave secreta.
 
-Ainda não existe: emissão do PDF do certificado.
-
 ## Configuração
 
 1. Crie um projeto em [supabase.com](https://supabase.com).
 2. No **SQL Editor**, rode os arquivos de `supabase/migrations/` em ordem
    (`0001_base.sql`, `0002_questoes_simulados.sql`, `0003_geracao_questoes.sql`,
-   `0004_flashcards.sql`, `0005_pagamentos_asaas.sql`, `0006_painel_aluno.sql`),
+   `0004_flashcards.sql`, `0005_pagamentos_asaas.sql`, `0006_painel_aluno.sql`,
+   `0007_certificados.sql`),
    ou `supabase db push` com a CLI. A 0003 cria o bucket privado `materiais` no Storage.
 3. Copie `.env.example` para `.env.local` e preencha:
    - URL e chave *publishable* do Supabase (**Project Settings → API Keys**);
@@ -81,7 +86,9 @@ Ainda não existe: emissão do PDF do certificado.
    - Asaas: `ASAAS_API_KEY`, `ASAAS_AMBIENTE` (`sandbox` para testar,
      `producao` para cobrar), `ASAAS_WEBHOOK_TOKEN` e `NEXT_PUBLIC_SITE_URL`.
    `IA_MODELO`, `IA_EFFORT`, `IA_COTA_MENSAL`, `IA_MODELO_GERACAO` e
-   `IA_EFFORT_GERACAO` são opcionais.
+   `IA_EFFORT_GERACAO` são opcionais. No certificado, `CERTIFICADO_RESPONSAVEL`
+   e `CERTIFICADO_RESPONSAVEL_CARGO` definem quem assina (ex.: nome e CRO do
+   professor responsável).
 4. Instale e rode:
 
    ```bash
@@ -132,7 +139,7 @@ ficarem próximas. O consumo de tokens de cada correção fica na tabela `uso_ia
 supabase/migrations/     Esquema do banco, RLS e funções de acesso
 src/proxy.ts             Renova a sessão e protege /aluno e /admin
 src/lib/acesso.ts        Janela de 12 meses (espelha pode_acessar_item() no SQL)
-src/lib/certificado.ts   Regra "100% dos itens obrigatórios"
+src/lib/certificado/     Regra "100% dos itens obrigatórios", texto e PDF do certificado
 src/lib/catalogo.ts      Monta o catálogo do aluno com cadeados e progresso
 src/lib/ia/              Correção por IA: prompt, rubrica → nota, cota, chamada à API
 src/lib/ia/geracao/      Geração de questões: leitura do material, prompt, lote e importação

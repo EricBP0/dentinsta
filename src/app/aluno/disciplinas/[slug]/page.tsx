@@ -23,7 +23,12 @@ export default async function PaginaDisciplina({ params }: PageProps<"/aluno/dis
         <div className="max-w-sm">
           <BarraProgresso feitos={disciplina.progresso.concluidos} total={disciplina.progresso.total} />
           {disciplina.progresso.completo && (
-            <p className="mt-2 text-sm font-medium text-teal-700">🎓 Você concluiu todos os itens obrigatórios!</p>
+            <p className="mt-2 text-sm font-medium text-teal-700">
+              🎓 Você concluiu todos os itens obrigatórios!{" "}
+              <Link href="/aluno/certificados" className="underline">
+                Emitir certificado
+              </Link>
+            </p>
           )}
         </div>
       </header>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { progressoObrigatorio } from "./certificado";
+import { progressoObrigatorio } from "./regra";
 
 describe("progressoObrigatorio", () => {
   // Exemplo do planejamento: 8 videoaulas obrigatórias, mapas e flashcards opcionais.

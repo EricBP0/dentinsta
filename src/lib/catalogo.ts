@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { paraData, situacaoItem, type Acesso, type SituacaoItem } from "@/lib/acesso";
-import { progressoObrigatorio, type ProgressoObrigatorio } from "@/lib/certificado";
+import { progressoObrigatorio, type ProgressoObrigatorio } from "@/lib/certificado/regra";
 import {
   COLUNAS_ITEM,
   type AcessoRow,
