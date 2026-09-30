@@ -1,8 +1,13 @@
 import { redirect } from "next/navigation";
+import { cache } from "react";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import type { Perfil } from "@/lib/tipos";
 
-export async function obterSessao() {
+/**
+ * Sessão e perfil do usuário. `cache` faz a consulta rodar uma vez por
+ * requisição, mesmo que o layout, a página e os componentes chamem de novo.
+ */
+export const obterSessao = cache(async () => {
   const supabase = await criarClienteServidor();
   const { data } = await supabase.auth.getClaims();
   const usuarioId = data?.claims?.sub;
@@ -14,7 +19,7 @@ export async function obterSessao() {
     .eq("id", usuarioId)
     .single<Perfil>();
   return { supabase, perfil };
-}
+});
 
 export async function exigirLogin() {
   const sessao = await obterSessao();

@@ -40,40 +40,24 @@ export async function carregarCatalogo(
 ): Promise<{ acesso: Acesso | null; disciplinas: DisciplinaCatalogo[] }> {
   const equipe = perfil.papel !== "aluno";
 
+  // Disciplinas, módulos e itens numa consulta só (o PostgREST junta pelas
+  // chaves estrangeiras e o RLS vale para cada tabela). Tudo em paralelo: cada
+  // ida ao banco a menos é tempo a menos para a página abrir.
   let consultaDisciplinas = supabase
     .from("disciplinas")
-    .select("*")
+    .select(`*, modulos(*, itens(${COLUNAS_ITEM}))`)
     .in("status", ["em_breve", "publicada"])
+    .eq("modulos.status", "publicado")
+    .eq("modulos.itens.status", "publicado")
     .order("ordem")
-    .order("nome");
+    .order("nome")
+    .order("ordem", { referencedTable: "modulos" })
+    .order("ordem", { referencedTable: "modulos.itens" });
   if (filtro) consultaDisciplinas = consultaDisciplinas.eq("slug", filtro.slug);
 
-  const [acesso, { data: disciplinas }] = await Promise.all([
+  const [acesso, { data: disciplinas }, { data: progresso }] = await Promise.all([
     carregarAcesso(supabase, perfil),
-    consultaDisciplinas.overrideTypes<Disciplina[], { merge: false }>(),
-  ]);
-  if (!disciplinas?.length) return { acesso, disciplinas: [] };
-
-  const idsDisciplinas = disciplinas.map((d) => d.id);
-  const { data: modulos } = await supabase
-    .from("modulos")
-    .select("*")
-    .in("disciplina_id", idsDisciplinas)
-    .eq("status", "publicado")
-    .order("ordem")
-    .overrideTypes<Modulo[], { merge: false }>();
-  const idsModulos = (modulos ?? []).map((m) => m.id);
-
-  const [{ data: itens }, { data: progresso }] = await Promise.all([
-    idsModulos.length
-      ? supabase
-          .from("itens")
-          .select(COLUNAS_ITEM)
-          .in("modulo_id", idsModulos)
-          .eq("status", "publicado")
-          .order("ordem")
-          .overrideTypes<Item[], { merge: false }>()
-      : Promise.resolve({ data: [] as Item[] }),
+    consultaDisciplinas.overrideTypes<(Disciplina & { modulos: (Modulo & { itens: Item[] })[] })[], { merge: false }>(),
     supabase
       .from("progresso_item")
       .select("item_id")
@@ -81,33 +65,34 @@ export async function carregarCatalogo(
       .eq("concluido", true)
       .overrideTypes<{ item_id: string }[], { merge: false }>(),
   ]);
+  if (!disciplinas?.length) return { acesso, disciplinas: [] };
   const concluidos = new Set((progresso ?? []).map((p) => p.item_id));
 
-  const resultado = disciplinas.map((disciplina): DisciplinaCatalogo => {
-    const modulosDaDisciplina = (modulos ?? [])
-      .filter((m) => m.disciplina_id === disciplina.id)
-      .map((modulo) => ({
-        ...modulo,
-        itens: (itens ?? [])
-          .filter((i) => i.modulo_id === modulo.id)
-          .map((item) => ({
-            ...item,
-            concluido: concluidos.has(item.id),
-            situacao: situacaoItem({
-              acesso,
-              equipe,
-              datas: {
-                item: paraData(item.primeira_publicacao_em),
-                modulo: paraData(modulo.primeira_publicacao_em),
-                disciplina: paraData(disciplina.primeira_publicacao_em),
-              },
-            }),
-          })),
-      }));
+  const resultado = disciplinas.map(({ modulos, ...disciplina }): DisciplinaCatalogo => {
+    const modulosDaDisciplina = (modulos ?? []).map((modulo) => ({
+      ...modulo,
+      itens: (modulo.itens ?? []).map((item) => ({
+        ...item,
+        concluido: concluidos.has(item.id),
+        situacao: situacaoItem({
+          acesso,
+          equipe,
+          datas: {
+            item: paraData(item.primeira_publicacao_em),
+            modulo: paraData(modulo.primeira_publicacao_em),
+            disciplina: paraData(disciplina.primeira_publicacao_em),
+          },
+        }),
+      })),
+    }));
 
     const todosItens = modulosDaDisciplina.flatMap((m) => m.itens);
     const progressoDisciplina = progressoObrigatorio(
-      todosItens.map((i) => ({ id: i.id, obrigatorio: i.obrigatorio, liberado: i.situacao === "liberado" })),
+      todosItens.map((i) => ({
+        id: i.id,
+        obrigatorio: i.obrigatorio,
+        liberado: i.situacao === "liberado",
+      })),
       concluidos,
     );
 
@@ -117,12 +102,19 @@ export async function carregarCatalogo(
     else if (todosItens.length > 0 && todosItens.every((i) => i.situacao === "renove")) situacao = "renove";
     else situacao = "liberada";
 
-    return { ...disciplina, modulos: modulosDaDisciplina, progresso: progressoDisciplina, situacao };
+    return {
+      ...disciplina,
+      modulos: modulosDaDisciplina,
+      progresso: progressoDisciplina,
+      situacao,
+    };
   });
 
   return { acesso, disciplinas: resultado };
 }
 
 export function formatarData(data: Date | string) {
-  return new Date(data).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" });
+  return new Date(data).toLocaleDateString("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+  });
 }
