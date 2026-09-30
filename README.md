@@ -1,7 +1,8 @@
 # dentinsta
 
 Plataforma de estudos para graduação em Odontologia. Planejamento completo em
-[`docs/PLANEJAMENTO.md`](docs/PLANEJAMENTO.md).
+[`docs/PLANEJAMENTO.md`](docs/PLANEJAMENTO.md). Para colocar no ar, siga o
+[roteiro de publicação](docs/PUBLICACAO.md).
 
 **Stack:** Next.js 16 (App Router) · Supabase (Postgres, Auth, RLS) · API da Anthropic (Claude) · Tailwind CSS 4 · shadcn/ui (Radix) · Motion · Vitest
 
@@ -17,7 +18,8 @@ Plataforma de estudos para graduação em Odontologia. Planejamento completo em
   parcelado em até 12x no cartão, pelo checkout hospedado do Asaas. O webhook
   libera o acesso ao confirmar, soma 12 meses na renovação e desfaz em estorno ou
   chargeback. Renovação fica desligada até o preço ser configurado.
-- **Login e cadastro** (Supabase Auth, e-mail e senha).
+- **Login e cadastro** (Supabase Auth, e-mail e senha), com confirmação de e-mail
+  (`/auth/confirmar`) e "esqueci minha senha" (`/redefinir-senha`).
 - **Backoffice** (`/admin`, só `professor` e `admin`):
   - disciplinas dinâmicas: rascunho → em breve → publicada → arquivada, com agendamento;
   - módulos e itens (vídeo, resumo, mapa mental, flashcards, prova) com ordem,
