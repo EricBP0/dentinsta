@@ -127,6 +127,11 @@ no `main` (enquanto isso, o `main` só tem o planejamento).
    URL** do Supabase usam o domínio final e faça **Redeploy**. Variáveis que
    começam com `NEXT_PUBLIC_` só mudam depois de um novo deploy.
 
+6. **Analytics**: na aba **Analytics** do projeto, clique em **Enable**. O
+   componente já está no código (`<Analytics />` em `src/app/layout.tsx`); as
+   visitas aparecem depois do próximo deploy. Não usa cookies, então não
+   precisa de banner de consentimento.
+
 ### 4.1 DNS na Hostinger
 
 O domínio fica registrado na Hostinger; só os registros de DNS apontam para a

@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
 import { Geist, Sora } from "next/font/google";
 import "./globals.css";
@@ -28,7 +29,10 @@ export const viewport: Viewport = { themeColor: "#0F766E" };
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="pt-BR" className={`${geistSans.variable} ${sora.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col bg-slate-50 text-slate-900">{children}</body>
+      <body className="flex min-h-full flex-col bg-slate-50 text-slate-900">
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }
