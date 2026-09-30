@@ -14,19 +14,19 @@ pagamento de teste e depois virar a chave para vender de verdade.
 
 | Serviço | Para quê | Plano |
 |---|---|---|
-| **GitHub** | Código (repositório `dentinsta` (o nome do repositório pode continuar o mesmo)) | Gratuito |
+| **GitHub** | Código (repositório `dentinsta`; o nome do repositório não precisa mudar) | Gratuito |
 | **Vercel** | Hospedar o site | **Pro obrigatório**: o plano gratuito (Hobby) é só para uso pessoal e **proíbe uso comercial**, e a plataforma cobra dos alunos |
 | **Supabase** | Banco de dados, login e arquivos | Comece no gratuito para testar. Para lançar, **Pro**: o gratuito pode pausar o projeto por inatividade e não tem backup diário |
 | **Resend** (ou outro SMTP) | E-mails de confirmação de cadastro e de senha | Plano gratuito atende o começo |
 | **Asaas** | Pagamentos (Pix, cartão, parcelado) e nota fiscal | Sem mensalidade; taxa por transação |
 | **Anthropic** | IA (correção de discursivas e geração de questões e flashcards) | Pré-pago por uso |
-| **Domínio** | Ex.: `odontolab.com.br` (registro.br) | Anual |
+| **Domínio** | `odontolab.online`, comprado na **Hostinger**. O DNS é configurado lá (seção 4.1) | Anual |
 
 ### O código
 
-Todo o trabalho está no branch `claude/nifty-euler-ywoua0`. Antes de publicar,
-junte esse branch ao `main` (por um pull request no GitHub). A Vercel publica o
-`main` como produção.
+O `main` é o branch padrão e a Vercel publica ele como produção. Antes de
+publicar, faça o merge do pull request do branch `claude/nifty-euler-ywoua0`
+no `main` (enquanto isso, o `main` só tem o planejamento).
 
 ---
 
@@ -48,9 +48,9 @@ junte esse branch ao `main` (por um pull request no GitHub). A Vercel publica o
    **publishable** e a chave **secret**. A secret nunca vai para o navegador nem
    para o GitHub — só para as variáveis da Vercel.
 4. **Authentication → URL Configuration**:
-   - **Site URL**: `https://SEU-DOMINIO` (enquanto não tiver domínio, use o
+   - **Site URL**: `https://odontolab.online` (enquanto o domínio não estiver ativo, use o
      endereço `https://....vercel.app` que a Vercel gerar no passo 4).
-   - **Redirect URLs**: adicione `https://SEU-DOMINIO/auth/confirmar` (e o
+   - **Redirect URLs**: adicione `https://odontolab.online/auth/confirmar` (e o
      equivalente no endereço `.vercel.app`).
 5. **Authentication → Emails → SMTP Settings**: configure o SMTP próprio
    (passo 2). **Sem isso o cadastro não funciona em produção**: o e-mail padrão
@@ -72,11 +72,11 @@ junte esse branch ao `main` (por um pull request no GitHub). A Vercel publica o
 ## 2. E-mail (Resend)
 
 1. Crie a conta em [resend.com](https://resend.com) e adicione o seu domínio.
-2. Cadastre no registro.br (ou onde o domínio estiver) os registros DNS que o
-   Resend mostrar (SPF/DKIM). Espere o domínio ficar **verificado**.
+2. Cadastre na Hostinger os registros DNS que o Resend mostrar (veja a seção
+   4.1, "Registros do Resend"). Espere o domínio ficar **verificado**.
 3. Gere uma chave de API (SMTP) e preencha no Supabase (passo 1.5):
    - Host `smtp.resend.com`, porta `465`, usuário `resend`, senha = a chave.
-   - Remetente: por exemplo `nao-responda@SEU-DOMINIO`, nome `OdontoLab`.
+   - Remetente: por exemplo `nao-responda@odontolab.online`, nome `OdontoLab`.
 
 ---
 
@@ -94,7 +94,7 @@ junte esse branch ao `main` (por um pull request no GitHub). A Vercel publica o
 ## 4. Vercel (site)
 
 1. Em [vercel.com](https://vercel.com), assine o **Pro** e clique em
-   **Add New → Project** → importe o repositório `dentinsta` (o nome do repositório pode continuar o mesmo) do GitHub.
+   **Add New → Project** → importe o repositório `dentinsta` do GitHub.
    A Vercel detecta Next.js sozinha; não mude os comandos de build.
 2. Antes do primeiro deploy, abra **Environment Variables** e cadastre (em
    **Production** e **Preview**):
@@ -108,7 +108,7 @@ junte esse branch ao `main` (por um pull request no GitHub). A Vercel publica o
    | `ASAAS_API_KEY` | Chave do **sandbox** do Asaas por enquanto (Sensitive) |
    | `ASAAS_AMBIENTE` | `sandbox` |
    | `ASAAS_WEBHOOK_TOKEN` | Uma senha longa e aleatória que você inventa (Sensitive) |
-   | `NEXT_PUBLIC_SITE_URL` | `https://SEU-DOMINIO` (ou o `.vercel.app` até ter domínio) |
+   | `NEXT_PUBLIC_SITE_URL` | `https://odontolab.online` (ou o `.vercel.app` até o domínio estar ativo) |
    | `CERTIFICADO_RESPONSAVEL` | Nome de quem assina (ex.: `Dr. Fulano de Tal`) |
    | `CERTIFICADO_RESPONSAVEL_CARGO` | Ex.: `CRO-SP 12345 · Coordenador pedagógico` |
 
@@ -118,11 +118,74 @@ junte esse branch ao `main` (por um pull request no GitHub). A Vercel publica o
 
 3. Clique em **Deploy**. As funções rodam na região de São Paulo (`gru1`),
    definida no `vercel.json`.
-4. **Domínio**: **Settings → Domains** → adicione o domínio e crie no
-   registro.br os registros que a Vercel indicar.
+4. **Domínio**: **Settings → Domains** → adicione `odontolab.online`
+   e também `www.odontolab.online`. Deixe `odontolab.online` (sem www) como
+   principal e o `www` redirecionando para ele: é o endereço usado nos
+   e-mails, no checkout e no QR do certificado. Depois crie na Hostinger os
+   registros que a Vercel indicar (seção 4.1).
 5. Quando o domínio estiver ativo, confira se `NEXT_PUBLIC_SITE_URL` e a **Site
    URL** do Supabase usam o domínio final e faça **Redeploy**. Variáveis que
    começam com `NEXT_PUBLIC_` só mudam depois de um novo deploy.
+
+6. **Analytics**: na aba **Analytics** do projeto, clique em **Enable**. O
+   componente já está no código (`<Analytics />` em `src/app/layout.tsx`); as
+   visitas aparecem depois do próximo deploy. Não usa cookies, então não
+   precisa de banner de consentimento.
+7. **Speed Insights**: na aba **Speed Insights**, clique em **Enable**. Mede a
+   velocidade real das páginas nos aparelhos dos alunos (`<SpeedInsights />`
+   também está no `layout.tsx`).
+
+### 4.1 DNS na Hostinger
+
+O domínio fica registrado na Hostinger; só os registros de DNS apontam para a
+Vercel (site) e para o Resend (e-mail). **Não troque os nameservers**: manter o
+DNS na Hostinger é o mais simples e não mexe em outros serviços que você
+tenha lá (como um e-mail da Hostinger).
+
+No **hPanel**: **Domínios → seu domínio → DNS / Nameservers → Gerenciar
+registros DNS**. No campo **Nome**, a Hostinger usa `@` para o domínio raiz e
+só o prefixo para subdomínios (`www`, e não `www.odontolab.online`).
+
+**1. Apague os registros que apontam para a Hostinger.** Um domínio novo vem
+com um registro `A` em `@` (página de "domínio estacionado") e um `CNAME` em
+`www`. Se ficarem, conflitam com os da Vercel. Apague só esses dois: não apague
+`MX`, `TXT` ou `CAA` que já existam.
+
+**2. Registros da Vercel (site).** Use exatamente os valores que a Vercel
+mostrar em **Settings → Domains**. Normalmente são:
+
+| Tipo | Nome | Valor | TTL |
+|---|---|---|---|
+| `A` | `@` | o IP que a Vercel mostrar (hoje costuma ser `76.76.21.21`) | 3600 |
+| `CNAME` | `www` | o endereço que a Vercel mostrar (ex.: `cname.vercel-dns.com`) | 3600 |
+
+Se a Vercel pedir um registro `TXT` com nome `_vercel` para confirmar a posse
+do domínio, crie também.
+
+**3. Registros do Resend (e-mail).** Em **Resend → Domains → seu domínio**,
+copie cada registro para a Hostinger. Eles ficam em subdomínios próprios
+(`send`, `resend._domainkey`), então **não atrapalham um e-mail da Hostinger**
+que use o domínio raiz. São parecidos com:
+
+| Tipo | Nome | Valor |
+|---|---|---|
+| `MX` | `send` | `feedback-smtp….amazonses.com` (prioridade 10) |
+| `TXT` | `send` | `v=spf1 include:amazonses.com ~all` |
+| `TXT` | `resend._domainkey` | a chave DKIM longa que o Resend mostrar |
+| `TXT` | `_dmarc` | `v=DMARC1; p=none;` (recomendado; crie só se ainda não existir) |
+
+Cuidado ao colar o nome: se o Resend mostrar `send.odontolab.online`, na
+Hostinger escreva só `send`, senão o registro vira
+`send.odontolab.online.odontolab.online`.
+
+**4. Espere e confira.** Costuma propagar em minutos, mas pode levar até 24h.
+A Vercel mostra **Valid Configuration** e emite o certificado HTTPS sozinha; o
+Resend mostra **Verified**. Se o certificado não sair, veja se há registros
+`CAA` na Hostinger: eles precisam permitir `letsencrypt.org` (ou apague os
+`CAA`).
+
+Depois disso, siga o passo 5 da seção 4 (atualizar `NEXT_PUBLIC_SITE_URL` e a
+Site URL do Supabase e fazer Redeploy).
 
 ---
 
@@ -132,7 +195,7 @@ junte esse branch ao `main` (por um pull request no GitHub). A Vercel publica o
    gere a chave de API (**Integrações → Chaves de API**). Coloque em
    `ASAAS_API_KEY` na Vercel, com `ASAAS_AMBIENTE=sandbox`.
 2. **Integrações → Webhooks → Adicionar**:
-   - URL: `https://SEU-DOMINIO/api/asaas/webhook`
+   - URL: `https://odontolab.online/api/asaas/webhook`
    - Token de autenticação: o mesmo valor de `ASAAS_WEBHOOK_TOKEN`
    - Tipo de envio: sequencial
    - Eventos: `CHECKOUT_PAID`, `CHECKOUT_CANCELED`, `CHECKOUT_EXPIRED`,

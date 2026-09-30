@@ -108,7 +108,7 @@ corrigidas por função do banco e discursivas pelo servidor com a chave secreta
 
 6. **Asaas**: crie a conta (use o [sandbox](https://sandbox.asaas.com) para
    testar), gere a chave de API e cadastre o webhook em **Integrações → Webhooks**:
-   - URL: `https://SEU-SITE/api/asaas/webhook`
+   - URL: `https://odontolab.online/api/asaas/webhook`
    - Token de autenticação: o mesmo valor de `ASAAS_WEBHOOK_TOKEN`
    - Eventos: `CHECKOUT_PAID`, `CHECKOUT_CANCELED`, `CHECKOUT_EXPIRED`,
      `PAYMENT_CONFIRMED`, `PAYMENT_RECEIVED`, `PAYMENT_REFUNDED`,
