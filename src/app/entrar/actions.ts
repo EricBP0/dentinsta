@@ -25,12 +25,15 @@ export async function cadastrar(_: EstadoForm, formData: FormData): Promise<Esta
   if (senha.length < 8) return { erro: "A senha precisa ter pelo menos 8 caracteres." };
 
   const proximo = destinoSeguro(formData.get("proximo"));
+  const nome = String(formData.get("nome") ?? "").trim();
   const supabase = await criarClienteServidor();
   const { data, error } = await supabase.auth.signUp({
     email: String(formData.get("email") ?? ""),
     password: senha,
     options: {
-      data: { nome: String(formData.get("nome") ?? "").trim() },
+      // primeiro_nome e proximo são usados pelo modelo de e-mail de confirmação
+      // (supabase/templates): saudação e para onde voltar depois de confirmar.
+      data: { nome, primeiro_nome: nome.split(/\s+/)[0] ?? "", proximo },
       // Depois de confirmar o e-mail, volta para onde o aluno estava (ex.: /assinar).
       emailRedirectTo: `${await urlDoSite()}/auth/confirmar?next=${encodeURIComponent(proximo)}`,
     },

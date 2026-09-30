@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<title>Seu link de acesso à OdontoLab</title>
+</head>
+<body style="margin:0;padding:0;background:#EEF4F3;-webkit-text-size-adjust:100%">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent">Entre na sua conta com um clique.&#8199;&#65279;&#847;&#8199;&#65279;&#847;&#8199;&#65279;&#847;</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#EEF4F3" style="background:#EEF4F3">
+  <tr>
+    <td align="center" style="padding:32px 16px">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px">
+        <tr>
+          <td style="padding:0 4px 20px">
+            <a href="{{ .SiteURL }}" target="_blank" style="text-decoration:none">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="padding-right:10px"><img src="{{ .SiteURL }}/marca/odontolab-simbolo-512.png" width="40" height="40" alt="" style="display:block;border:0;border-radius:10px"></td>
+                  <td style="font-family:'Segoe UI', Helvetica, Arial, sans-serif;font-size:22px;font-weight:700;letter-spacing:-0.3px;color:#0B1F24">Odonto<span style="color:#0F766E">Lab</span></td>
+                </tr>
+              </table>
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td bgcolor="#FFFFFF" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:16px;overflow:hidden">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td height="5" bgcolor="#0F766E" style="height:5px;line-height:5px;font-size:0;background:#0F766E">&nbsp;</td>
+                <td height="5" width="72" bgcolor="#FF7A59" style="height:5px;width:72px;line-height:5px;font-size:0;background:#FF7A59">&nbsp;</td>
+              </tr>
+              <tr>
+                <td colspan="2" style="padding:36px 36px 32px;font-family:'Segoe UI', Helvetica, Arial, sans-serif">
+                  <h1 style="margin:0 0 18px;font-family:'Segoe UI', Helvetica, Arial, sans-serif;font-size:24px;line-height:32px;font-weight:700;color:#0B1F24">Seu link de acesso</h1>
+<p style="margin:0 0 14px;font-size:16px;line-height:26px;color:#334155">{{ if .Data.primeiro_nome }}Olá, {{ .Data.primeiro_nome }}!{{ else }}Olá!{{ end }}</p>
+<p style="margin:0 0 14px;font-size:16px;line-height:26px;color:#334155">Use o botão abaixo para entrar na sua conta, sem precisar da senha.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0 8px">
+  <tr>
+    <td bgcolor="#0F766E" style="border-radius:10px;mso-padding-alt:14px 28px">
+      <a href="{{ .SiteURL }}/auth/confirmar?token_hash={{ .TokenHash }}&type=email&next=/aluno" target="_blank" style="display:inline-block;padding:14px 28px;font-family:'Segoe UI', Helvetica, Arial, sans-serif;font-size:16px;font-weight:600;line-height:20px;color:#FFFFFF;text-decoration:none;border-radius:10px">Entrar na OdontoLab</a>
+    </td>
+  </tr>
+</table>
+<p style="margin:20px 0 0;font-size:13px;line-height:20px;color:#64748B">Se o botão não funcionar, copie e cole este endereço no navegador:<br>
+<a href="{{ .SiteURL }}/auth/confirmar?token_hash={{ .TokenHash }}&type=email&next=/aluno" style="color:#0F766E;word-break:break-all">{{ .SiteURL }}/auth/confirmar?token_hash={{ .TokenHash }}&type=email&next=/aluno</a></p>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2" style="padding:18px 36px;border-top:1px solid #E2E8F0;font-family:'Segoe UI', Helvetica, Arial, sans-serif;font-size:13px;line-height:20px;color:#64748B">Por segurança, o link vale por 1 hora e só pode ser usado uma vez. Se você não pediu isso, pode ignorar este e-mail.</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding:24px 12px 0;font-family:'Segoe UI', Helvetica, Arial, sans-serif;font-size:12px;line-height:18px;color:#64748B">
+            <strong style="color:#0B1F24">OdontoLab</strong> · o laboratório de estudos da graduação em Odontologia<br>
+            <a href="{{ .SiteURL }}" style="color:#0F766E;text-decoration:none">odontolab.online</a> · Este é um e-mail automático, não precisa responder.
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>

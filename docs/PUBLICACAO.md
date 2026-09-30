@@ -55,17 +55,15 @@ no `main` (enquanto isso, o `main` só tem o planejamento).
 5. **Authentication → Emails → SMTP Settings**: configure o SMTP próprio
    (passo 2). **Sem isso o cadastro não funciona em produção**: o e-mail padrão
    do Supabase envia só 2 mensagens por hora e só para membros da equipe.
-6. **Authentication → Emails → Templates** (recomendado): troque o link dos
-   modelos para o formato abaixo. Assim o link funciona mesmo se o aluno abrir o
-   e-mail no celular depois de se cadastrar no computador. Aproveite para
-   traduzir os textos para português.
-   - **Confirm signup**:
-     `{{ .SiteURL }}/auth/confirmar?token_hash={{ .TokenHash }}&type=email`
-   - **Reset password**:
-     `{{ .SiteURL }}/auth/confirmar?token_hash={{ .TokenHash }}&type=recovery&next=/redefinir-senha`
+6. **Authentication → Emails → Templates**: cole os modelos com a marca
+   OdontoLab que estão em `supabase/templates/` (assunto e arquivo de cada um
+   no [README da pasta](../supabase/templates/README.md)). Além do visual, eles
+   fazem o link funcionar mesmo se o aluno abrir o e-mail no celular depois de
+   se cadastrar no computador, e levam de volta ao checkout depois da
+   confirmação.
 
-   Se não trocar, os modelos padrão também funcionam, mas o link precisa ser
-   aberto no mesmo navegador em que o aluno se cadastrou.
+   Se não trocar, os modelos padrão (em inglês) também funcionam, mas o link
+   precisa ser aberto no mesmo navegador em que o aluno se cadastrou.
 
 ---
 
