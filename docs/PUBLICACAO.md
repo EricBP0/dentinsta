@@ -131,6 +131,9 @@ no `main` (enquanto isso, o `main` só tem o planejamento).
    componente já está no código (`<Analytics />` em `src/app/layout.tsx`); as
    visitas aparecem depois do próximo deploy. Não usa cookies, então não
    precisa de banner de consentimento.
+7. **Speed Insights**: na aba **Speed Insights**, clique em **Enable**. Mede a
+   velocidade real das páginas nos aparelhos dos alunos (`<SpeedInsights />`
+   também está no `layout.tsx`).
 
 ### 4.1 DNS na Hostinger
 
