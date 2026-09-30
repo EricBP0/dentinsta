@@ -5,8 +5,17 @@ export async function proxy(request: NextRequest) {
   return atualizarSessao(request);
 }
 
+// Só as rotas que usam login passam pelo proxy. A landing, a validação
+// pública de certificado, o webhook e as imagens saem direto do CDN, sem
+// esperar uma função rodar.
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/aluno/:path*",
+    "/admin/:path*",
+    "/assinar/:path*",
+    "/renovar/:path*",
+    "/pagamento/:path*",
+    "/entrar",
+    "/redefinir-senha",
   ],
 };

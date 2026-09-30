@@ -27,12 +27,7 @@ export function PreviaProduto() {
       {/* brilho de fundo */}
       <div aria-hidden className="absolute -inset-8 -z-10 rounded-[3rem] bg-gradient-to-br from-teal-200/60 via-coral-claro/25 to-transparent blur-2xl" />
 
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xl shadow-teal-900/5"
-      >
+      <div className="entrar rounded-2xl border border-slate-200 bg-white p-5 shadow-xl shadow-teal-900/5 [animation-delay:200ms]">
         <div className="flex items-center justify-between">
           <span className="inline-flex items-center gap-1.5 text-xs font-medium text-teal-700">
             <Sparkles className="size-3.5" /> Correção por IA
@@ -72,7 +67,7 @@ export function PreviaProduto() {
             <NumeroAnimado valor={8.5} />
           </p>
         </div>
-      </motion.div>
+      </div>
 
       {/* flashcard flutuante */}
       <motion.div

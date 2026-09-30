@@ -102,29 +102,29 @@ export default function Inicio() {
         <CabecalhoLanding />
 
         <main className="relative">
-          {/* Hero */}
+          {/* Hero: animação só em CSS, para o título aparecer no primeiro desenho da página (LCP) */}
           <section className="mx-auto grid max-w-6xl items-center gap-16 px-4 pb-24 pt-12 md:pt-20 lg:grid-cols-2">
             <div className="space-y-6">
-              <Surgir>
+              <div className="entrar">
                 <Badge variant="secondary" className="gap-1.5 px-3 py-1">
                   <Stethoscope className="size-3.5" /> O laboratório de estudos da graduação em Odontologia
                 </Badge>
-              </Surgir>
-              <Surgir atraso={0.05}>
+              </div>
+              <div className="subir [animation-delay:50ms]">
                 <h1 className="text-4xl font-bold tracking-tight text-tinta sm:text-5xl lg:text-6xl">
                   Passe nas provas da faculdade com{" "}
                   <span className="bg-gradient-to-r from-teal-700 to-teal-500 bg-clip-text text-transparent underline decoration-coral decoration-4 underline-offset-[10px]">
                     quem entende de Odontologia
                   </span>
                 </h1>
-              </Surgir>
-              <Surgir atraso={0.1}>
+              </div>
+              <div className="entrar [animation-delay:100ms]">
                 <p className="max-w-xl text-lg text-slate-600">
                   Videoaulas, resumos, mapas mentais e flashcards feitos por um cirurgião-dentista — e simulados com IA
                   que corrige suas respostas como um professor.
                 </p>
-              </Surgir>
-              <Surgir atraso={0.15} className="flex flex-wrap gap-3">
+              </div>
+              <div className="entrar flex flex-wrap gap-3 [animation-delay:150ms]">
                 <Button size="lg" className="h-11 px-5 text-base" asChild>
                   <Link href="/assinar">
                     Começar agora <ArrowRight data-icon="inline-end" />
@@ -133,8 +133,8 @@ export default function Inicio() {
                 <Button variant="outline" size="lg" className="h-11 px-5 text-base" asChild>
                   <a href="#como-funciona">Ver como funciona</a>
                 </Button>
-              </Surgir>
-              <Surgir atraso={0.2}>
+              </div>
+              <div className="entrar [animation-delay:200ms]">
                 <p className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-slate-500">
                   <span className="inline-flex items-center gap-1.5">
                     <Check className="size-4 text-teal-600" /> Acesso vitalício
@@ -146,7 +146,7 @@ export default function Inicio() {
                     <Check className="size-4 text-teal-600" /> 7 dias para desistir
                   </span>
                 </p>
-              </Surgir>
+              </div>
             </div>
             <div>
               <PreviaProduto />

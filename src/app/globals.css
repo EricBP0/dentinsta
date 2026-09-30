@@ -149,3 +149,32 @@
     radial-gradient(28rem 18rem at 105% 110%, color-mix(in oklab, var(--color-coral-claro) 35%, transparent), transparent 70%),
     #fff;
 }
+
+/*
+ * Entrada do topo da landing em CSS puro: começa no primeiro desenho da página,
+ * sem esperar o JavaScript. `subir` não mexe na opacidade, para o título (o
+ * maior elemento da tela, que conta para o LCP) aparecer imediatamente.
+ */
+@keyframes entrar {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+@keyframes subir {
+  from {
+    transform: translateY(16px);
+  }
+}
+.entrar {
+  animation: entrar 0.5s cubic-bezier(0.21, 0.47, 0.32, 0.98) both;
+}
+.subir {
+  animation: subir 0.5s cubic-bezier(0.21, 0.47, 0.32, 0.98) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .entrar,
+  .subir {
+    animation: none;
+  }
+}
