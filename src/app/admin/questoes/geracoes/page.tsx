@@ -69,7 +69,7 @@ export default async function Geracoes() {
           <Link href="/admin/questoes" className="text-sm text-slate-600 hover:text-slate-900">
             ← Banco de questões
           </Link>
-          <h1 className="text-2xl font-bold text-slate-900">Gerações por IA</h1>
+          <h1 className="text-2xl font-bold text-tinta">Gerações por IA</h1>
         </div>
         <div className="flex gap-2">
           <form action={verificarGeracoes}>

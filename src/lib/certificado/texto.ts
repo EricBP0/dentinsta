@@ -34,7 +34,7 @@ export function montarTextoCertificado(dados: DadosCertificado) {
 /** Responsável que assina o certificado (configurável sem mexer no código). */
 export function responsavelCertificado() {
   return {
-    plataforma: process.env.CERTIFICADO_PLATAFORMA || "dentinsta",
+    plataforma: process.env.CERTIFICADO_PLATAFORMA || "OdontoLab",
     responsavel: process.env.CERTIFICADO_RESPONSAVEL || "Coordenação pedagógica",
     responsavelCargo: process.env.CERTIFICADO_RESPONSAVEL_CARGO || "",
   };

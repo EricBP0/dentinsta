@@ -39,7 +39,7 @@ export default async function PaginaItem({ params }: PageProps<"/aluno/itens/[id
       </Link>
       <header>
         <p className="text-sm text-slate-500">{NOME_TIPO_ITEM[item.tipo]}</p>
-        <h1 className="text-2xl font-bold text-slate-900">{item.titulo}</h1>
+        <h1 className="text-2xl font-bold text-tinta">{item.titulo}</h1>
       </header>
 
       {config && item.tipo === "flashcards" ? (

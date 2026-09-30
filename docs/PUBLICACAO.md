@@ -14,13 +14,13 @@ pagamento de teste e depois virar a chave para vender de verdade.
 
 | Serviço | Para quê | Plano |
 |---|---|---|
-| **GitHub** | Código (repositório `dentinsta`) | Gratuito |
+| **GitHub** | Código (repositório `dentinsta` (o nome do repositório pode continuar o mesmo)) | Gratuito |
 | **Vercel** | Hospedar o site | **Pro obrigatório**: o plano gratuito (Hobby) é só para uso pessoal e **proíbe uso comercial**, e a plataforma cobra dos alunos |
 | **Supabase** | Banco de dados, login e arquivos | Comece no gratuito para testar. Para lançar, **Pro**: o gratuito pode pausar o projeto por inatividade e não tem backup diário |
 | **Resend** (ou outro SMTP) | E-mails de confirmação de cadastro e de senha | Plano gratuito atende o começo |
 | **Asaas** | Pagamentos (Pix, cartão, parcelado) e nota fiscal | Sem mensalidade; taxa por transação |
 | **Anthropic** | IA (correção de discursivas e geração de questões e flashcards) | Pré-pago por uso |
-| **Domínio** | Ex.: `dentinsta.com.br` (registro.br) | Anual |
+| **Domínio** | Ex.: `odontolab.com.br` (registro.br) | Anual |
 
 ### O código
 
@@ -76,7 +76,7 @@ junte esse branch ao `main` (por um pull request no GitHub). A Vercel publica o
    Resend mostrar (SPF/DKIM). Espere o domínio ficar **verificado**.
 3. Gere uma chave de API (SMTP) e preencha no Supabase (passo 1.5):
    - Host `smtp.resend.com`, porta `465`, usuário `resend`, senha = a chave.
-   - Remetente: por exemplo `nao-responda@SEU-DOMINIO`, nome `dentinsta`.
+   - Remetente: por exemplo `nao-responda@SEU-DOMINIO`, nome `OdontoLab`.
 
 ---
 
@@ -94,7 +94,7 @@ junte esse branch ao `main` (por um pull request no GitHub). A Vercel publica o
 ## 4. Vercel (site)
 
 1. Em [vercel.com](https://vercel.com), assine o **Pro** e clique em
-   **Add New → Project** → importe o repositório `dentinsta` do GitHub.
+   **Add New → Project** → importe o repositório `dentinsta` (o nome do repositório pode continuar o mesmo) do GitHub.
    A Vercel detecta Next.js sozinha; não mude os comandos de build.
 2. Antes do primeiro deploy, abra **Environment Variables** e cadastre (em
    **Production** e **Preview**):

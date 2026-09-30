@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Logo } from "@/components/marca/logo";
 import { redirect } from "next/navigation";
 import { AvisoCheckout, OpcoesPagamento } from "@/components/ofertas";
 import { exigirLogin } from "@/lib/auth";
@@ -13,11 +14,11 @@ export default async function Assinar({ searchParams }: PageProps<"/assinar">) {
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 space-y-8 px-4 py-12">
-      <Link href="/" className="text-xl font-bold text-teal-800">
-        dentinsta
+      <Link href="/" aria-label="OdontoLab — início" className="inline-block">
+        <Logo />
       </Link>
       <header className="space-y-2">
-        <h1 className="text-3xl font-bold text-slate-900">Liberar acesso completo</h1>
+        <h1 className="text-3xl font-bold text-tinta">Liberar acesso completo</h1>
         <ul className="space-y-1 text-slate-700">
           <li>✓ Acesso vitalício a todo o conteúdo publicado até 12 meses após a compra</li>
           <li>✓ Novas disciplinas, aulas e a IA (simulados e correção) por 12 meses</li>

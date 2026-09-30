@@ -73,7 +73,7 @@ export default async function Vendas({ searchParams }: PageProps<"/admin/vendas"
   return (
     <div className="space-y-8">
       <header>
-        <h1 className="text-2xl font-bold text-slate-900">Vendas e acessos</h1>
+        <h1 className="text-2xl font-bold text-tinta">Vendas e acessos</h1>
         <p className="text-sm text-slate-600">Pagamentos pelo Asaas. Estornos e chargebacks retiram o acesso automaticamente.</p>
       </header>
 

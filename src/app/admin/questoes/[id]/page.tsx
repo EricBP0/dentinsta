@@ -24,7 +24,7 @@ export default async function EditarQuestao({ params }: PageProps<"/admin/questo
       <Link href={`/admin/questoes?disciplina=${existente.disciplina_id}`} className="text-sm text-slate-600 hover:text-slate-900">
         ← Banco de questões
       </Link>
-      <h1 className="text-2xl font-bold text-slate-900">Editar questão</h1>
+      <h1 className="text-2xl font-bold text-tinta">Editar questão</h1>
       <FormularioQuestao disciplinas={disciplinas ?? []} questao={existente} />
     </div>
   );

@@ -15,6 +15,7 @@ import {
   Video,
 } from "lucide-react";
 import Link from "next/link";
+import { Logo } from "@/components/marca/logo";
 import { CabecalhoLanding } from "@/components/landing/cabecalho-landing";
 import { PreviaProduto } from "@/components/landing/previa-produto";
 import { Movimento, Surgir, SurgirItem, SurgirLista } from "@/components/movimento";
@@ -106,13 +107,13 @@ export default function Inicio() {
             <div className="space-y-6">
               <Surgir>
                 <Badge variant="secondary" className="gap-1.5 px-3 py-1">
-                  <Stethoscope className="size-3.5" /> Feito para a graduação em Odontologia
+                  <Stethoscope className="size-3.5" /> O laboratório de estudos da graduação em Odontologia
                 </Badge>
               </Surgir>
               <Surgir atraso={0.05}>
-                <h1 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
+                <h1 className="text-4xl font-bold tracking-tight text-tinta sm:text-5xl lg:text-6xl">
                   Passe nas provas da faculdade com{" "}
-                  <span className="bg-gradient-to-r from-teal-700 to-teal-500 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-teal-700 to-teal-500 bg-clip-text text-transparent underline decoration-coral decoration-4 underline-offset-[10px]">
                     quem entende de Odontologia
                   </span>
                 </h1>
@@ -156,7 +157,7 @@ export default function Inicio() {
           <section id="recursos" className="scroll-mt-20 border-t border-slate-100 bg-slate-50/60 py-24">
             <div className="mx-auto max-w-6xl space-y-12 px-4">
               <Surgir className="mx-auto max-w-2xl space-y-3 text-center">
-                <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Tudo para estudar em um só lugar</h2>
+                <h2 className="text-3xl font-bold tracking-tight text-tinta sm:text-4xl">Tudo para estudar em um só lugar</h2>
                 <p className="text-slate-600">Organizado por disciplina e período, do jeito que a faculdade cobra.</p>
               </Surgir>
               <SurgirLista className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -168,13 +169,13 @@ export default function Inicio() {
                     <div
                       className={`group h-full rounded-2xl border p-6 transition-all hover:-translate-y-1 hover:shadow-lg ${
                         destaque
-                          ? "border-teal-700 bg-gradient-to-br from-teal-700 to-teal-900 text-white hover:shadow-teal-900/20"
+                          ? "border-teal-700 bg-gradient-to-br from-primary to-tinta text-white hover:shadow-teal-900/20"
                           : "border-slate-200 bg-white hover:shadow-slate-900/5"
                       }`}
                     >
                       <div
                         className={`mb-4 inline-flex size-10 items-center justify-center rounded-xl ${
-                          destaque ? "bg-white/15" : "bg-teal-50 text-teal-700"
+                          destaque ? "bg-coral text-tinta" : "bg-teal-50 text-teal-700"
                         }`}
                       >
                         <Icone className="size-5" />
@@ -183,10 +184,10 @@ export default function Inicio() {
                       <p className={`mt-2 text-sm leading-relaxed ${destaque ? "text-teal-50" : "text-slate-600"}`}>{texto}</p>
                       {destaque && (
                         <ul className="mt-6 grid gap-2 text-sm text-teal-50 sm:grid-cols-2">
-                          <li className="flex gap-2"><Check className="size-4 shrink-0" /> Nota por critério da rubrica do professor</li>
-                          <li className="flex gap-2"><Check className="size-4 shrink-0" /> Comentários e o que faltou citar</li>
-                          <li className="flex gap-2"><Check className="size-4 shrink-0" /> Prioriza as questões que você errou</li>
-                          <li className="flex gap-2"><Check className="size-4 shrink-0" /> Revisão do professor se você discordar</li>
+                          <li className="flex gap-2"><Check className="size-4 shrink-0 text-menta" /> Nota por critério da rubrica do professor</li>
+                          <li className="flex gap-2"><Check className="size-4 shrink-0 text-menta" /> Comentários e o que faltou citar</li>
+                          <li className="flex gap-2"><Check className="size-4 shrink-0 text-menta" /> Prioriza as questões que você errou</li>
+                          <li className="flex gap-2"><Check className="size-4 shrink-0 text-menta" /> Revisão do professor se você discordar</li>
                         </ul>
                       )}
                     </div>
@@ -200,16 +201,16 @@ export default function Inicio() {
           <section id="como-funciona" className="scroll-mt-20 py-24">
             <div className="mx-auto max-w-6xl space-y-12 px-4">
               <Surgir className="mx-auto max-w-2xl space-y-3 text-center">
-                <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Como funciona</h2>
+                <h2 className="text-3xl font-bold tracking-tight text-tinta sm:text-4xl">Como funciona</h2>
                 <p className="text-slate-600">Em poucos minutos você já está estudando.</p>
               </Surgir>
               <SurgirLista className="grid gap-8 md:grid-cols-3">
                 {PASSOS.map(({ icone: Icone, titulo, texto }, i) => (
                   <SurgirItem key={titulo} className="relative space-y-3 text-center md:text-left">
-                    <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-teal-700 text-white shadow-lg shadow-teal-900/20 md:mx-0">
+                    <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-primary text-white shadow-lg shadow-teal-900/20 md:mx-0">
                       <Icone className="size-5" />
                     </div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-teal-700">Passo {i + 1}</p>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-coral">Passo {i + 1}</p>
                     <h3 className="text-lg font-semibold text-slate-900">{titulo}</h3>
                     <p className="text-sm leading-relaxed text-slate-600">{texto}</p>
                   </SurgirItem>
@@ -234,7 +235,7 @@ export default function Inicio() {
           <section id="preco" className="scroll-mt-20 border-t border-slate-100 bg-slate-50/60 py-24">
             <div className="mx-auto max-w-6xl space-y-10 px-4">
               <Surgir className="mx-auto max-w-2xl space-y-3 text-center">
-                <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Um pagamento, acesso para sempre</h2>
+                <h2 className="text-3xl font-bold tracking-tight text-tinta sm:text-4xl">Um pagamento, acesso para sempre</h2>
                 <p className="text-slate-600">Sem mensalidade. Pague uma vez e estude no seu ritmo.</p>
               </Surgir>
               <Surgir className="mx-auto max-w-md">
@@ -280,7 +281,7 @@ export default function Inicio() {
           <section id="duvidas" className="scroll-mt-20 py-24">
             <div className="mx-auto max-w-3xl space-y-10 px-4">
               <Surgir className="space-y-3 text-center">
-                <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Dúvidas frequentes</h2>
+                <h2 className="text-3xl font-bold tracking-tight text-tinta sm:text-4xl">Dúvidas frequentes</h2>
               </Surgir>
               <Surgir>
                 <Accordion type="single" collapsible className="rounded-2xl border border-slate-200 bg-white px-6">
@@ -298,15 +299,15 @@ export default function Inicio() {
           {/* Chamada final */}
           <section className="px-4 pb-24">
             <Surgir className="mx-auto max-w-6xl">
-              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-teal-700 to-teal-900 px-6 py-16 text-center text-white">
-                <div aria-hidden className="absolute -right-24 -top-24 size-72 rounded-full bg-teal-500/30 blur-3xl" />
-                <div aria-hidden className="absolute -bottom-24 -left-24 size-72 rounded-full bg-sky-400/20 blur-3xl" />
+              <div className="relative overflow-hidden rounded-3xl bg-tinta px-6 py-16 text-center text-white">
+                <div aria-hidden className="absolute -right-24 -top-24 size-72 rounded-full bg-teal-500/35 blur-3xl" />
+                <div aria-hidden className="absolute -bottom-24 -left-24 size-72 rounded-full bg-coral/25 blur-3xl" />
                 <div className="relative space-y-5">
                   <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Sua próxima prova começa hoje</h2>
-                  <p className="mx-auto max-w-xl text-teal-50">
+                  <p className="mx-auto max-w-xl text-teal-100">
                     Estude com método, treine com simulados e chegue na prova sabendo onde você precisa melhorar.
                   </p>
-                  <Button size="lg" variant="secondary" className="h-12 px-6 text-base" asChild>
+                  <Button size="lg" className="h-12 bg-coral px-6 text-base text-tinta hover:bg-coral-claro" asChild>
                     <Link href="/assinar">
                       Começar agora <ArrowRight data-icon="inline-end" />
                     </Link>
@@ -319,7 +320,10 @@ export default function Inicio() {
 
         <footer className="border-t border-slate-100 py-8">
           <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 text-sm text-slate-500 sm:flex-row">
-            <span className="font-semibold text-teal-800">dentinsta</span>
+            <span className="flex flex-col items-center gap-1 sm:items-start">
+              <Logo tamanho="sm" />
+              <span className="text-xs">O laboratório de estudos da graduação em Odontologia</span>
+            </span>
             <span className="inline-flex items-center gap-1.5">
               <Smartphone className="size-4" /> Estude no celular, tablet ou computador
             </span>

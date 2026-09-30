@@ -30,7 +30,7 @@ export default async function PagamentoConcluido({ searchParams }: PageProps<"/p
             <Confete quantidade={40} />
             <p className="text-4xl">🎉</p>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-2xl font-bold text-tinta">
             {compra.tipo === "renovacao" ? "Renovação confirmada!" : "Pagamento confirmado!"}
           </h1>
           <p className="text-slate-600">Seu acesso já está liberado. Bons estudos!</p>
@@ -40,7 +40,7 @@ export default async function PagamentoConcluido({ searchParams }: PageProps<"/p
         </Movimento>
       ) : pendente ? (
         <>
-          <h1 className="text-2xl font-bold text-slate-900">Confirmando seu pagamento…</h1>
+          <h1 className="text-2xl font-bold text-tinta">Confirmando seu pagamento…</h1>
           <p className="text-slate-600">
             Pix e cartão costumam confirmar em poucos segundos. Esta página atualiza sozinha — e você também recebe o
             acesso automaticamente se fechar agora.
@@ -52,7 +52,7 @@ export default async function PagamentoConcluido({ searchParams }: PageProps<"/p
         </>
       ) : (
         <>
-          <h1 className="text-2xl font-bold text-slate-900">Pagamento não encontrado</h1>
+          <h1 className="text-2xl font-bold text-tinta">Pagamento não encontrado</h1>
           <p className="text-slate-600">Se você acabou de pagar, aguarde alguns minutos e confira na área do aluno.</p>
           <Link href="/aluno" className="text-sm font-medium text-teal-700 underline">
             Ir para a área do aluno

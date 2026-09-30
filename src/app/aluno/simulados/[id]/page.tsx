@@ -74,7 +74,7 @@ async function Prova({ simulado }: { simulado: Simulado }) {
     <form action={enviarSimulado} className="space-y-6">
       <input type="hidden" name="simulado_id" value={simulado.id} />
       <header>
-        <h1 className="text-2xl font-bold text-slate-900">Simulado · {simulado.disciplinas.nome}</h1>
+        <h1 className="text-2xl font-bold text-tinta">Simulado · {simulado.disciplinas.nome}</h1>
         <p className="text-sm text-slate-600">{questoes.length} questões. Responda e envie no final.</p>
       </header>
 
@@ -130,7 +130,7 @@ async function Resultado({ simulado }: { simulado: Simulado }) {
     <div className="space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Resultado · {simulado.disciplinas.nome}</h1>
+          <h1 className="text-2xl font-bold text-tinta">Resultado · {simulado.disciplinas.nome}</h1>
           {objetivas > 0 && (
             <p className="text-sm text-slate-600">
               Objetivas: {acertos} de {objetivas} corretas

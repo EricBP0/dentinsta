@@ -25,7 +25,7 @@ export function PreviaProduto() {
   return (
     <div className="relative mx-auto w-full max-w-md pb-24">
       {/* brilho de fundo */}
-      <div aria-hidden className="absolute -inset-8 -z-10 rounded-[3rem] bg-gradient-to-br from-teal-200/60 via-sky-100/40 to-transparent blur-2xl" />
+      <div aria-hidden className="absolute -inset-8 -z-10 rounded-[3rem] bg-gradient-to-br from-teal-200/60 via-coral-claro/25 to-transparent blur-2xl" />
 
       <motion.div
         initial={{ opacity: 0, y: 24 }}

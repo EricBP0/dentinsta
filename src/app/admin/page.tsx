@@ -15,7 +15,7 @@ export default async function AdminDisciplinas() {
   return (
     <div className="space-y-8">
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold text-slate-900">Disciplinas</h1>
+        <h1 className="text-2xl font-bold text-tinta">Disciplinas</h1>
         <p className="text-sm text-slate-600">
           Crie a disciplina, organize módulos e itens e publique quando estiver pronta.
         </p>

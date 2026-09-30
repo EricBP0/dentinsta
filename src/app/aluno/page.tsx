@@ -142,7 +142,7 @@ export default async function Painel() {
     <div className="space-y-8">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Olá{perfil.nome ? `, ${perfil.nome.split(" ")[0]}` : ""}!</h1>
+          <h1 className="text-2xl font-bold text-tinta">Olá{perfil.nome ? `, ${perfil.nome.split(" ")[0]}` : ""}!</h1>
           <p className="text-sm text-slate-600">
             {sequencia > 1 ? `Você estudou ${sequencia} dias seguidos. Continue assim!` : "Bora estudar hoje?"}
           </p>

@@ -17,7 +17,7 @@ export default async function GerarQuestoes({ searchParams }: PageProps<"/admin/
         ← Banco de questões
       </Link>
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold text-slate-900">Gerar questões com IA</h1>
+        <h1 className="text-2xl font-bold text-tinta">Gerar questões com IA</h1>
         <p className="text-sm text-slate-600">
           Envie o material da aula e a IA cria questões objetivas e discursivas (com gabarito, explicação e rubrica)
           baseadas nele. <Link href="/admin/questoes/geracoes" className="underline">Ver gerações anteriores</Link>

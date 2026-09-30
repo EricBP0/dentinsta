@@ -50,7 +50,7 @@ export default async function Simulados() {
     <div className="space-y-8">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Simulados</h1>
+          <h1 className="text-2xl font-bold text-tinta">Simulados</h1>
           <p className="text-sm text-slate-600">Monte um simulado com questões do banco da sua disciplina.</p>
         </div>
         {comIa ? (

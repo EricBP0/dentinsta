@@ -16,7 +16,7 @@ export default async function NovaQuestao({ searchParams }: PageProps<"/admin/qu
       <Link href="/admin/questoes" className="text-sm text-slate-600 hover:text-slate-900">
         ← Banco de questões
       </Link>
-      <h1 className="text-2xl font-bold text-slate-900">Nova questão</h1>
+      <h1 className="text-2xl font-bold text-tinta">Nova questão</h1>
       <FormularioQuestao
         disciplinas={disciplinas ?? []}
         disciplinaPadrao={typeof disciplina === "string" ? disciplina : undefined}

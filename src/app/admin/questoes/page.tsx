@@ -46,7 +46,7 @@ export default async function AdminQuestoes({ searchParams }: PageProps<"/admin/
     <div className="space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Banco de questões</h1>
+          <h1 className="text-2xl font-bold text-tinta">Banco de questões</h1>
           <p className="text-sm text-slate-600">
             {lista.length} questões · {aprovadas} aprovadas (entram nos simulados)
           </p>

@@ -38,7 +38,7 @@ export default async function Certificados({ searchParams }: PageProps<"/aluno/c
   return (
     <div className="space-y-8">
       <header>
-        <h1 className="text-2xl font-bold text-slate-900">Certificados</h1>
+        <h1 className="text-2xl font-bold text-tinta">Certificados</h1>
         <p className="text-sm text-slate-600">
           Conclua todos os itens obrigatórios de uma disciplina para emitir o certificado.
         </p>

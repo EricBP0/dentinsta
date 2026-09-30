@@ -18,7 +18,7 @@ export default async function Catalogo() {
   return (
     <div className="space-y-8">
       <section className="space-y-3">
-        <h1 className="text-2xl font-bold text-slate-900">Disciplinas</h1>
+        <h1 className="text-2xl font-bold text-tinta">Disciplinas</h1>
 
         {!acesso && !equipe && (
           <div className="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm text-teal-900">

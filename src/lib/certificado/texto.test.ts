@@ -8,7 +8,7 @@ const base = {
   emitidoEm: new Date("2026-10-05T15:00:00Z"),
   codigo: "A1B2C3D4E5F6",
   urlValidacao: "https://exemplo.com/certificado/A1B2C3D4E5F6",
-  plataforma: "dentinsta",
+  plataforma: "OdontoLab",
   responsavel: "Coordenação pedagógica",
   responsavelCargo: "",
 };
@@ -16,7 +16,7 @@ const base = {
 describe("texto do certificado", () => {
   it("inclui disciplina e carga horária", () => {
     expect(montarTextoCertificado(base).corpo).toBe(
-      "concluiu a disciplina Endodontia, com carga horária de 40 horas, na plataforma de estudos dentinsta.",
+      "concluiu a disciplina Endodontia, com carga horária de 40 horas, na plataforma de estudos OdontoLab.",
     );
   });
   it("omite carga horária quando não cadastrada e usa singular para 1 hora", () => {

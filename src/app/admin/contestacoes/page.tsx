@@ -40,7 +40,7 @@ export default async function AdminContestacoes({ searchParams }: PageProps<"/ad
     <div className="space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Contestações de correção</h1>
+          <h1 className="text-2xl font-bold text-tinta">Contestações de correção</h1>
           <p className="text-sm text-slate-600">
             Alunos que discordaram da nota da IA. Use os casos para melhorar gabaritos e rubricas.
           </p>

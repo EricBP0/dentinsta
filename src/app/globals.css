@@ -4,9 +4,17 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Cores da marca OdontoLab (docs/MARCA.md) */
+@theme {
+  --color-tinta: #0b1f24;
+  --color-menta: #99f6e4;
+  --color-coral: #ff7a59;
+  --color-coral-claro: #ffb199;
+}
+
 @theme inline {
   --font-sans: var(--font-geist-sans);
-  --font-heading: var(--font-geist-sans);
+  --font-heading: var(--font-sora);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -130,4 +138,14 @@
   html {
     @apply font-sans;
   }
+  h1, h2, h3 {
+    @apply font-heading tracking-tight;
+  }
+}
+/* Fundo das telas de entrada: manchas suaves de menta e coral sobre branco. */
+.fundo-marca {
+  background:
+    radial-gradient(40rem 24rem at 12% -10%, color-mix(in oklab, var(--color-menta) 55%, transparent), transparent 70%),
+    radial-gradient(28rem 18rem at 105% 110%, color-mix(in oklab, var(--color-coral-claro) 35%, transparent), transparent 70%),
+    #fff;
 }

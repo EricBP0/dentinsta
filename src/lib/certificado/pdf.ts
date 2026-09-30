@@ -8,11 +8,16 @@ import { montarTextoCertificado, type DadosCertificado } from "./texto";
 
 const TEAL_ESCURO = rgb(0.059, 0.463, 0.431); // #0f766e
 const TEAL_CLARO = rgb(0.8, 0.984, 0.945); // #ccfbf1
-const TINTA = rgb(0.059, 0.09, 0.165); // #0f172a
+const TINTA = rgb(0.043, 0.122, 0.141); // #0b1f24 (tinta da marca)
+const CORAL = rgb(1, 0.478, 0.349); // #ff7a59
 const CINZA = rgb(0.392, 0.455, 0.545); // #64748b
 
 async function fonte(nome: string) {
   return readFile(path.join(process.cwd(), "assets", "fontes", nome));
+}
+
+async function marca(nome: string) {
+  return readFile(path.join(process.cwd(), "assets", "marca", nome));
 }
 
 /** Quebra o texto em linhas que caibam na largura. */
@@ -52,10 +57,12 @@ export async function gerarPdfCertificado(dados: DadosCertificado): Promise<Uint
   pdf.setAuthor(dados.plataforma);
   pdf.setSubject(`Código de validação ${dados.codigo}`);
 
-  const [regular, seminegrito, negrito] = await Promise.all([
+  const [regular, seminegrito, negrito, fonteMarca, simbolo] = await Promise.all([
     fonte("Geist-Regular.ttf").then((f) => pdf.embedFont(f, { subset: true })),
     fonte("Geist-SemiBold.ttf").then((f) => pdf.embedFont(f, { subset: true })),
     fonte("Geist-Bold.ttf").then((f) => pdf.embedFont(f, { subset: true })),
+    fonte("Sora-Bold.ttf").then((f) => pdf.embedFont(f, { subset: true })),
+    marca("simbolo-512.png").then((f) => pdf.embedPng(f)),
   ]);
 
   // A4 paisagem
@@ -66,10 +73,21 @@ export async function gerarPdfCertificado(dados: DadosCertificado): Promise<Uint
   pagina.drawRectangle({ x: 0, y: 0, width: L, height: A, color: rgb(1, 1, 1) });
   pagina.drawRectangle({ x: 0, y: A - 14, width: L, height: 14, color: TEAL_ESCURO });
   pagina.drawRectangle({ x: 0, y: 0, width: L, height: 6, color: TEAL_ESCURO });
+  pagina.drawRectangle({ x: L / 2 - 40, y: A - 14, width: 80, height: 4, color: CORAL });
   pagina.drawRectangle({ x: 28, y: 28, width: L - 56, height: A - 64, borderColor: TEAL_CLARO, borderWidth: 2 });
 
   // Cabeçalho
-  centralizar(pagina, dados.plataforma.toUpperCase(), seminegrito, 12, A - 80, TEAL_ESCURO);
+  // Logo OdontoLab: símbolo + "Odonto" (tinta) "Lab" (teal), em Sora.
+  const tamLogo = 20;
+  const ladoSimbolo = 28;
+  const larguraOdonto = fonteMarca.widthOfTextAtSize("Odonto", tamLogo);
+  const larguraLogo = ladoSimbolo + 8 + larguraOdonto + fonteMarca.widthOfTextAtSize("Lab", tamLogo);
+  const xLogo = (L - larguraLogo) / 2;
+  const yLogo = A - 88;
+  pagina.drawImage(simbolo, { x: xLogo, y: yLogo - 6, width: ladoSimbolo, height: ladoSimbolo });
+  const xTexto = xLogo + ladoSimbolo + 8;
+  pagina.drawText("Odonto", { x: xTexto, y: yLogo, size: tamLogo, font: fonteMarca, color: TINTA });
+  pagina.drawText("Lab", { x: xTexto + larguraOdonto, y: yLogo, size: tamLogo, font: fonteMarca, color: TEAL_ESCURO });
   centralizar(pagina, "CERTIFICADO", negrito, 40, A - 140);
   centralizar(pagina, "DE CONCLUSÃO", seminegrito, 14, A - 164, CINZA);
 

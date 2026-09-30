@@ -1,3 +1,6 @@
+Geist: Copyright (c) 2023 Vercel. Sora: Copyright 2019 The Sora Project Authors (https://github.com/sora-xor/sora-font).
+Ambas sob a mesma licença abaixo.
+
 Copyright (c) 2023 Vercel, in collaboration with basement.studio
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.

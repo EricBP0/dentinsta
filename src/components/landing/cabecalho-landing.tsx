@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
 import Link from "next/link";
 import { useState } from "react";
+import { Logo } from "@/components/marca/logo";
 import { Button } from "@/components/ui/button";
 
 const LINKS = [
@@ -26,8 +27,8 @@ export function CabecalhoLanding() {
       }`}
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <Link href="/" className="text-xl font-bold tracking-tight text-teal-800">
-          dentinsta
+        <Link href="/" aria-label="OdontoLab — início">
+          <Logo />
         </Link>
         <nav className="hidden items-center gap-6 text-sm text-slate-600 md:flex">
           {LINKS.map((l) => (

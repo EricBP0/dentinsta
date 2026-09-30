@@ -18,7 +18,7 @@ export default async function PaginaDisciplina({ params }: PageProps<"/aluno/dis
         ← Disciplinas
       </Link>
       <header className="space-y-3">
-        <h1 className="text-2xl font-bold text-slate-900">{disciplina.nome}</h1>
+        <h1 className="text-2xl font-bold text-tinta">{disciplina.nome}</h1>
         {disciplina.descricao && <p className="text-slate-600">{disciplina.descricao}</p>}
         <div className="max-w-sm">
           <BarraProgresso feitos={disciplina.progresso.concluidos} total={disciplina.progresso.total} />

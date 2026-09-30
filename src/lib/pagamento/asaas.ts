@@ -24,7 +24,7 @@ async function chamar<T>(caminho: string, corpo: unknown): Promise<T> {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "User-Agent": "dentinsta",
+      "User-Agent": "OdontoLab",
       access_token: chave,
     },
     body: JSON.stringify(corpo),

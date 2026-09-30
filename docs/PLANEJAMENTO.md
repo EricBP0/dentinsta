@@ -1,6 +1,6 @@
 # Plataforma de Estudos para Odontologia — Planejamento do MVP
 
-> Nome provisório: **dentinsta** (a definir)
+> Nome: **OdontoLab**. Identidade visual em [MARCA.md](MARCA.md).
 
 ## 1. Visão geral
 

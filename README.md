@@ -1,4 +1,4 @@
-# dentinsta
+# OdontoLab
 
 Plataforma de estudos para graduação em Odontologia. Planejamento completo em
 [`docs/PLANEJAMENTO.md`](docs/PLANEJAMENTO.md). Para colocar no ar, siga o
