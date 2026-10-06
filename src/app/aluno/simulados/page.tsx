@@ -54,7 +54,7 @@ export default async function Simulados() {
           <p className="text-sm text-slate-600">Monte um simulado com questões do banco da sua disciplina.</p>
         </div>
         {comIa ? (
-          <span className="rounded-full bg-teal-50 px-3 py-1 text-xs text-teal-800">
+          <span className="rounded-full bg-violeta-50 px-3 py-1 text-xs text-violeta-800">
             Correções por IA este mês: {usadas ?? 0} de {cota}
           </span>
         ) : (
@@ -63,7 +63,7 @@ export default async function Simulados() {
       </header>
 
       {!acesso && !equipe ? (
-        <p className="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm text-teal-900">
+        <p className="rounded-xl border border-violeta-200 bg-violeta-50 p-4 text-sm text-violeta-900">
           Você ainda não tem acesso. <Link href="/assinar" className="font-medium underline">Liberar acesso</Link>
         </p>
       ) : (
@@ -84,11 +84,11 @@ export default async function Simulados() {
                   </p>
                 </div>
                 {s.status === "em_andamento" ? (
-                  <span className="text-sm font-medium text-teal-700">Continuar →</span>
+                  <span className="text-sm font-medium text-violeta-700">Continuar →</span>
                 ) : s.nota === null ? (
                   <span className="text-sm text-slate-500">Corrigindo…</span>
                 ) : (
-                  <span className={`text-lg font-bold ${Number(s.nota) >= 6 ? "text-teal-700" : "text-red-600"}`}>
+                  <span className={`text-lg font-bold ${Number(s.nota) >= 6 ? "text-violeta-700" : "text-red-600"}`}>
                     {Number(s.nota).toFixed(1)}
                   </span>
                 )}

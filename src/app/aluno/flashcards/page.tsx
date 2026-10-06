@@ -44,7 +44,7 @@ export default async function RevisaoDoDia({ searchParams }: PageProps<"/aluno/f
           </p>
         </div>
         {vencidos + novos > 0 && (
-          <Link href="/aluno/flashcards?estudar=1" className="rounded-lg bg-teal-700 px-5 py-3 font-medium text-white hover:bg-teal-800">
+          <Link href="/aluno/flashcards?estudar=1" className="rounded-lg bg-violeta-700 px-5 py-3 font-medium text-white hover:bg-violeta-800">
             Revisar agora ({vencidos} para revisar{novos > 0 && `, ${novos} novos`})
           </Link>
         )}

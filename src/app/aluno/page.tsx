@@ -47,7 +47,7 @@ function Variacao({ valor, sufixo, periodo }: { valor: number | null; sufixo?: s
   const subiu = valor > 0;
   const Icone = subiu ? ArrowUpRight : ArrowDownRight;
   return (
-    <p className={`flex items-center gap-0.5 text-xs ${subiu ? "text-teal-700" : "text-slate-600"}`}>
+    <p className={`flex items-center gap-0.5 text-xs ${subiu ? "text-violeta-700" : "text-slate-600"}`}>
       <Icone className="size-3.5" />
       {subiu ? "+" : ""}
       {valor.toLocaleString("pt-BR")}
@@ -149,7 +149,7 @@ export default async function Painel() {
         </div>
         {acesso &&
           (iaAtiva(acesso) ? (
-            <span className="rounded-full bg-teal-50 px-3 py-1 text-xs text-teal-800">
+            <span className="rounded-full bg-violeta-50 px-3 py-1 text-xs text-violeta-800">
               Novidades e IA até {formatarData(acesso.novidadesAte)}
             </span>
           ) : (
@@ -158,7 +158,7 @@ export default async function Painel() {
       </header>
 
       {!acesso && !equipe && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm text-teal-900">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-violeta-200 bg-violeta-50 p-4 text-sm text-violeta-900">
           Você ainda não tem acesso ao conteúdo.
           <Button asChild>
             <Link href="/assinar">Liberar acesso</Link>
@@ -171,12 +171,12 @@ export default async function Painel() {
         {continuar ? (
           <Link
             href={`/aluno/itens/${continuar.item.id}`}
-            className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-700 to-teal-900 p-5 text-white md:col-span-2"
+            className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-violeta-700 to-violeta-900 p-5 text-white md:col-span-2"
           >
-            <div aria-hidden className="absolute -right-12 -top-12 size-40 rounded-full bg-teal-500/30 blur-2xl" />
-            <p className="text-xs font-medium uppercase tracking-wide text-teal-100">Continue de onde parou</p>
+            <div aria-hidden className="absolute -right-12 -top-12 size-40 rounded-full bg-violeta-500/30 blur-2xl" />
+            <p className="text-xs font-medium uppercase tracking-wide text-violeta-100">Continue de onde parou</p>
             <p className="mt-2 text-lg font-semibold">{continuar.item.titulo}</p>
-            <p className="text-sm text-teal-100">
+            <p className="text-sm text-violeta-100">
               {NOME_TIPO_ITEM[continuar.item.tipo]} · {continuar.disciplina.nome}
             </p>
             <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium">
@@ -205,7 +205,7 @@ export default async function Painel() {
             </span>
           </Link>
           <Link href="/aluno/simulados" className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 hover:shadow-md">
-            <span className="flex size-9 items-center justify-center rounded-xl bg-teal-50 text-teal-700">
+            <span className="flex size-9 items-center justify-center rounded-xl bg-violeta-50 text-violeta-700">
               <Sparkles className="size-4" />
             </span>
             <span className="text-sm">
@@ -258,7 +258,7 @@ export default async function Painel() {
           rodape={<p className="text-xs text-slate-500">de {liberadas.length} liberadas</p>}
         >
           <span className="inline-flex items-center gap-1.5">
-            <GraduationCap className="size-5 text-teal-600" />
+            <GraduationCap className="size-5 text-violeta-600" />
             {concluidas.length}
           </span>
         </Indicador>
@@ -357,7 +357,7 @@ export default async function Painel() {
                     <div className="flex items-center justify-between gap-2 text-sm">
                       <span className="text-slate-900">{d.nome}</span>
                       {d.progresso.completo && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-teal-50 px-2 py-0.5 text-xs text-teal-800">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-violeta-50 px-2 py-0.5 text-xs text-violeta-800">
                           <GraduationCap className="size-3.5" /> Concluída
                         </span>
                       )}

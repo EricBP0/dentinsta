@@ -24,20 +24,20 @@ export function OpcoesPagamento({ aVista, parcelado }: { aVista: Oferta; parcela
   const desconto = Math.round((1 - aVista.valorCentavos / parcelado.valorCentavos) * 100);
   return (
     <div className="grid gap-4 sm:grid-cols-2">
-      <form action={iniciarCheckout} className="flex flex-col gap-3 rounded-2xl border-2 border-teal-600 bg-white p-6">
+      <form action={iniciarCheckout} className="flex flex-col gap-3 rounded-2xl border-2 border-violeta-600 bg-white p-6">
         <input type="hidden" name="tipo" value={aVista.tipo} />
         <input type="hidden" name="modalidade" value="a_vista" />
         <div className="flex items-center justify-between">
           <p className="font-medium text-slate-900">À vista</p>
           {desconto > 0 && (
-            <span className="rounded-full bg-teal-100 px-2 py-0.5 text-xs font-medium text-teal-800">
+            <span className="rounded-full bg-violeta-100 px-2 py-0.5 text-xs font-medium text-violeta-800">
               {desconto}% de desconto
             </span>
           )}
         </div>
         <p className="text-3xl font-bold text-slate-900">{formatarReais(aVista.valorCentavos)}</p>
         <p className="text-sm text-slate-600">Pix ou cartão de crédito em 1x. Pix libera o acesso na hora.</p>
-        <button className="mt-auto rounded-lg bg-teal-700 py-3 font-medium text-white hover:bg-teal-800">
+        <button className="mt-auto rounded-lg bg-violeta-700 py-3 font-medium text-white hover:bg-violeta-800">
           Pagar à vista
         </button>
       </form>
@@ -52,7 +52,7 @@ export function OpcoesPagamento({ aVista, parcelado }: { aVista: Oferta; parcela
         <p className="text-sm text-slate-600">
           Sem juros no cartão de crédito (total {formatarReais(parcelado.valorCentavos)}).
         </p>
-        <button className="mt-auto rounded-lg border border-teal-700 py-3 font-medium text-teal-800 hover:bg-teal-50">
+        <button className="mt-auto rounded-lg border border-violeta-700 py-3 font-medium text-violeta-800 hover:bg-violeta-50">
           Pagar parcelado
         </button>
       </form>

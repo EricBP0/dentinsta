@@ -26,7 +26,7 @@ export function Navegacao({ itens, escuro = false }: { itens: ItemMenu[]; escuro
               escuro
                 ? atual
                   ? "bg-white/15 font-medium text-white"
-                  : "text-teal-100/80 hover:bg-white/10 hover:text-white"
+                  : "text-violeta-100/80 hover:bg-white/10 hover:text-white"
                 : atual
                   ? "bg-secondary font-medium text-secondary-foreground"
                   : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"

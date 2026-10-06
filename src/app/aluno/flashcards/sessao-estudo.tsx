@@ -11,7 +11,7 @@ import { registrarRevisao } from "./actions";
 const BOTOES: { avaliacao: Avaliacao; texto: string; tecla: string; cor: string }[] = [
   { avaliacao: "errei", texto: "Errei", tecla: "1", cor: "border-red-300 bg-red-50 text-red-800 hover:bg-red-100" },
   { avaliacao: "dificil", texto: "Difícil", tecla: "2", cor: "border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100" },
-  { avaliacao: "bom", texto: "Bom", tecla: "3", cor: "border-teal-300 bg-teal-50 text-teal-900 hover:bg-teal-100" },
+  { avaliacao: "bom", texto: "Bom", tecla: "3", cor: "border-violeta-300 bg-violeta-50 text-violeta-900 hover:bg-violeta-100" },
   { avaliacao: "facil", texto: "Fácil", tecla: "4", cor: "border-sky-300 bg-sky-50 text-sky-900 hover:bg-sky-100" },
 ];
 
@@ -67,16 +67,16 @@ export function SessaoEstudo({ cards, nomesDecks }: { cards: CardSessao[]; nomes
       <motion.div
         initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="relative space-y-3 rounded-xl border border-teal-200 bg-teal-50 p-8 text-center"
+        className="relative space-y-3 rounded-xl border border-violeta-200 bg-violeta-50 p-8 text-center"
       >
         {revisados > 0 && <Confete />}
         <p className="text-2xl">🎉</p>
-        <p className="font-medium text-teal-900">
+        <p className="font-medium text-violeta-900">
           {revisados > 0 ? `Sessão concluída: ${revisados} revisões.` : "Nada para revisar agora."}
         </p>
-        {deckConcluido && <p className="text-sm text-teal-800">Você viu todos os cards deste deck — item concluído!</p>}
-        <p className="text-sm text-teal-800">Os cards voltam no dia certo para fixar na memória.</p>
-        <button onClick={() => router.refresh()} className="text-sm font-medium text-teal-700 underline">
+        {deckConcluido && <p className="text-sm text-violeta-800">Você viu todos os cards deste deck — item concluído!</p>}
+        <p className="text-sm text-violeta-800">Os cards voltam no dia certo para fixar na memória.</p>
+        <button onClick={() => router.refresh()} className="text-sm font-medium text-violeta-700 underline">
           Atualizar
         </button>
       </motion.div>
@@ -122,7 +122,7 @@ export function SessaoEstudo({ cards, nomesDecks }: { cards: CardSessao[]; nomes
               </div>
               {/* verso */}
               <div
-                className="flex min-h-64 flex-col justify-center gap-4 rounded-2xl border border-teal-200 bg-gradient-to-br from-white to-teal-50 p-6 shadow-sm sm:p-10"
+                className="flex min-h-64 flex-col justify-center gap-4 rounded-2xl border border-violeta-200 bg-gradient-to-br from-white to-violeta-50 p-6 shadow-sm sm:p-10"
                 style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
               >
                 <p className="whitespace-pre-wrap text-center text-sm text-slate-500">{atual.frente}</p>
@@ -154,7 +154,7 @@ export function SessaoEstudo({ cards, nomesDecks }: { cards: CardSessao[]; nomes
       ) : (
         <button
           onClick={() => setMostrandoVerso(true)}
-          className="w-full rounded-lg bg-teal-700 py-3 font-medium text-white hover:bg-teal-800"
+          className="w-full rounded-lg bg-violeta-700 py-3 font-medium text-white hover:bg-violeta-800"
         >
           Mostrar resposta
         </button>

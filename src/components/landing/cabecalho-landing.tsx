@@ -23,32 +23,32 @@ export function CabecalhoLanding() {
   return (
     <header
       className={`sticky top-0 z-40 transition-colors ${
-        rolou || aberto ? "border-b border-slate-200/80 bg-white/80 backdrop-blur-md" : "bg-transparent"
+        rolou || aberto ? "border-b-2 border-tinta bg-white/90 text-tinta backdrop-blur-md" : "bg-transparent text-white"
       }`}
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
         <Link href="/" aria-label="OdontoLab — início">
-          <Logo />
+          <Logo claro={!(rolou || aberto)} />
         </Link>
-        <nav className="hidden items-center gap-6 text-sm text-slate-600 md:flex">
+        <nav className={`hidden items-center gap-6 text-sm font-medium md:flex ${rolou ? "text-slate-600" : "text-white/85"}`}>
           {LINKS.map((l) => (
-            <a key={l.href} href={l.href} className="hover:text-slate-900">
+            <a key={l.href} href={l.href} className={rolou ? "hover:text-tinta" : "hover:text-white"}>
               {l.texto}
             </a>
           ))}
         </nav>
         <div className="hidden items-center gap-2 md:flex">
-          <Button variant="ghost" size="lg" asChild>
+          <Button variant="ghost" size="lg" className={rolou ? "" : "text-white hover:bg-white/10 hover:text-white"} asChild>
             <Link href="/entrar">Entrar</Link>
           </Button>
-          <Button size="lg" asChild>
+          <Button variant={rolou ? "default" : "destaque"} size="lg" className="rounded-full px-4" asChild>
             <Link href="/assinar">Começar agora</Link>
           </Button>
         </div>
         <Button
           variant="ghost"
           size="icon-lg"
-          className="md:hidden"
+          className={`md:hidden ${rolou || aberto ? "" : "text-white hover:bg-white/10 hover:text-white"}`}
           aria-label={aberto ? "Fechar menu" : "Abrir menu"}
           onClick={() => setAberto((a) => !a)}
         >
@@ -62,11 +62,11 @@ export function CabecalhoLanding() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden border-t border-slate-100 md:hidden"
+            className="overflow-hidden border-t border-border md:hidden"
           >
             <div className="flex flex-col gap-1 px-4 py-3">
               {LINKS.map((l) => (
-                <a key={l.href} href={l.href} onClick={() => setAberto(false)} className="rounded-md px-2 py-2 text-slate-700 hover:bg-slate-50">
+                <a key={l.href} href={l.href} onClick={() => setAberto(false)} className="rounded-md px-2 py-2 font-medium text-slate-700 hover:bg-papel">
                   {l.texto}
                 </a>
               ))}
@@ -74,7 +74,7 @@ export function CabecalhoLanding() {
                 <Button variant="outline" size="lg" asChild>
                   <Link href="/entrar">Entrar</Link>
                 </Button>
-                <Button size="lg" asChild>
+                <Button variant="destaque" size="lg" asChild>
                   <Link href="/assinar">Começar</Link>
                 </Button>
               </div>

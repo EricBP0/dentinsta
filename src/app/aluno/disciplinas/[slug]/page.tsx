@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BarraProgresso, BotaoRenovar } from "@/components/cadeado";
+import { CapaDisciplina } from "@/components/capa-disciplina";
 import { exigirLogin } from "@/lib/auth";
 import { carregarCatalogo } from "@/lib/catalogo";
 import { NOME_TIPO_ITEM } from "@/lib/tipos";
@@ -18,12 +19,13 @@ export default async function PaginaDisciplina({ params }: PageProps<"/aluno/dis
         ← Disciplinas
       </Link>
       <header className="space-y-3">
+        {disciplina.capa_url && <CapaDisciplina src={disciplina.capa_url} nome={disciplina.nome} className="max-w-xl" />}
         <h1 className="text-2xl font-bold text-tinta">{disciplina.nome}</h1>
         {disciplina.descricao && <p className="text-slate-600">{disciplina.descricao}</p>}
         <div className="max-w-sm">
           <BarraProgresso feitos={disciplina.progresso.concluidos} total={disciplina.progresso.total} />
           {disciplina.progresso.completo && (
-            <p className="mt-2 text-sm font-medium text-teal-700">
+            <p className="mt-2 text-sm font-medium text-violeta-700">
               🎓 Você concluiu todos os itens obrigatórios!{" "}
               <Link href="/aluno/certificados" className="underline">
                 Emitir certificado
@@ -43,7 +45,7 @@ export default async function PaginaDisciplina({ params }: PageProps<"/aluno/dis
                   <span className="w-5 text-center">{item.concluido ? "✅" : item.situacao === "liberado" ? "○" : "🔒"}</span>
                   <div>
                     {item.situacao === "liberado" ? (
-                      <Link href={`/aluno/itens/${item.id}`} className="font-medium text-slate-900 hover:text-teal-700">
+                      <Link href={`/aluno/itens/${item.id}`} className="font-medium text-slate-900 hover:text-violeta-700">
                         {item.titulo}
                       </Link>
                     ) : (

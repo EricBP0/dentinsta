@@ -92,7 +92,7 @@ export default async function AdminDisciplina({ params }: PageProps<"/admin/disc
             <input name="carga_horaria_h" type="number" min={0} defaultValue={disciplina.carga_horaria_h} className={campo} />
           </Rotulo>
           <Rotulo texto="Capa (URL da imagem)">
-            <input name="capa_url" type="url" defaultValue={disciplina.capa_url ?? ""} className={campo} />
+            <input name="capa_url" defaultValue={disciplina.capa_url ?? ""} placeholder="/capas/nome.png ou https://…" className={campo} />
           </Rotulo>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -182,7 +182,7 @@ function ListaItens({ itens }: { itens: Item[] }) {
         <li key={item.id} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2">
           <div className="flex items-center gap-2">
             <span className="w-24 text-xs text-slate-500">{NOME_TIPO_ITEM[item.tipo as TipoItem]}</span>
-            <Link href={`/admin/itens/${item.id}`} className="font-medium text-slate-900 hover:text-teal-700">
+            <Link href={`/admin/itens/${item.id}`} className="font-medium text-slate-900 hover:text-violeta-700">
               {item.titulo}
             </Link>
           </div>
@@ -191,7 +191,7 @@ function ListaItens({ itens }: { itens: Item[] }) {
               <input type="hidden" name="id" value={item.id} />
               <input type="hidden" name="campo" value="obrigatorio" />
               <input type="hidden" name="valor" value={String(!item.obrigatorio)} />
-              <button className={`${botaoSecundario} ${item.obrigatorio ? "border-teal-600 text-teal-800" : ""}`}>
+              <button className={`${botaoSecundario} ${item.obrigatorio ? "border-violeta-600 text-violeta-800" : ""}`}>
                 {item.obrigatorio ? "✓ Obrigatório" : "Opcional"}
               </button>
             </form>

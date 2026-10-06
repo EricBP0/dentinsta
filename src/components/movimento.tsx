@@ -100,7 +100,8 @@ export function BarraAnimada({ porcentagem, className }: { porcentagem: number; 
   );
 }
 
-const CORES_CONFETE = ["#0f766e", "#14b8a6", "#5eead4", "#f59e0b", "#38bdf8", "#f472b6"];
+// Confete nas cores da marca: Violeta, Lima, Tinta e tons do violeta.
+const CORES_CONFETE = ["#5b3df0", "#c8f250", "#12121c", "#8b78f5", "#b4dc3c", "#c9c0fa"];
 
 /** "Aleatório" determinístico (0 a 1): o componente continua puro entre renderizações. */
 function pseudoAleatorio(indice: number, semente: number) {

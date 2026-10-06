@@ -37,7 +37,7 @@ const RECURSOS = [
     texto: "Repetição espaçada: cada card volta no dia certo para você não esquecer.",
   },
   { icone: Video, titulo: "Videoaulas", texto: "Aulas objetivas, gravadas por um cirurgião-dentista." },
-  { icone: FileText, titulo: "Resumos", texto: "O essencial de cada tema para revisar em minutos." },
+  { icone: FileText, titulo: "Resumos de bolso", texto: "O essencial de cada tema, com figuras e pontos-chave, para revisar em minutos." },
   { icone: Network, titulo: "Mapas mentais", texto: "A matéria inteira em uma imagem, para fixar as conexões." },
   {
     icone: GraduationCap,
@@ -83,67 +83,64 @@ const DUVIDAS = [
   },
 ];
 
+/** Rótulo em mono, como nos carrosséis ("LAB 01 · RECURSOS"). */
+function Rotulo({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return <p className={`rotulo text-xs font-semibold ${className}`}>{children}</p>;
+}
+
 export default function Inicio() {
   const desconto = Math.round((1 - PRECO.aVistaCentavos / totalParcelado()) * 100);
 
   return (
     <Movimento>
-      <div className="relative flex-1 overflow-x-clip bg-white">
-        {/* fundo do topo */}
-        <div
-          aria-hidden
-          className="absolute inset-x-0 top-0 -z-0 h-[720px] bg-[radial-gradient(ellipse_at_top,var(--color-teal-50),transparent_70%)]"
-        />
-        <div
-          aria-hidden
-          className="absolute inset-x-0 top-0 h-[720px] bg-[linear-gradient(to_right,var(--color-slate-100)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-slate-100)_1px,transparent_1px)] bg-[size:48px_48px] [mask-image:radial-gradient(ellipse_at_top,black_30%,transparent_70%)]"
-        />
+      <div className="relative flex-1 overflow-x-clip bg-papel">
+        {/* Topo violeta quadriculado, como a capa dos carrosséis */}
+        <div className="grade-violeta text-white">
+          <CabecalhoLanding />
 
-        <CabecalhoLanding />
-
-        <main className="relative">
           {/* Hero: animação só em CSS, para o título aparecer no primeiro desenho da página (LCP) */}
-          <section className="mx-auto grid max-w-6xl items-center gap-16 px-4 pb-24 pt-12 md:pt-20 lg:grid-cols-2">
-            <div className="space-y-6">
-              <div className="entrar">
-                <Badge variant="secondary" className="gap-1.5 px-3 py-1">
-                  <Stethoscope className="size-3.5" /> O laboratório de estudos da graduação em Odontologia
-                </Badge>
+          <section className="mx-auto grid max-w-6xl items-center gap-16 px-4 pb-24 pt-10 md:pt-16 lg:grid-cols-2">
+            <div className="space-y-7">
+              <div className="entrar flex flex-wrap items-center gap-3">
+                <span className="rotulo rounded-md bg-lima px-2.5 py-1 text-xs font-bold text-tinta">Lab 01</span>
+                <span className="rotulo text-xs font-medium text-white/90">Graduação em Odontologia</span>
               </div>
               <div className="subir [animation-delay:50ms]">
-                <h1 className="text-4xl font-bold tracking-tight text-tinta sm:text-5xl lg:text-6xl">
-                  Passe nas provas da faculdade com{" "}
-                  <span className="bg-gradient-to-r from-teal-700 to-teal-500 bg-clip-text text-transparent underline decoration-coral decoration-4 underline-offset-[10px]">
-                    quem entende de Odontologia
-                  </span>
+                <h1 className="text-5xl leading-[0.95] font-extrabold tracking-tighter sm:text-6xl lg:text-7xl">
+                  Passe nas provas da faculdade com <span className="text-lima">quem entende de Odontologia.</span>
                 </h1>
               </div>
               <div className="entrar [animation-delay:100ms]">
-                <p className="max-w-xl text-lg text-slate-600">
-                  Videoaulas, resumos, mapas mentais e flashcards feitos por um cirurgião-dentista — e simulados com IA
-                  que corrige suas respostas como um professor.
+                <p className="max-w-xl text-lg text-white/90 sm:text-xl">
+                  Cada tema é um experimento: um resumo de bolso, flashcards, videoaulas e simulados com IA que corrige
+                  suas respostas como um professor.
                 </p>
               </div>
               <div className="entrar flex flex-wrap gap-3 [animation-delay:150ms]">
-                <Button size="lg" className="h-11 px-5 text-base" asChild>
+                <Button variant="destaque" size="lg" className="h-12 rounded-full px-6 text-base" asChild>
                   <Link href="/assinar">
                     Começar agora <ArrowRight data-icon="inline-end" />
                   </Link>
                 </Button>
-                <Button variant="outline" size="lg" className="h-11 px-5 text-base" asChild>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="h-12 rounded-full border-white/40 bg-transparent px-6 text-base text-white hover:bg-white/10 hover:text-white"
+                  asChild
+                >
                   <a href="#como-funciona">Ver como funciona</a>
                 </Button>
               </div>
               <div className="entrar [animation-delay:200ms]">
-                <p className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-slate-500">
+                <p className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-white/90">
                   <span className="inline-flex items-center gap-1.5">
-                    <Check className="size-4 text-teal-600" /> Acesso vitalício
+                    <Check className="size-4 text-lima" /> Acesso vitalício
                   </span>
                   <span className="inline-flex items-center gap-1.5">
-                    <Check className="size-4 text-teal-600" /> Pix ou 12x sem juros
+                    <Check className="size-4 text-lima" /> Pix ou 12x sem juros
                   </span>
                   <span className="inline-flex items-center gap-1.5">
-                    <Check className="size-4 text-teal-600" /> 7 dias para desistir
+                    <Check className="size-4 text-lima" /> 7 dias para desistir
                   </span>
                 </p>
               </div>
@@ -152,42 +149,44 @@ export default function Inicio() {
               <PreviaProduto />
             </div>
           </section>
+        </div>
 
+        <main className="relative">
           {/* Recursos */}
-          <section id="recursos" className="scroll-mt-20 border-t border-slate-100 bg-slate-50/60 py-24">
+          <section id="recursos" className="fundo-marca scroll-mt-20 py-24">
             <div className="mx-auto max-w-6xl space-y-12 px-4">
-              <Surgir className="mx-auto max-w-2xl space-y-3 text-center">
-                <h2 className="text-3xl font-bold tracking-tight text-tinta sm:text-4xl">Tudo para estudar em um só lugar</h2>
-                <p className="text-slate-600">Organizado por disciplina e período, do jeito que a faculdade cobra.</p>
+              <Surgir className="max-w-2xl space-y-3">
+                <Rotulo className="text-violeta">Fig. 01 · Recursos</Rotulo>
+                <h2 className="text-4xl font-extrabold tracking-tighter text-tinta sm:text-5xl">Tudo para estudar em um só lugar</h2>
+                <p className="text-lg text-slate-600">Organizado por disciplina e período, do jeito que a faculdade cobra.</p>
               </Surgir>
               <SurgirLista className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {RECURSOS.map(({ icone: Icone, titulo, texto, destaque, largo }) => (
+                {RECURSOS.map(({ icone: Icone, titulo, texto, destaque, largo }, i) => (
                   <SurgirItem
                     key={titulo}
                     className={destaque ? "sm:col-span-2" : largo ? "sm:col-span-2 lg:col-span-3" : ""}
                   >
                     <div
-                      className={`group h-full rounded-2xl border p-6 transition-all hover:-translate-y-1 hover:shadow-lg ${
-                        destaque
-                          ? "border-teal-700 bg-gradient-to-br from-primary to-tinta text-white hover:shadow-teal-900/20"
-                          : "border-slate-200 bg-white hover:shadow-slate-900/5"
+                      className={`group h-full rounded-2xl border-2 border-tinta p-6 transition-transform hover:-translate-y-1 ${
+                        destaque ? "bg-violeta text-white" : "bg-white"
                       }`}
                     >
-                      <div
-                        className={`mb-4 inline-flex size-10 items-center justify-center rounded-xl ${
-                          destaque ? "bg-coral text-tinta" : "bg-teal-50 text-teal-700"
-                        }`}
-                      >
-                        <Icone className="size-5" />
+                      <div className="mb-5 flex items-start justify-between">
+                        <div className="inline-flex size-11 items-center justify-center rounded-xl border-2 border-tinta bg-lima text-tinta">
+                          <Icone className="size-5" />
+                        </div>
+                        <span className={`rotulo text-xs ${destaque ? "text-white/80" : "text-slate-500"}`}>
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
                       </div>
-                      <h3 className={`font-semibold ${destaque ? "text-xl" : "text-slate-900"}`}>{titulo}</h3>
-                      <p className={`mt-2 text-sm leading-relaxed ${destaque ? "text-teal-50" : "text-slate-600"}`}>{texto}</p>
+                      <h3 className={`font-extrabold tracking-tight ${destaque ? "text-2xl" : "text-xl text-tinta"}`}>{titulo}</h3>
+                      <p className={`mt-2 leading-relaxed ${destaque ? "text-white/90" : "text-slate-600"}`}>{texto}</p>
                       {destaque && (
-                        <ul className="mt-6 grid gap-2 text-sm text-teal-50 sm:grid-cols-2">
-                          <li className="flex gap-2"><Check className="size-4 shrink-0 text-menta" /> Nota por critério da rubrica do professor</li>
-                          <li className="flex gap-2"><Check className="size-4 shrink-0 text-menta" /> Comentários e o que faltou citar</li>
-                          <li className="flex gap-2"><Check className="size-4 shrink-0 text-menta" /> Prioriza as questões que você errou</li>
-                          <li className="flex gap-2"><Check className="size-4 shrink-0 text-menta" /> Revisão do professor se você discordar</li>
+                        <ul className="mt-6 grid gap-2 text-sm text-white/90 sm:grid-cols-2">
+                          <li className="flex gap-2"><Check className="size-4 shrink-0 text-lima" /> Nota por critério da rubrica do professor</li>
+                          <li className="flex gap-2"><Check className="size-4 shrink-0 text-lima" /> Comentários e o que faltou citar</li>
+                          <li className="flex gap-2"><Check className="size-4 shrink-0 text-lima" /> Prioriza as questões que você errou</li>
+                          <li className="flex gap-2"><Check className="size-4 shrink-0 text-lima" /> Revisão do professor se você discordar</li>
                         </ul>
                       )}
                     </div>
@@ -198,32 +197,34 @@ export default function Inicio() {
           </section>
 
           {/* Como funciona */}
-          <section id="como-funciona" className="scroll-mt-20 py-24">
+          <section id="como-funciona" className="scroll-mt-20 border-y-2 border-tinta bg-white py-24">
             <div className="mx-auto max-w-6xl space-y-12 px-4">
-              <Surgir className="mx-auto max-w-2xl space-y-3 text-center">
-                <h2 className="text-3xl font-bold tracking-tight text-tinta sm:text-4xl">Como funciona</h2>
-                <p className="text-slate-600">Em poucos minutos você já está estudando.</p>
+              <Surgir className="max-w-2xl space-y-3">
+                <Rotulo className="text-violeta">Fig. 02 · Como funciona</Rotulo>
+                <h2 className="text-4xl font-extrabold tracking-tighter text-tinta sm:text-5xl">Em poucos minutos você já está estudando</h2>
               </Surgir>
-              <SurgirLista className="grid gap-8 md:grid-cols-3">
+              <SurgirLista className="grid gap-6 md:grid-cols-3">
                 {PASSOS.map(({ icone: Icone, titulo, texto }, i) => (
-                  <SurgirItem key={titulo} className="relative space-y-3 text-center md:text-left">
-                    <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-primary text-white shadow-lg shadow-teal-900/20 md:mx-0">
-                      <Icone className="size-5" />
+                  <SurgirItem key={titulo} className="space-y-4">
+                    {/* Selo no estilo da tabela periódica, como na capa dos carrosséis */}
+                    <div className="flex size-24 flex-col justify-between rounded-2xl border-2 border-tinta bg-lima p-3 text-tinta">
+                      <span className="rotulo text-[11px] font-bold">{String(i + 1).padStart(2, "0")}</span>
+                      <Icone className="size-7" />
                     </div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-coral">Passo {i + 1}</p>
-                    <h3 className="text-lg font-semibold text-slate-900">{titulo}</h3>
-                    <p className="text-sm leading-relaxed text-slate-600">{texto}</p>
+                    <Rotulo className="text-violeta">Passo {i + 1}</Rotulo>
+                    <h3 className="text-2xl font-extrabold tracking-tight text-tinta">{titulo}</h3>
+                    <p className="leading-relaxed text-slate-600">{texto}</p>
                   </SurgirItem>
                 ))}
               </SurgirLista>
 
               <Surgir>
-                <div className="flex flex-col items-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-6 text-center sm:flex-row sm:text-left">
-                  <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-white text-teal-700 shadow-sm">
+                <div className="flex flex-col items-center gap-4 rounded-2xl border-2 border-tinta bg-papel p-6 text-center sm:flex-row sm:text-left">
+                  <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-violeta text-white">
                     <Stethoscope className="size-5" />
                   </div>
                   <p className="text-slate-700">
-                    <strong className="text-slate-900">Conteúdo criado e revisado por um cirurgião-dentista de referência.</strong>{" "}
+                    <strong className="text-tinta">Conteúdo criado e revisado por um cirurgião-dentista de referência.</strong>{" "}
                     As questões geradas com ajuda da IA só entram nos simulados depois da revisão do professor.
                   </p>
                 </div>
@@ -232,26 +233,29 @@ export default function Inicio() {
           </section>
 
           {/* Preço */}
-          <section id="preco" className="scroll-mt-20 border-t border-slate-100 bg-slate-50/60 py-24">
+          <section id="preco" className="fundo-marca scroll-mt-20 py-24">
             <div className="mx-auto max-w-6xl space-y-10 px-4">
               <Surgir className="mx-auto max-w-2xl space-y-3 text-center">
-                <h2 className="text-3xl font-bold tracking-tight text-tinta sm:text-4xl">Um pagamento, acesso para sempre</h2>
-                <p className="text-slate-600">Sem mensalidade. Pague uma vez e estude no seu ritmo.</p>
+                <Rotulo className="text-violeta">Fig. 03 · Preço</Rotulo>
+                <h2 className="text-4xl font-extrabold tracking-tighter text-tinta sm:text-5xl">Um pagamento, acesso para sempre</h2>
+                <p className="text-lg text-slate-600">Sem mensalidade. Pague uma vez e estude no seu ritmo.</p>
               </Surgir>
               <Surgir className="mx-auto max-w-md">
-                <div className="relative rounded-3xl border-2 border-teal-600 bg-white p-8 shadow-xl shadow-teal-900/10">
-                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1">Acesso completo</Badge>
-                  <p className="text-center text-5xl font-bold tracking-tight text-slate-900">
-                    {PRECO.parcelas}x <span className="text-teal-700">{formatarReais(PRECO.parcelaCentavos)}</span>
+                <div className="relative rounded-3xl border-2 border-tinta bg-white p-8 shadow-[8px_8px_0_0_var(--color-tinta)]">
+                  <span className="rotulo absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-md border-2 border-tinta bg-lima px-3 py-1 text-xs font-bold whitespace-nowrap text-tinta">
+                    Acesso completo
+                  </span>
+                  <p className="text-center font-heading text-5xl font-extrabold tracking-tighter text-tinta">
+                    {PRECO.parcelas}x <span className="text-violeta">{formatarReais(PRECO.parcelaCentavos)}</span>
                   </p>
                   <p className="mt-1 text-center text-sm text-slate-500">
                     sem juros no cartão · total {formatarReais(totalParcelado())}
                   </p>
-                  <p className="mt-4 text-center text-lg text-slate-900">
+                  <p className="mt-4 text-center text-lg text-tinta">
                     ou <strong>{formatarReais(PRECO.aVistaCentavos)}</strong> à vista
-                    <Badge variant="secondary" className="ml-2 align-middle">{desconto}% off</Badge>
+                    <Badge variant="secondary" className="rotulo ml-2 align-middle text-[10px]">{desconto}% off</Badge>
                   </p>
-                  <ul className="mt-8 space-y-3 text-sm text-slate-700">
+                  <ul className="mt-8 space-y-3 text-slate-700">
                     {[
                       "Acesso vitalício ao conteúdo",
                       "Novas disciplinas e aulas por 12 meses",
@@ -260,11 +264,11 @@ export default function Inicio() {
                       "Certificado por disciplina",
                     ].map((item) => (
                       <li key={item} className="flex gap-3">
-                        <Check className="size-5 shrink-0 text-teal-600" /> {item}
+                        <Check className="size-5 shrink-0 text-violeta" /> {item}
                       </li>
                     ))}
                   </ul>
-                  <Button size="lg" className="mt-8 h-12 w-full text-base" asChild>
+                  <Button size="lg" className="mt-8 h-12 w-full rounded-full text-base" asChild>
                     <Link href="/assinar">
                       Quero começar <ArrowRight data-icon="inline-end" />
                     </Link>
@@ -278,16 +282,17 @@ export default function Inicio() {
           </section>
 
           {/* Dúvidas */}
-          <section id="duvidas" className="scroll-mt-20 py-24">
+          <section id="duvidas" className="scroll-mt-20 border-t-2 border-tinta bg-white py-24">
             <div className="mx-auto max-w-3xl space-y-10 px-4">
               <Surgir className="space-y-3 text-center">
-                <h2 className="text-3xl font-bold tracking-tight text-tinta sm:text-4xl">Dúvidas frequentes</h2>
+                <Rotulo className="text-violeta">Fig. 04 · Dúvidas</Rotulo>
+                <h2 className="text-4xl font-extrabold tracking-tighter text-tinta sm:text-5xl">Dúvidas frequentes</h2>
               </Surgir>
               <Surgir>
-                <Accordion type="single" collapsible className="rounded-2xl border border-slate-200 bg-white px-6">
+                <Accordion type="single" collapsible className="rounded-2xl border-2 border-tinta bg-white px-6">
                   {DUVIDAS.map((d) => (
                     <AccordionItem key={d.pergunta} value={d.pergunta}>
-                      <AccordionTrigger className="text-base">{d.pergunta}</AccordionTrigger>
+                      <AccordionTrigger className="text-base font-semibold">{d.pergunta}</AccordionTrigger>
                       <AccordionContent className="text-slate-600">{d.resposta}</AccordionContent>
                     </AccordionItem>
                   ))}
@@ -296,18 +301,24 @@ export default function Inicio() {
             </div>
           </section>
 
-          {/* Chamada final */}
-          <section className="px-4 pb-24">
+          {/* Chamada final: o "Resumo de bolso" dos carrosséis, em Lima */}
+          <section className="bg-white px-4 pb-24">
             <Surgir className="mx-auto max-w-6xl">
-              <div className="relative overflow-hidden rounded-3xl bg-tinta px-6 py-16 text-center text-white">
-                <div aria-hidden className="absolute -right-24 -top-24 size-72 rounded-full bg-teal-500/35 blur-3xl" />
-                <div aria-hidden className="absolute -bottom-24 -left-24 size-72 rounded-full bg-coral/25 blur-3xl" />
+              <div
+                className="relative overflow-hidden rounded-3xl border-2 border-tinta bg-lima px-6 py-16 text-center text-tinta"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(rgb(18 18 28 / 7%) 1px, transparent 1px), linear-gradient(90deg, rgb(18 18 28 / 7%) 1px, transparent 1px)",
+                  backgroundSize: "40px 40px",
+                }}
+              >
                 <div className="relative space-y-5">
-                  <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Sua próxima prova começa hoje</h2>
-                  <p className="mx-auto max-w-xl text-teal-100">
+                  <Rotulo>Resumo de bolso</Rotulo>
+                  <h2 className="text-4xl font-extrabold tracking-tighter sm:text-6xl">Sua próxima prova começa hoje</h2>
+                  <p className="mx-auto max-w-xl text-lg">
                     Estude com método, treine com simulados e chegue na prova sabendo onde você precisa melhorar.
                   </p>
-                  <Button size="lg" className="h-12 bg-coral px-6 text-base text-tinta hover:bg-coral-claro" asChild>
+                  <Button size="lg" className="h-12 rounded-full bg-tinta px-6 text-base text-white hover:bg-tinta/85" asChild>
                     <Link href="/assinar">
                       Começar agora <ArrowRight data-icon="inline-end" />
                     </Link>
@@ -318,16 +329,16 @@ export default function Inicio() {
           </section>
         </main>
 
-        <footer className="border-t border-slate-100 py-8">
-          <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 text-sm text-slate-500 sm:flex-row">
-            <span className="flex flex-col items-center gap-1 sm:items-start">
+        <footer className="border-t-2 border-tinta bg-papel py-8">
+          <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 text-sm text-slate-600 sm:flex-row">
+            <span className="flex flex-col items-center gap-1.5 sm:items-start">
               <Logo tamanho="sm" />
-              <span className="text-xs">O laboratório de estudos da graduação em Odontologia</span>
+              <span className="rotulo text-[10px]">O laboratório de estudos da Odontologia</span>
             </span>
             <span className="inline-flex items-center gap-1.5">
               <Smartphone className="size-4" /> Estude no celular, tablet ou computador
             </span>
-            <Link href="/entrar" className="hover:text-slate-900">
+            <Link href="/entrar" className="font-medium hover:text-tinta">
               Área do aluno
             </Link>
           </div>

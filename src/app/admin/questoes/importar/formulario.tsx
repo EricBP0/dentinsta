@@ -51,7 +51,7 @@ export function FormularioImportacao({
         </div>
       )}
       {estado.importadas !== undefined && (
-        <p className="rounded-lg bg-teal-50 p-3 text-sm text-teal-800">
+        <p className="rounded-lg bg-violeta-50 p-3 text-sm text-violeta-800">
           {estado.importadas} questões importadas. <Link href="/admin/questoes" className="underline">Ver banco de questões</Link>
         </p>
       )}

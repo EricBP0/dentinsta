@@ -3,17 +3,21 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
 // Imagem de compartilhamento (WhatsApp, Instagram, LinkedIn…), gerada no build.
+// Mesmo desenho das capas do Instagram: violeta quadriculado, título em
+// Bricolage, rótulos em JetBrains Mono e o Lima só como destaque.
 export const alt = "OdontoLab — o laboratório de estudos da graduação em Odontologia";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+const fonte = (arquivo: string) => readFile(join(process.cwd(), "assets/fontes", arquivo));
+
 export default async function Image() {
-  const [sora, geist, simbolo] = await Promise.all([
-    readFile(join(process.cwd(), "assets/fontes/Sora-Bold.ttf")),
-    readFile(join(process.cwd(), "assets/fontes/Geist-Regular.ttf")),
-    readFile(join(process.cwd(), "assets/marca/simbolo-512.png")),
+  const [bricolage, instrument, mono] = await Promise.all([
+    fonte("BricolageGrotesque-ExtraBold.ttf"),
+    fonte("InstrumentSans-Regular.ttf"),
+    fonte("JetBrainsMono-Bold.ttf"),
   ]);
-  const simboloUrl = `data:image/png;base64,${simbolo.toString("base64")}`;
+  const rotulo = { fontFamily: "JetBrains Mono", fontSize: 22, letterSpacing: 3, textTransform: "uppercase" } as const;
 
   return new ImageResponse(
     (
@@ -24,35 +28,44 @@ export default async function Image() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          padding: 72,
-          background: "#0B1F24",
+          padding: 64,
+          background: "#5B3DF0",
           backgroundImage:
-            "radial-gradient(circle at 88% 12%, rgba(20,184,166,0.45), transparent 45%), radial-gradient(circle at 8% 110%, rgba(255,122,89,0.30), transparent 40%)",
+            "linear-gradient(rgba(255,255,255,0.09) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.09) 2px, transparent 2px)",
+          backgroundSize: "60px 60px",
           color: "white",
-          fontFamily: "Geist",
+          fontFamily: "Instrument Sans",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          <img src={simboloUrl} width={84} height={84} alt="" />
-          <div style={{ display: "flex", fontFamily: "Sora", fontSize: 56, letterSpacing: -1.5 }}>
-            Odonto<span style={{ color: "#5EEAD4" }}>Lab</span>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ ...rotulo, display: "flex", background: "#C8F250", color: "#12121C", borderRadius: 10, padding: "8px 14px" }}>
+            Lab 01
+          </div>
+          <div style={{ ...rotulo, display: "flex" }}>Graduação em Odontologia</div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+          <div style={{ display: "flex", flexDirection: "column", fontFamily: "Bricolage Grotesque", fontSize: 84, lineHeight: 0.98, letterSpacing: -3 }}>
+            <span>O laboratório de estudos</span>
+            <span style={{ color: "#C8F250" }}>da Odontologia.</span>
+          </div>
+          <div style={{ display: "flex", fontSize: 28, opacity: 0.9 }}>
+            Resumos, flashcards, videoaulas e simulados com correção por IA.
           </div>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-          <div style={{ display: "flex", fontFamily: "Sora", fontSize: 64, lineHeight: 1.1, letterSpacing: -2, maxWidth: 940 }}>
-            O laboratório de estudos da graduação em Odontologia
-          </div>
-          <div style={{ display: "flex", fontSize: 26, color: "#99F6E4" }}>
-            Videoaulas · resumos · mapas mentais · flashcards · simulados com correção por IA
-          </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontFamily: "Bricolage Grotesque", fontSize: 40, letterSpacing: -1.5 }}>odonto</span>
+          <span style={{ ...rotulo, display: "flex", fontSize: 20, background: "#C8F250", color: "#12121C", borderRadius: 7, padding: "4px 9px" }}>
+            Lab
+          </span>
         </div>
       </div>
     ),
     {
       ...size,
       fonts: [
-        { name: "Sora", data: sora, style: "normal", weight: 700 },
-        { name: "Geist", data: geist, style: "normal", weight: 400 },
+        { name: "Bricolage Grotesque", data: bricolage, style: "normal", weight: 800 },
+        { name: "Instrument Sans", data: instrument, style: "normal", weight: 400 },
+        { name: "JetBrains Mono", data: mono, style: "normal", weight: 700 },
       ],
     },
   );

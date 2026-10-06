@@ -89,7 +89,7 @@ async function Prova({ simulado }: { simulado: Simulado }) {
           {q.tipo === "objetiva" ? (
             <div className="space-y-2">
               {q.alternativas.map((a) => (
-                <label key={a.letra} className="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-200 p-3 hover:bg-slate-50 has-[:checked]:border-teal-600 has-[:checked]:bg-teal-50">
+                <label key={a.letra} className="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-200 p-3 hover:bg-slate-50 has-[:checked]:border-violeta-600 has-[:checked]:bg-violeta-50">
                   <input type="radio" name={`q_${q.id}`} value={a.letra} className="mt-1" />
                   <span className="text-sm text-slate-800">
                     <strong>{a.letra})</strong> {a.texto}
@@ -103,13 +103,13 @@ async function Prova({ simulado }: { simulado: Simulado }) {
               rows={6}
               maxLength={3000}
               placeholder="Escreva sua resposta (até 3.000 caracteres)"
-              className="w-full rounded-lg border border-slate-300 p-3 text-sm focus:border-teal-600 focus:outline-none"
+              className="w-full rounded-lg border border-slate-300 p-3 text-sm focus:border-violeta-600 focus:outline-none"
             />
           )}
         </fieldset>
       ))}
 
-      <button className="w-full rounded-lg bg-teal-700 py-3 font-medium text-white hover:bg-teal-800 sm:w-auto sm:px-8">
+      <button className="w-full rounded-lg bg-violeta-700 py-3 font-medium text-white hover:bg-violeta-800 sm:w-auto sm:px-8">
         Enviar respostas
       </button>
     </form>
@@ -142,10 +142,10 @@ async function Resultado({ simulado }: { simulado: Simulado }) {
             <div className="relative">
               {/* Comemoração para nota a partir de 7 */}
               {Number(simulado.nota) >= 7 && <Confete />}
-              <p className={`text-4xl font-bold ${Number(simulado.nota) >= 6 ? "text-teal-700" : "text-red-600"}`}>
+              <p className={`text-4xl font-bold ${Number(simulado.nota) >= 6 ? "text-violeta-700" : "text-red-600"}`}>
                 <NumeroAnimado valor={Number(simulado.nota)} />
               </p>
-              {Number(simulado.nota) >= 7 && <p className="text-xs font-medium text-teal-700">Mandou bem!</p>}
+              {Number(simulado.nota) >= 7 && <p className="text-xs font-medium text-violeta-700">Mandou bem!</p>}
             </div>
           ) : (
             <p className="text-sm text-slate-500">Nota final após a correção</p>
@@ -195,11 +195,11 @@ async function Resultado({ simulado }: { simulado: Simulado }) {
                   <li
                     key={a.letra}
                     className={`rounded-lg border p-3 text-sm ${
-                      certa ? "border-teal-500 bg-teal-50" : escolhida ? "border-red-400 bg-red-50" : "border-slate-200"
+                      certa ? "border-violeta-500 bg-violeta-50" : escolhida ? "border-red-400 bg-red-50" : "border-slate-200"
                     }`}
                   >
                     <strong>{a.letra})</strong> {a.texto}
-                    {certa && <span className="ml-2 text-xs font-medium text-teal-700">correta</span>}
+                    {certa && <span className="ml-2 text-xs font-medium text-violeta-700">correta</span>}
                     {escolhida && !certa && <span className="ml-2 text-xs font-medium text-red-600">sua resposta</span>}
                   </li>
                 );
@@ -225,7 +225,7 @@ function SeloNota({ linha }: { linha: LinhaResultado }) {
   if (linha.status_correcao === "sem_cota") return <span className="text-xs text-amber-700">Sem correção</span>;
   if (linha.status_correcao === "erro") return <span className="text-xs text-red-600">Erro na correção</span>;
   const nota = Number(linha.nota);
-  return <span className={`text-sm font-bold ${nota >= 6 ? "text-teal-700" : "text-red-600"}`}>{nota.toFixed(1)}</span>;
+  return <span className={`text-sm font-bold ${nota >= 6 ? "text-violeta-700" : "text-red-600"}`}>{nota.toFixed(1)}</span>;
 }
 
 function Discursiva({ linha, simuladoId }: { linha: LinhaResultado; simuladoId: string }) {
@@ -286,7 +286,7 @@ function Discursiva({ linha, simuladoId }: { linha: LinhaResultado; simuladoId: 
               maxLength={2000}
               rows={3}
               placeholder="Explique por que a nota deveria ser diferente"
-              className="w-full rounded-lg border border-slate-300 p-2 focus:border-teal-600 focus:outline-none"
+              className="w-full rounded-lg border border-slate-300 p-2 focus:border-violeta-600 focus:outline-none"
             />
             <button className="rounded-md border border-slate-300 px-3 py-1 hover:bg-slate-50">Enviar para o professor</button>
           </form>

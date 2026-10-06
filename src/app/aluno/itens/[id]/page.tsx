@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BotaoRenovar } from "@/components/cadeado";
+import { ResumoEstruturado } from "@/components/resumo/resumo-estruturado";
 import { SessaoEstudo } from "@/app/aluno/flashcards/sessao-estudo";
 import { exigirLogin } from "@/lib/auth";
 import { carregarResumo, carregarSessao } from "@/lib/flashcards/sessao";
+import { assinarMidiaResumo } from "@/lib/resumos/midia";
 import { COLUNAS_ITEM, NOME_TIPO_ITEM, type ConfigItem, type Item } from "@/lib/tipos";
 import { marcarConcluido } from "./actions";
 
@@ -52,7 +54,7 @@ export default async function PaginaItem({ params }: PageProps<"/aluno/itens/[id
             <input type="hidden" name="concluido" value={String(!concluido)} />
             <button
               className={`rounded-lg px-4 py-2 text-sm font-medium ${
-                concluido ? "border border-slate-300 text-slate-700" : "bg-teal-700 text-white hover:bg-teal-800"
+                concluido ? "border border-slate-300 text-slate-700" : "bg-violeta-700 text-white hover:bg-violeta-800"
               }`}
             >
               {concluido ? "✅ Concluído — desmarcar" : "Marcar como concluído"}
@@ -104,6 +106,7 @@ function ConteudoItem({ tipo, config }: { tipo: Item["tipo"]; config: ConfigItem
         <Vazio />
       );
     case "resumo":
+      if (config.resumo || config.pdf_caminho) return <ResumoImportado config={config} />;
       return (
         <div className="space-y-4">
           {config.conteudo && (
@@ -112,7 +115,7 @@ function ConteudoItem({ tipo, config }: { tipo: Item["tipo"]; config: ConfigItem
             </article>
           )}
           {config.pdf_url && (
-            <a href={config.pdf_url} target="_blank" className="text-sm font-medium text-teal-700 underline">
+            <a href={config.pdf_url} target="_blank" className="text-sm font-medium text-violeta-700 underline">
               Abrir PDF
             </a>
           )}
@@ -124,7 +127,7 @@ function ConteudoItem({ tipo, config }: { tipo: Item["tipo"]; config: ConfigItem
         <a href={config.imagem_url} target="_blank" className="block">
           {/* eslint-disable-next-line @next/next/no-img-element -- imagem de origem externa configurável */}
           <img src={config.imagem_url} alt="Mapa mental" className="w-full rounded-xl border border-slate-200" />
-          <span className="mt-2 block text-sm text-teal-700 underline">Abrir em tamanho real</span>
+          <span className="mt-2 block text-sm text-violeta-700 underline">Abrir em tamanho real</span>
         </a>
       ) : (
         <Vazio />
@@ -136,4 +139,24 @@ function ConteudoItem({ tipo, config }: { tipo: Item["tipo"]; config: ConfigItem
 
 function Vazio() {
   return <p className="rounded-xl bg-slate-100 p-6 text-slate-600">Conteúdo ainda não cadastrado.</p>;
+}
+
+/** Resumo vindo dos PDFs: texto no site + PDF completo para baixar. */
+async function ResumoImportado({ config }: { config: ConfigItem }) {
+  const midia = await assinarMidiaResumo(config);
+  return (
+    <div className="space-y-6">
+      {midia.pdf && (
+        <a
+          href={midia.pdf}
+          target="_blank"
+          rel="noopener"
+          className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
+        >
+          Abrir o PDF completo
+        </a>
+      )}
+      {config.resumo ? <ResumoEstruturado resumo={config.resumo} figuras={midia.figuras} /> : !midia.pdf && <Vazio />}
+    </div>
+  );
 }

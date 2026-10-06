@@ -1,19 +1,24 @@
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
-import { Geist, Sora } from "next/font/google";
+import { Bricolage_Grotesque, Instrument_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Tipografia da marca (docs/MARCA.md): títulos em Bricolage Grotesque, texto em
+// Instrument Sans e rótulos ("LAB 01 · FIG. 01") em JetBrains Mono.
+const bricolage = Bricolage_Grotesque({
+  variable: "--font-bricolage",
   subsets: ["latin"],
 });
 
-// Fonte da marca, usada no logotipo e nos títulos (docs/MARCA.md).
-const sora = Sora({
-  variable: "--font-sora",
+const instrumentSans = Instrument_Sans({
+  variable: "--font-instrument-sans",
   subsets: ["latin"],
-  weight: ["600", "700"],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -25,12 +30,12 @@ export const metadata: Metadata = {
   openGraph: { siteName: "OdontoLab", locale: "pt_BR", type: "website" },
 };
 
-export const viewport: Viewport = { themeColor: "#0F766E" };
+export const viewport: Viewport = { themeColor: "#5B3DF0" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="pt-BR" className={`${geistSans.variable} ${sora.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col bg-slate-50 text-slate-900">
+    <html lang="pt-BR" className={`${bricolage.variable} ${instrumentSans.variable} ${jetbrainsMono.variable} h-full antialiased`}>
+      <body className="flex min-h-full flex-col bg-background text-foreground">
         {children}
         <Analytics />
         <SpeedInsights />
