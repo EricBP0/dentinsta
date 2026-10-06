@@ -34,7 +34,7 @@ export default async function PagamentoConcluido({ searchParams }: PageProps<"/p
             {compra.tipo === "renovacao" ? "Renovação confirmada!" : "Pagamento confirmado!"}
           </h1>
           <p className="text-slate-600">Seu acesso já está liberado. Bons estudos!</p>
-          <Link href="/aluno" className="rounded-lg bg-teal-700 px-6 py-3 font-medium text-white hover:bg-teal-800">
+          <Link href="/aluno" className="rounded-lg bg-violeta-700 px-6 py-3 font-medium text-white hover:bg-violeta-800">
             Começar a estudar
           </Link>
         </Movimento>
@@ -46,7 +46,7 @@ export default async function PagamentoConcluido({ searchParams }: PageProps<"/p
             acesso automaticamente se fechar agora.
           </p>
           <AtualizarPeriodicamente segundos={4} />
-          <Link href="/aluno" className="text-sm font-medium text-teal-700 underline">
+          <Link href="/aluno" className="text-sm font-medium text-violeta-700 underline">
             Ir para a área do aluno
           </Link>
         </>
@@ -54,7 +54,7 @@ export default async function PagamentoConcluido({ searchParams }: PageProps<"/p
         <>
           <h1 className="text-2xl font-bold text-tinta">Pagamento não encontrado</h1>
           <p className="text-slate-600">Se você acabou de pagar, aguarde alguns minutos e confira na área do aluno.</p>
-          <Link href="/aluno" className="text-sm font-medium text-teal-700 underline">
+          <Link href="/aluno" className="text-sm font-medium text-violeta-700 underline">
             Ir para a área do aluno
           </Link>
         </>

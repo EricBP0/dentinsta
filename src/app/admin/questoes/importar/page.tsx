@@ -20,7 +20,7 @@ export default async function ImportarQuestoes({ searchParams }: PageProps<"/adm
         <h1 className="text-2xl font-bold text-tinta">Importar questões por planilha</h1>
         <p className="text-sm text-slate-600">
           Monte a planilha no Excel ou Google Sheets e salve como CSV.{" "}
-          <a href="/modelo-questoes.csv" download className="font-medium text-teal-700 underline">
+          <a href="/modelo-questoes.csv" download className="font-medium text-violeta-700 underline">
             Baixar planilha modelo
           </a>
         </p>

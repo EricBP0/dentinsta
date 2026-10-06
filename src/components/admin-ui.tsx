@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 export const campo =
   "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-xs transition-colors focus:border-primary focus:outline-none focus:ring-3 focus:ring-primary/15";
 export const botaoPrimario =
-  "inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-teal-800";
+  "inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-violeta-800";
 export const botaoSecundario =
   "inline-flex items-center justify-center gap-1 rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-xs text-slate-700 transition-colors hover:border-slate-400 hover:bg-slate-50";
 export const botaoPerigo = "rounded-lg px-2 py-1 text-xs text-red-700 transition-colors hover:bg-red-50";
@@ -22,8 +22,8 @@ export function Rotulo({ texto, children, dica }: { texto: string; children: Rea
 const CORES: Record<string, string> = {
   rascunho: "bg-slate-100 text-slate-700 ring-slate-200",
   em_breve: "bg-sky-50 text-sky-800 ring-sky-200",
-  publicada: "bg-teal-50 text-teal-800 ring-teal-200",
-  publicado: "bg-teal-50 text-teal-800 ring-teal-200",
+  publicada: "bg-violeta-50 text-violeta-800 ring-violeta-200",
+  publicado: "bg-violeta-50 text-violeta-800 ring-violeta-200",
   arquivada: "bg-slate-100 text-slate-500 ring-slate-200",
 };
 

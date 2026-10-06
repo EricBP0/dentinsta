@@ -4,17 +4,32 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Cores da marca OdontoLab (docs/MARCA.md) */
+/* Cores da marca OdontoLab (docs/MARCA.md): Violeta, Lima, Tinta e Papel. */
 @theme {
-  --color-tinta: #0b1f24;
-  --color-menta: #99f6e4;
-  --color-coral: #ff7a59;
-  --color-coral-claro: #ffb199;
+  --color-violeta: #5b3df0;
+  --color-lima: #c8f250;
+  --color-lima-escuro: #b4dc3c;
+  --color-tinta: #12121c;
+  --color-papel: #f2f4f7;
+
+  /* Escala do violeta para fundos suaves, bordas e textos (700 = Violeta da marca). */
+  --color-violeta-50: oklch(0.97 0.018 285);
+  --color-violeta-100: oklch(0.94 0.04 285);
+  --color-violeta-200: oklch(0.88 0.08 284);
+  --color-violeta-300: oklch(0.79 0.13 283);
+  --color-violeta-400: oklch(0.69 0.19 282);
+  --color-violeta-500: oklch(0.6 0.23 281);
+  --color-violeta-600: oklch(0.56 0.245 281);
+  --color-violeta-700: #5b3df0;
+  --color-violeta-800: oklch(0.43 0.22 280);
+  --color-violeta-900: oklch(0.34 0.17 281);
+  --color-violeta-950: oklch(0.24 0.1 283);
 }
 
 @theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-heading: var(--font-sora);
+  --font-sans: var(--font-instrument-sans);
+  --font-heading: var(--font-bricolage);
+  --font-mono: var(--font-jetbrains-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -56,73 +71,73 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --background: #f2f4f7; /* Papel */
+  --foreground: #12121c; /* Tinta */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: #12121c;
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  /* Marca: verde-azulado (teal-700 do Tailwind) */
-  --primary: oklch(0.511 0.096 186.391);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.953 0.051 180.801);
-  --secondary-foreground: oklch(0.386 0.063 188.416);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.984 0.014 180.72);
-  --accent-foreground: oklch(0.386 0.063 188.416);
+  --popover-foreground: #12121c;
+  /* Marca: Violeta como cor principal; Lima só como destaque (sempre com texto Tinta). */
+  --primary: #5b3df0;
+  --primary-foreground: oklch(1 0 0);
+  --secondary: #c8f250;
+  --secondary-foreground: #12121c;
+  --muted: oklch(0.955 0.008 270);
+  --muted-foreground: oklch(0.5 0.025 275);
+  --accent: oklch(0.95 0.035 285);
+  --accent-foreground: oklch(0.43 0.22 280);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.6 0.118 184.704);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
+  --border: oklch(0.9 0.01 275);
+  --input: oklch(0.88 0.012 275);
+  --ring: #5b3df0;
+  --chart-1: #5b3df0;
+  --chart-2: #c8f250;
+  --chart-3: #12121c;
+  --chart-4: oklch(0.79 0.13 283);
+  --chart-5: oklch(0.6 0.02 275);
+  --radius: 0.75rem;
   --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-foreground: #12121c;
+  --sidebar-primary: #5b3df0;
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.95 0.035 285);
+  --sidebar-accent-foreground: #12121c;
+  --sidebar-border: oklch(0.9 0.01 275);
+  --sidebar-ring: #5b3df0;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.777 0.152 181.912);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --background: #12121c;
+  --foreground: #f2f4f7;
+  --card: oklch(0.23 0.02 284);
+  --card-foreground: #f2f4f7;
+  --popover: oklch(0.23 0.02 284);
+  --popover-foreground: #f2f4f7;
+  --primary: oklch(0.69 0.19 282);
+  --primary-foreground: #12121c;
+  --secondary: #c8f250;
+  --secondary-foreground: #12121c;
+  --muted: oklch(0.27 0.02 284);
+  --muted-foreground: oklch(0.72 0.02 275);
+  --accent: oklch(0.3 0.06 283);
+  --accent-foreground: #f2f4f7;
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: oklch(0.69 0.19 282);
+  --chart-1: oklch(0.69 0.19 282);
+  --chart-2: #c8f250;
+  --chart-3: #f2f4f7;
+  --chart-4: oklch(0.79 0.13 283);
+  --chart-5: oklch(0.6 0.02 275);
+  --sidebar: oklch(0.23 0.02 284);
+  --sidebar-foreground: #f2f4f7;
+  --sidebar-primary: oklch(0.69 0.19 282);
+  --sidebar-primary-foreground: #12121c;
+  --sidebar-accent: oklch(0.3 0.06 283);
+  --sidebar-accent-foreground: #f2f4f7;
+  --sidebar-border: oklch(1 0 0 / 12%);
+  --sidebar-ring: oklch(0.69 0.19 282);
 }
 
 @layer base {
@@ -142,12 +157,29 @@
     @apply font-heading tracking-tight;
   }
 }
-/* Fundo das telas de entrada: manchas suaves de menta e coral sobre branco. */
+/* Fundo das telas de entrada: o quadriculado da marca sobre o Papel. */
 .fundo-marca {
-  background:
-    radial-gradient(40rem 24rem at 12% -10%, color-mix(in oklab, var(--color-menta) 55%, transparent), transparent 70%),
-    radial-gradient(28rem 18rem at 105% 110%, color-mix(in oklab, var(--color-coral-claro) 35%, transparent), transparent 70%),
-    #fff;
+  background-color: var(--color-papel);
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--color-tinta) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--color-tinta) 6%, transparent) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Quadriculado sobre o Violeta (topo da landing, chamadas). */
+.grade-violeta {
+  background-color: var(--color-violeta);
+  background-image:
+    linear-gradient(rgb(255 255 255 / 9%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 9%) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* Rótulo da marca: JetBrains Mono em caixa alta e espaçado ("LAB 01 · FIG. 01"). */
+.rotulo {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
 }
 
 /*

@@ -7,9 +7,9 @@
 <meta name="supported-color-schemes" content="light">
 <title>Crie uma nova senha na OdontoLab</title>
 </head>
-<body style="margin:0;padding:0;background:#EEF4F3;-webkit-text-size-adjust:100%">
+<body style="margin:0;padding:0;background:#F2F4F7;-webkit-text-size-adjust:100%">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent">Use o link para criar uma nova senha.&#8199;&#65279;&#847;&#8199;&#65279;&#847;&#8199;&#65279;&#847;</div>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#EEF4F3" style="background:#EEF4F3">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F2F4F7" style="background:#F2F4F7">
   <tr>
     <td align="center" style="padding:32px 16px">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px">
@@ -18,46 +18,47 @@
             <a href="{{ .SiteURL }}" target="_blank" style="text-decoration:none">
               <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                  <td style="padding-right:10px"><img src="{{ .SiteURL }}/marca/odontolab-simbolo-512.png" width="40" height="40" alt="" style="display:block;border:0;border-radius:10px"></td>
-                  <td style="font-family:'Segoe UI', Helvetica, Arial, sans-serif;font-size:22px;font-weight:700;letter-spacing:-0.3px;color:#0B1F24">Odonto<span style="color:#0F766E">Lab</span></td>
+                  <td style="padding-right:10px"><img src="{{ .SiteURL }}/marca/odontolab-simbolo-512.png" width="36" height="36" alt="" style="display:block;border:0;border-radius:8px"></td>
+                  <td style="font-family:'Segoe UI', Helvetica, Arial, sans-serif;font-size:24px;font-weight:800;letter-spacing:-0.8px;color:#12121C">odonto</td>
+                  <td style="padding-left:6px"><span style="display:inline-block;padding:3px 7px;border-radius:5px;background:#5B3DF0;font-family:'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, 'Courier New', monospace;font-size:12px;font-weight:700;letter-spacing:1.5px;color:#FFFFFF">LAB</span></td>
                 </tr>
               </table>
             </a>
           </td>
         </tr>
         <tr>
-          <td bgcolor="#FFFFFF" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:16px;overflow:hidden">
+          <td bgcolor="#FFFFFF" style="background:#FFFFFF;border:2px solid #12121C;border-radius:16px;overflow:hidden">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
-                <td height="5" bgcolor="#0F766E" style="height:5px;line-height:5px;font-size:0;background:#0F766E">&nbsp;</td>
-                <td height="5" width="72" bgcolor="#FF7A59" style="height:5px;width:72px;line-height:5px;font-size:0;background:#FF7A59">&nbsp;</td>
+                <td height="6" bgcolor="#5B3DF0" style="height:6px;line-height:6px;font-size:0;background:#5B3DF0">&nbsp;</td>
+                <td height="6" width="72" bgcolor="#C8F250" style="height:6px;width:72px;line-height:6px;font-size:0;background:#C8F250">&nbsp;</td>
               </tr>
               <tr>
                 <td colspan="2" style="padding:36px 36px 32px;font-family:'Segoe UI', Helvetica, Arial, sans-serif">
-                  <h1 style="margin:0 0 18px;font-family:'Segoe UI', Helvetica, Arial, sans-serif;font-size:24px;line-height:32px;font-weight:700;color:#0B1F24">Crie uma nova senha</h1>
-<p style="margin:0 0 14px;font-size:16px;line-height:26px;color:#334155">{{ if .Data.primeiro_nome }}Olá, {{ .Data.primeiro_nome }}!{{ else }}Olá!{{ end }}</p>
-<p style="margin:0 0 14px;font-size:16px;line-height:26px;color:#334155">Recebemos um pedido para trocar a senha da sua conta. Clique no botão para escolher uma nova.</p>
+                  <h1 style="margin:0 0 18px;font-family:'Segoe UI', Helvetica, Arial, sans-serif;font-size:26px;line-height:32px;font-weight:800;letter-spacing:-0.5px;color:#12121C">Crie uma nova senha</h1>
+<p style="margin:0 0 14px;font-size:16px;line-height:26px;color:#3A3A48">{{ if .Data.primeiro_nome }}Olá, {{ .Data.primeiro_nome }}!{{ else }}Olá!{{ end }}</p>
+<p style="margin:0 0 14px;font-size:16px;line-height:26px;color:#3A3A48">Recebemos um pedido para trocar a senha da sua conta. Clique no botão para escolher uma nova.</p>
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0 8px">
   <tr>
-    <td bgcolor="#0F766E" style="border-radius:10px;mso-padding-alt:14px 28px">
-      <a href="{{ .SiteURL }}/auth/confirmar?token_hash={{ .TokenHash }}&type=recovery&next=/redefinir-senha" target="_blank" style="display:inline-block;padding:14px 28px;font-family:'Segoe UI', Helvetica, Arial, sans-serif;font-size:16px;font-weight:600;line-height:20px;color:#FFFFFF;text-decoration:none;border-radius:10px">Criar nova senha</a>
+    <td bgcolor="#5B3DF0" style="border-radius:999px;mso-padding-alt:14px 28px">
+      <a href="{{ .SiteURL }}/auth/confirmar?token_hash={{ .TokenHash }}&type=recovery&next=/redefinir-senha" target="_blank" style="display:inline-block;padding:14px 28px;font-family:'Segoe UI', Helvetica, Arial, sans-serif;font-size:16px;font-weight:600;line-height:20px;color:#FFFFFF;text-decoration:none;border-radius:999px">Criar nova senha</a>
     </td>
   </tr>
 </table>
-<p style="margin:20px 0 0;font-size:13px;line-height:20px;color:#64748B">Se o botão não funcionar, copie e cole este endereço no navegador:<br>
-<a href="{{ .SiteURL }}/auth/confirmar?token_hash={{ .TokenHash }}&type=recovery&next=/redefinir-senha" style="color:#0F766E;word-break:break-all">{{ .SiteURL }}/auth/confirmar?token_hash={{ .TokenHash }}&type=recovery&next=/redefinir-senha</a></p>
+<p style="margin:20px 0 0;font-size:13px;line-height:20px;color:#6B6B7B">Se o botão não funcionar, copie e cole este endereço no navegador:<br>
+<a href="{{ .SiteURL }}/auth/confirmar?token_hash={{ .TokenHash }}&type=recovery&next=/redefinir-senha" style="color:#5B3DF0;word-break:break-all">{{ .SiteURL }}/auth/confirmar?token_hash={{ .TokenHash }}&type=recovery&next=/redefinir-senha</a></p>
                 </td>
               </tr>
               <tr>
-                <td colspan="2" style="padding:18px 36px;border-top:1px solid #E2E8F0;font-family:'Segoe UI', Helvetica, Arial, sans-serif;font-size:13px;line-height:20px;color:#64748B">O link vale por 1 hora. Se você não pediu a troca, ignore este e-mail: sua senha continua a mesma.</td>
+                <td colspan="2" style="padding:18px 36px;border-top:1px solid #E2E3EA;font-family:'Segoe UI', Helvetica, Arial, sans-serif;font-size:13px;line-height:20px;color:#6B6B7B">O link vale por 1 hora. Se você não pediu a troca, ignore este e-mail: sua senha continua a mesma.</td>
               </tr>
             </table>
           </td>
         </tr>
         <tr>
-          <td align="center" style="padding:24px 12px 0;font-family:'Segoe UI', Helvetica, Arial, sans-serif;font-size:12px;line-height:18px;color:#64748B">
-            <strong style="color:#0B1F24">OdontoLab</strong> · o laboratório de estudos da graduação em Odontologia<br>
-            <a href="{{ .SiteURL }}" style="color:#0F766E;text-decoration:none">odontolab.online</a> · Este é um e-mail automático, não precisa responder.
+          <td align="center" style="padding:24px 12px 0;font-family:'Segoe UI', Helvetica, Arial, sans-serif;font-size:12px;line-height:18px;color:#6B6B7B">
+            <strong style="color:#12121C">OdontoLab</strong> · o laboratório de estudos da graduação em Odontologia<br>
+            <a href="{{ .SiteURL }}" style="color:#5B3DF0;text-decoration:none">odontolab.online</a> · Este é um e-mail automático, não precisa responder.
           </td>
         </tr>
       </table>

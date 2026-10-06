@@ -16,7 +16,7 @@ export default async function RedefinirSenha() {
       ) : (
         <div className="max-w-sm space-y-3 text-center">
           <p className="text-slate-700">Esse link expirou. Peça um novo na tela de entrar.</p>
-          <Link href="/entrar" className="text-sm font-medium text-teal-700 underline">
+          <Link href="/entrar" className="text-sm font-medium text-violeta-700 underline">
             Ir para entrar
           </Link>
         </div>

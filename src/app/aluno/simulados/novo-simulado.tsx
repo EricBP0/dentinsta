@@ -4,7 +4,7 @@ import { useActionState, useState } from "react";
 import { criarSimulado, type EstadoSimulado } from "./actions";
 
 const campo =
-  "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-teal-600 focus:outline-none";
+  "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-violeta-600 focus:outline-none";
 
 export function NovoSimulado({
   disciplinas,
@@ -73,7 +73,7 @@ export function NovoSimulado({
       </fieldset>
 
       <div className="flex flex-wrap items-center gap-3">
-        <button disabled={criando} className="rounded-lg bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-60">
+        <button disabled={criando} className="rounded-lg bg-violeta-700 px-4 py-2 text-sm font-medium text-white hover:bg-violeta-800 disabled:opacity-60">
           {criando ? "Montando…" : "Começar simulado"}
         </button>
         {estado.erro && <p className="text-sm text-red-600">{estado.erro}</p>}

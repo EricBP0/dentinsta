@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from "react";
 
 // Série única na cor da marca (validada: faixa de luminosidade, croma e contraste).
-const COR_SERIE = "#0d9488";
+const COR_SERIE = "#5b3df0"; // Violeta da marca
 const COR_GRADE = "#e2e8f0"; // slate-200
 const COR_TEXTO = "#64748b"; // slate-500
 
@@ -162,7 +162,7 @@ export function GraficoLinha({
             onFocus={() => setAtivo(ultimo)}
             onBlur={() => setAtivo(null)}
             onKeyDown={aoTeclar}
-            className="touch-pan-y outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40"
+            className="touch-pan-y outline-none focus-visible:ring-2 focus-visible:ring-violeta-500/40"
           >
             {marcas.map((m) => (
               <g key={m}>
@@ -182,13 +182,13 @@ export function GraficoLinha({
             <path d={`${caminho} L${x(ultimo)},${y(0)} L${x(0)},${y(0)} Z`} fill={COR_SERIE} opacity={0.1} />
             <path d={caminho} fill="none" stroke={COR_SERIE} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
             {ativo !== null && (
-              <line x1={x(ativo)} x2={x(ativo)} y1={MARGEM.topo} y2={y(0)} stroke="#94a3b8" strokeWidth={1} />
+              <line x1={x(ativo)} x2={x(ativo)} y1={MARGEM.topo} y2={y(0)} stroke="#a1a1b5" strokeWidth={1} />
             )}
             {/* último ponto sempre marcado e rotulado; o ativo ganha marcador */}
             {[ultimo, ...(ativo !== null && ativo !== ultimo ? [ativo] : [])].map((i) => (
               <circle key={i} cx={x(i)} cy={y(pontos[i].valor)} r={4} fill={COR_SERIE} stroke="white" strokeWidth={2} />
             ))}
-            <text x={x(ultimo) + 8} y={y(pontos[ultimo].valor)} dominantBaseline="middle" fontSize={12} fontWeight={600} fill="#0f172a">
+            <text x={x(ultimo) + 8} y={y(pontos[ultimo].valor)} dominantBaseline="middle" fontSize={12} fontWeight={600} fill="#12121c">
               {formatar(pontos[ultimo].valor)}
             </text>
           </svg>

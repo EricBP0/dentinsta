@@ -42,7 +42,7 @@ export function Cabecalho({ perfil, area }: { perfil: Perfil; area: "aluno" | "a
           <Link href={escuro ? "/admin" : "/aluno"} className="flex items-center gap-2">
             <Logo tamanho="sm" claro={escuro} />
             {escuro && (
-              <span className="rounded-full bg-coral/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-tinta">
+              <span className="rotulo rounded-md bg-lima px-2 py-0.5 text-[10px] font-bold text-tinta">
                 Backoffice
               </span>
             )}
@@ -57,7 +57,7 @@ export function Cabecalho({ perfil, area }: { perfil: Perfil; area: "aluno" | "a
             <Link
               href={escuro ? "/aluno" : "/admin"}
               className={`hidden shrink-0 rounded-full border px-3 py-1.5 text-sm md:inline-block ${
-                escuro ? "border-white/20 text-teal-100 hover:bg-white/10" : "border-teal-200 text-teal-800 hover:bg-teal-50"
+                escuro ? "border-white/20 text-violeta-100 hover:bg-white/10" : "border-violeta-200 text-violeta-800 hover:bg-violeta-50"
               }`}
             >
               {escuro ? "Ver como aluno" : "Backoffice"}
@@ -88,7 +88,7 @@ function Conta({ perfil, escuro, iniciais }: { perfil: Perfil; escuro: boolean; 
           aria-label="Sair"
           title="Sair"
           className={`flex size-8 items-center justify-center rounded-full ${
-            escuro ? "text-teal-100 hover:bg-white/10" : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+            escuro ? "text-violeta-100 hover:bg-white/10" : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
           }`}
         >
           <LogOut className="size-4" />

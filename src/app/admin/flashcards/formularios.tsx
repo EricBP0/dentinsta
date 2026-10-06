@@ -8,7 +8,7 @@ function Mensagens({ estado }: { estado: EstadoCards }) {
   return (
     <>
       {estado.erro && <p className="text-sm text-red-600">{estado.erro}</p>}
-      {estado.mensagem && <p className="text-sm text-teal-700">{estado.mensagem}</p>}
+      {estado.mensagem && <p className="text-sm text-violeta-700">{estado.mensagem}</p>}
       {estado.erros && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">
           <p className="font-medium">Nada foi importado. Corrija estas linhas:</p>

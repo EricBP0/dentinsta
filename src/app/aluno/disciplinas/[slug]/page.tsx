@@ -25,7 +25,7 @@ export default async function PaginaDisciplina({ params }: PageProps<"/aluno/dis
         <div className="max-w-sm">
           <BarraProgresso feitos={disciplina.progresso.concluidos} total={disciplina.progresso.total} />
           {disciplina.progresso.completo && (
-            <p className="mt-2 text-sm font-medium text-teal-700">
+            <p className="mt-2 text-sm font-medium text-violeta-700">
               🎓 Você concluiu todos os itens obrigatórios!{" "}
               <Link href="/aluno/certificados" className="underline">
                 Emitir certificado
@@ -45,7 +45,7 @@ export default async function PaginaDisciplina({ params }: PageProps<"/aluno/dis
                   <span className="w-5 text-center">{item.concluido ? "✅" : item.situacao === "liberado" ? "○" : "🔒"}</span>
                   <div>
                     {item.situacao === "liberado" ? (
-                      <Link href={`/aluno/itens/${item.id}`} className="font-medium text-slate-900 hover:text-teal-700">
+                      <Link href={`/aluno/itens/${item.id}`} className="font-medium text-slate-900 hover:text-violeta-700">
                         {item.titulo}
                       </Link>
                     ) : (

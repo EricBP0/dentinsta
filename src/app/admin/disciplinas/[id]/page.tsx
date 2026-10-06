@@ -182,7 +182,7 @@ function ListaItens({ itens }: { itens: Item[] }) {
         <li key={item.id} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2">
           <div className="flex items-center gap-2">
             <span className="w-24 text-xs text-slate-500">{NOME_TIPO_ITEM[item.tipo as TipoItem]}</span>
-            <Link href={`/admin/itens/${item.id}`} className="font-medium text-slate-900 hover:text-teal-700">
+            <Link href={`/admin/itens/${item.id}`} className="font-medium text-slate-900 hover:text-violeta-700">
               {item.titulo}
             </Link>
           </div>
@@ -191,7 +191,7 @@ function ListaItens({ itens }: { itens: Item[] }) {
               <input type="hidden" name="id" value={item.id} />
               <input type="hidden" name="campo" value="obrigatorio" />
               <input type="hidden" name="valor" value={String(!item.obrigatorio)} />
-              <button className={`${botaoSecundario} ${item.obrigatorio ? "border-teal-600 text-teal-800" : ""}`}>
+              <button className={`${botaoSecundario} ${item.obrigatorio ? "border-violeta-600 text-violeta-800" : ""}`}>
                 {item.obrigatorio ? "✓ Obrigatório" : "Opcional"}
               </button>
             </form>

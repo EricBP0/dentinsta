@@ -22,7 +22,7 @@ export default async function Catalogo() {
         <h1 className="text-2xl font-bold text-tinta">Disciplinas</h1>
 
         {!acesso && !equipe && (
-          <div className="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm text-teal-900">
+          <div className="rounded-xl border border-violeta-200 bg-violeta-50 p-4 text-sm text-violeta-900">
             Você ainda não tem acesso ao conteúdo. <Link href="/assinar" className="font-medium underline">Liberar acesso</Link>
           </div>
         )}
@@ -30,7 +30,7 @@ export default async function Catalogo() {
         {acesso && (
           <div className="flex flex-wrap gap-3 text-sm">
             {iaAtiva(acesso) ? (
-              <span className="rounded-full bg-teal-50 px-3 py-1 text-teal-800">
+              <span className="rounded-full bg-violeta-50 px-3 py-1 text-violeta-800">
                 Novidades e IA liberadas até {formatarData(acesso.novidadesAte)}
               </span>
             ) : (
@@ -77,14 +77,14 @@ export default async function Catalogo() {
                   </div>
                 )}
                 {d.situacao === "sem_acesso" && (
-                  <Link href="/assinar" className="text-sm font-medium text-teal-700 underline">
+                  <Link href="/assinar" className="text-sm font-medium text-violeta-700 underline">
                     Liberar acesso
                   </Link>
                 )}
                 {d.situacao === "liberada" && (
                   <Link href={`/aluno/disciplinas/${d.slug}`} className="block space-y-2">
                     <BarraProgresso feitos={d.progresso.concluidos} total={d.progresso.total} />
-                    <span className="text-sm font-medium text-teal-700">Estudar →</span>
+                    <span className="text-sm font-medium text-violeta-700">Estudar →</span>
                   </Link>
                 )}
               </div>

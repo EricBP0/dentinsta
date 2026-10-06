@@ -24,17 +24,14 @@ export function PreviaProduto() {
 
   return (
     <div className="relative mx-auto w-full max-w-md pb-24">
-      {/* brilho de fundo */}
-      <div aria-hidden className="absolute -inset-8 -z-10 rounded-[3rem] bg-gradient-to-br from-teal-200/60 via-coral-claro/25 to-transparent blur-2xl" />
-
-      <div className="entrar rounded-2xl border border-slate-200 bg-white p-5 shadow-xl shadow-teal-900/5 [animation-delay:200ms]">
+      <div className="entrar rounded-2xl border-2 border-tinta bg-white p-5 text-tinta shadow-[8px_8px_0_0_var(--color-tinta)] [animation-delay:200ms]">
         <div className="flex items-center justify-between">
-          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-teal-700">
+          <span className="rotulo inline-flex items-center gap-1.5 text-[11px] font-bold text-violeta">
             <Sparkles className="size-3.5" /> Correção por IA
           </span>
-          <span className="text-xs text-slate-400">exemplo</span>
+          <span className="rotulo text-[10px] text-slate-400">Fig. 01</span>
         </div>
-        <p className="mt-3 text-sm font-medium text-slate-900">
+        <p className="mt-3 font-semibold text-tinta">
           Explique o papel do hipoclorito de sódio na irrigação dos canais radiculares.
         </p>
 
@@ -43,13 +40,13 @@ export function PreviaProduto() {
             <li key={c.criterio} className="space-y-1">
               <div className="flex justify-between text-xs text-slate-600">
                 <span>{c.criterio}</span>
-                <span className="font-medium text-slate-900">
+                <span className="font-mono font-semibold text-tinta">
                   {String(c.obtidos).replace(".", ",")}/{c.max}
                 </span>
               </div>
-              <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
+              <div className="h-2 overflow-hidden rounded-full bg-papel">
                 <motion.div
-                  className="h-full rounded-full bg-teal-600"
+                  className="h-full rounded-full bg-violeta"
                   initial={{ width: 0 }}
                   animate={{ width: `${(c.obtidos / c.max) * 100}%` }}
                   transition={{ duration: 0.8, delay: 0.6 + i * 0.25, ease: "easeOut" }}
@@ -61,9 +58,9 @@ export function PreviaProduto() {
 
         <div className="mt-4 flex items-end justify-between border-t border-slate-100 pt-4">
           <p className="max-w-[60%] text-xs text-slate-600">
-            Faltou citar: <span className="text-slate-900">concentração usada na clínica</span>
+            Faltou citar: <span className="font-medium text-tinta">concentração usada na clínica</span>
           </p>
-          <p className="text-3xl font-bold text-teal-700">
+          <p className="rounded-xl bg-lima px-3 py-1 font-heading text-3xl font-extrabold tracking-tight text-tinta">
             <NumeroAnimado valor={8.5} />
           </p>
         </div>
@@ -84,14 +81,14 @@ export function PreviaProduto() {
           style={{ transformStyle: "preserve-3d" }}
         >
           <div
-            className="absolute inset-0 flex flex-col justify-center rounded-xl border border-teal-200 bg-teal-50 p-4 shadow-lg"
+            className="absolute inset-0 flex flex-col justify-center rounded-xl border-2 border-tinta bg-lima p-4"
             style={{ backfaceVisibility: "hidden" }}
           >
-            <span className="text-[10px] font-medium uppercase tracking-wide text-teal-700">Flashcard</span>
-            <span className="mt-1 text-sm font-medium text-slate-900">O que é a smear layer?</span>
+            <span className="rotulo text-[10px] font-bold text-tinta/70">OdontoCard</span>
+            <span className="mt-1 text-sm font-semibold text-tinta">O que é a smear layer?</span>
           </div>
           <div
-            className="absolute inset-0 flex items-center rounded-xl border border-teal-600 bg-teal-700 p-4 text-sm text-white shadow-lg"
+            className="absolute inset-0 flex items-center rounded-xl border-2 border-tinta bg-tinta p-4 text-sm text-white"
             style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
           >
             Camada de detritos que se forma nas paredes do canal durante a instrumentação.

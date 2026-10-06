@@ -48,7 +48,7 @@ export default async function Certificados({ searchParams }: PageProps<"/aluno/c
         <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">{erro}</p>
       )}
       {emitido === "1" && (
-        <div className="relative rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm text-teal-900">
+        <div className="relative rounded-xl border border-violeta-200 bg-violeta-50 p-4 text-sm text-violeta-900">
           <Confete />
           🎓 Certificado emitido! Baixe o PDF abaixo.
         </div>
@@ -61,12 +61,12 @@ export default async function Certificados({ searchParams }: PageProps<"/aluno/c
             <form
               key={d.id}
               action={emitirCertificado}
-              className="flex flex-wrap items-end gap-3 rounded-2xl border-2 border-teal-600 bg-white p-5"
+              className="flex flex-wrap items-end gap-3 rounded-2xl border-2 border-violeta-600 bg-white p-5"
             >
               <input type="hidden" name="disciplina_id" value={d.id} />
               <div className="flex-1 space-y-1">
                 <p className="flex items-center gap-2 font-semibold text-slate-900">
-                  <GraduationCap className="size-5 text-teal-600" /> {d.nome}
+                  <GraduationCap className="size-5 text-violeta-600" /> {d.nome}
                 </p>
                 <label className="block space-y-1 text-sm">
                   <span className="text-slate-600">Nome completo, como deve aparecer no certificado</span>
@@ -76,7 +76,7 @@ export default async function Certificados({ searchParams }: PageProps<"/aluno/c
                     required
                     minLength={5}
                     maxLength={120}
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 focus:border-teal-600 focus:outline-none"
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 focus:border-violeta-600 focus:outline-none"
                   />
                 </label>
               </div>
@@ -98,7 +98,7 @@ export default async function Certificados({ searchParams }: PageProps<"/aluno/c
             {certificados.map((c) => (
               <SurgirItem key={c.id} className="space-y-3 rounded-2xl border border-slate-200 bg-white p-5">
                 <div className="flex items-start gap-3">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700">
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-violeta-50 text-violeta-700">
                     <GraduationCap className="size-5" />
                   </span>
                   <div>

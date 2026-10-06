@@ -12,18 +12,18 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+// Cores da marca (docs/MARCA.md): Violeta, Lima, Tinta e Papel.
 const COR = {
-  teal: "#0F766E",
-  tealEscuro: "#115E59",
-  tinta: "#0B1F24",
-  texto: "#334155",
-  suave: "#64748B",
-  fundo: "#EEF4F3",
-  borda: "#E2E8F0",
-  menta: "#CCFBF1",
-  coral: "#FF7A59",
+  violeta: "#5B3DF0",
+  tinta: "#12121C",
+  texto: "#3A3A48",
+  suave: "#6B6B7B",
+  fundo: "#F2F4F7",
+  borda: "#E2E3EA",
+  lima: "#C8F250",
 };
 const FONTE = "'Segoe UI', Helvetica, Arial, sans-serif";
+const MONO = "'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, 'Courier New', monospace";
 
 /** Link que passa pelo /auth/confirmar do site (funciona em qualquer aparelho). */
 function linkConfirmacao(tipo, proximo) {
@@ -39,8 +39,8 @@ const SAUDACAO = "{{ if .Data.primeiro_nome }}Olá, {{ .Data.primeiro_nome }}!{{
 function botao(texto, href) {
   return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0 8px">
   <tr>
-    <td bgcolor="${COR.teal}" style="border-radius:10px;mso-padding-alt:14px 28px">
-      <a href="${href}" target="_blank" style="display:inline-block;padding:14px 28px;font-family:${FONTE};font-size:16px;font-weight:600;line-height:20px;color:#FFFFFF;text-decoration:none;border-radius:10px">${texto}</a>
+    <td bgcolor="${COR.violeta}" style="border-radius:999px;mso-padding-alt:14px 28px">
+      <a href="${href}" target="_blank" style="display:inline-block;padding:14px 28px;font-family:${FONTE};font-size:16px;font-weight:600;line-height:20px;color:#FFFFFF;text-decoration:none;border-radius:999px">${texto}</a>
     </td>
   </tr>
 </table>`;
@@ -48,13 +48,13 @@ function botao(texto, href) {
 
 function linkReserva(href) {
   return `<p style="margin:20px 0 0;font-size:13px;line-height:20px;color:${COR.suave}">Se o botão não funcionar, copie e cole este endereço no navegador:<br>
-<a href="${href}" style="color:${COR.teal};word-break:break-all">${href}</a></p>`;
+<a href="${href}" style="color:${COR.violeta};word-break:break-all">${href}</a></p>`;
 }
 
 function codigo(valor) {
   return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0 8px">
   <tr>
-    <td bgcolor="${COR.menta}" style="border-radius:12px;padding:16px 20px 16px 28px;font-family:'Courier New',monospace;font-size:30px;font-weight:700;letter-spacing:8px;color:${COR.tinta}">${valor}</td>
+    <td bgcolor="${COR.lima}" style="border:2px solid ${COR.tinta};border-radius:12px;padding:16px 20px 16px 28px;font-family:${MONO};font-size:30px;font-weight:700;letter-spacing:8px;color:${COR.tinta}">${valor}</td>
   </tr>
 </table>`;
 }
@@ -63,7 +63,7 @@ function paragrafo(texto) {
   return `<p style="margin:0 0 14px;font-size:16px;line-height:26px;color:${COR.texto}">${texto}</p>`;
 }
 
-/** Layout comum: logo, cartão branco com faixa da marca e rodapé. */
+/** Layout comum: logo, cartão branco com borda Tinta e faixa da marca, rodapé. */
 function layout({ assunto, preheader, titulo, corpo, aviso }) {
   return `<!doctype html>
 <html lang="pt-BR">
@@ -85,23 +85,24 @@ function layout({ assunto, preheader, titulo, corpo, aviso }) {
             <a href="{{ .SiteURL }}" target="_blank" style="text-decoration:none">
               <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                  <td style="padding-right:10px"><img src="{{ .SiteURL }}/marca/odontolab-simbolo-512.png" width="40" height="40" alt="" style="display:block;border:0;border-radius:10px"></td>
-                  <td style="font-family:${FONTE};font-size:22px;font-weight:700;letter-spacing:-0.3px;color:${COR.tinta}">Odonto<span style="color:${COR.teal}">Lab</span></td>
+                  <td style="padding-right:10px"><img src="{{ .SiteURL }}/marca/odontolab-simbolo-512.png" width="36" height="36" alt="" style="display:block;border:0;border-radius:8px"></td>
+                  <td style="font-family:${FONTE};font-size:24px;font-weight:800;letter-spacing:-0.8px;color:${COR.tinta}">odonto</td>
+                  <td style="padding-left:6px"><span style="display:inline-block;padding:3px 7px;border-radius:5px;background:${COR.violeta};font-family:${MONO};font-size:12px;font-weight:700;letter-spacing:1.5px;color:#FFFFFF">LAB</span></td>
                 </tr>
               </table>
             </a>
           </td>
         </tr>
         <tr>
-          <td bgcolor="#FFFFFF" style="background:#FFFFFF;border:1px solid ${COR.borda};border-radius:16px;overflow:hidden">
+          <td bgcolor="#FFFFFF" style="background:#FFFFFF;border:2px solid ${COR.tinta};border-radius:16px;overflow:hidden">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
-                <td height="5" bgcolor="${COR.teal}" style="height:5px;line-height:5px;font-size:0;background:${COR.teal}">&nbsp;</td>
-                <td height="5" width="72" bgcolor="${COR.coral}" style="height:5px;width:72px;line-height:5px;font-size:0;background:${COR.coral}">&nbsp;</td>
+                <td height="6" bgcolor="${COR.violeta}" style="height:6px;line-height:6px;font-size:0;background:${COR.violeta}">&nbsp;</td>
+                <td height="6" width="72" bgcolor="${COR.lima}" style="height:6px;width:72px;line-height:6px;font-size:0;background:${COR.lima}">&nbsp;</td>
               </tr>
               <tr>
                 <td colspan="2" style="padding:36px 36px 32px;font-family:${FONTE}">
-                  <h1 style="margin:0 0 18px;font-family:${FONTE};font-size:24px;line-height:32px;font-weight:700;color:${COR.tinta}">${titulo}</h1>
+                  <h1 style="margin:0 0 18px;font-family:${FONTE};font-size:26px;line-height:32px;font-weight:800;letter-spacing:-0.5px;color:${COR.tinta}">${titulo}</h1>
 ${corpo}
                 </td>
               </tr>
@@ -114,7 +115,7 @@ ${corpo}
         <tr>
           <td align="center" style="padding:24px 12px 0;font-family:${FONTE};font-size:12px;line-height:18px;color:${COR.suave}">
             <strong style="color:${COR.tinta}">OdontoLab</strong> · o laboratório de estudos da graduação em Odontologia<br>
-            <a href="{{ .SiteURL }}" style="color:${COR.teal};text-decoration:none">odontolab.online</a> · Este é um e-mail automático, não precisa responder.
+            <a href="{{ .SiteURL }}" style="color:${COR.violeta};text-decoration:none">odontolab.online</a> · Este é um e-mail automático, não precisa responder.
           </td>
         </tr>
       </table>

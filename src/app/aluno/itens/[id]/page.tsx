@@ -54,7 +54,7 @@ export default async function PaginaItem({ params }: PageProps<"/aluno/itens/[id
             <input type="hidden" name="concluido" value={String(!concluido)} />
             <button
               className={`rounded-lg px-4 py-2 text-sm font-medium ${
-                concluido ? "border border-slate-300 text-slate-700" : "bg-teal-700 text-white hover:bg-teal-800"
+                concluido ? "border border-slate-300 text-slate-700" : "bg-violeta-700 text-white hover:bg-violeta-800"
               }`}
             >
               {concluido ? "✅ Concluído — desmarcar" : "Marcar como concluído"}
@@ -115,7 +115,7 @@ function ConteudoItem({ tipo, config }: { tipo: Item["tipo"]; config: ConfigItem
             </article>
           )}
           {config.pdf_url && (
-            <a href={config.pdf_url} target="_blank" className="text-sm font-medium text-teal-700 underline">
+            <a href={config.pdf_url} target="_blank" className="text-sm font-medium text-violeta-700 underline">
               Abrir PDF
             </a>
           )}
@@ -127,7 +127,7 @@ function ConteudoItem({ tipo, config }: { tipo: Item["tipo"]; config: ConfigItem
         <a href={config.imagem_url} target="_blank" className="block">
           {/* eslint-disable-next-line @next/next/no-img-element -- imagem de origem externa configurável */}
           <img src={config.imagem_url} alt="Mapa mental" className="w-full rounded-xl border border-slate-200" />
-          <span className="mt-2 block text-sm text-teal-700 underline">Abrir em tamanho real</span>
+          <span className="mt-2 block text-sm text-violeta-700 underline">Abrir em tamanho real</span>
         </a>
       ) : (
         <Vazio />

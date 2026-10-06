@@ -1,94 +1,111 @@
-# OdontoLab — guia de marca
+# OdontoLab — guia de marca (identidade visual v1)
 
-> **OdontoLab — o laboratório de estudos da graduação em Odontologia.**
+> **Cada post é um experimento: um tema, uma figura e um resumo de bolso.**
 
 ## Conceito
 
-"Lab" é onde se testa, erra, corrige e aprende de novo, que é exatamente o
-ciclo da plataforma: estudar, fazer simulado, receber a correção e reforçar o
-que faltou. O símbolo junta as duas ideias num desenho só: um **dente que também
-é um frasco de laboratório**.
+"Lab" é onde se testa, erra, corrige e aprende de novo, que é o ciclo da
+plataforma: estudar, fazer simulado, receber a correção e reforçar o que faltou.
+A identidade é editorial e tipográfica, como um caderno de laboratório: grade
+quadriculada, rótulos em mono ("LAB 01 · FIG. 01 · 02/06"), cartões com borda
+escura e um único destaque em lima.
 
-- **Dente branco**: a Odontologia, com traço limpo e clínico.
-- **Líquido menta** dentro do dente: o conhecimento que vai enchendo.
-- **Bolhas coral** saindo do frasco: o experimento em andamento e a energia de
-  quem está estudando. É o único ponto quente da marca.
-- **Quadrado teal arredondado**: a base, o "ambiente" do laboratório. Funciona
-  como ícone de app.
+- **O selo do tema** abre toda capa, como um elemento da tabela periódica
+  (número, sigla e nome). As capas das disciplinas seguem esse desenho.
+- **A marca fica só no rodapé**, pequena, em todos os slides. No site ela fica
+  no cabeçalho, também discreta.
+- **Lima é destaque**: uma palavra, um selo, um botão. Nunca texto longo.
 
 ## Arquivos
 
 | Arquivo | Uso |
 |---|---|
-| `public/marca/odontolab-logo.svg` | Logo horizontal para fundos claros |
-| `public/marca/odontolab-logo-branco.svg` | Logo horizontal para fundos escuros |
-| `public/marca/odontolab-simbolo.svg` | Só o símbolo (avatar, redes, ícone) |
-| `public/marca/odontolab-simbolo-512.png` | Símbolo em PNG (perfil do Instagram, WhatsApp) |
-| `src/app/icon.svg` | Favicon (sem a bolha pequena, que some em 16px) |
+| `public/marca/odontolab-logo.svg` | Logo horizontal para fundos claros (LAB violeta) |
+| `public/marca/odontolab-logo-branco.svg` | Logo para fundos escuros ou violeta (LAB lima) |
+| `public/marca/odontolab-selo.svg` | Selo "oL" (ícone, avatar) |
+| `public/marca/odontolab-simbolo-512.png` | Selo em PNG (e-mails, WhatsApp) |
+| `public/marca/odontolab-perfil.svg` / `-1024.png` | Foto de perfil: selo lima sobre círculo Tinta |
+| `src/app/icon.svg` | Favicon (selo com borda Tinta, para não sumir em abas claras) |
 | `src/app/apple-icon.tsx` | Ícone da tela inicial do iPhone |
 | `src/app/opengraph-image.tsx` | Imagem de compartilhamento de links |
 | `src/components/marca/logo.tsx` | `<Logo />` e `<Simbolo />` para usar no código |
+| `public/capas/*.png` | Capas das disciplinas (`scripts/resumos/capas.mjs`) |
+
+Os SVGs têm o texto em contornos (não dependem de fonte instalada) e saem de
+`scripts/marca/gerar.py`; os PNGs, de `scripts/marca/png.mjs`.
 
 No código, use sempre o componente: `<Logo />` (tamanhos `sm`, `md`, `lg`) e
-`<Logo claro />` sobre fundo escuro.
+`<Logo claro />` sobre fundo escuro ou violeta.
 
 ## Uso do logo
 
-- **Área de respiro**: deixe em volta do logo pelo menos a altura da bolha
-  maior (~1/4 da altura do símbolo).
-- **Tamanho mínimo**: símbolo com 16px (favicon) e logo horizontal com 96px
-  de largura.
-- **Fundo claro**: "Odonto" em tinta, "Lab" em teal. **Fundo escuro**: "Odonto"
-  em branco, "Lab" em menta.
-- **Não faça**: esticar, girar, trocar as cores do símbolo, colocar sombra ou
-  contorno, escrever "Odontolab", "ODONTOLAB" ou "Odonto Lab". O nome é
-  sempre **OdontoLab**, com L maiúsculo e sem espaço.
+- **Composição**: "odonto" em Bricolage Grotesque 800, minúsculo, + selo "LAB"
+  em JetBrains Mono, caixa alta e espaçado.
+- **Fundo claro**: "odonto" em Tinta, selo Violeta com "LAB" branco.
+  **Fundo escuro ou violeta**: "odonto" branco, selo Lima com "LAB" Tinta.
+- **Não faça**: esticar, girar, trocar as cores do selo, escrever "Odontolab",
+  "ODONTOLAB" ou "Odonto Lab" no texto corrido. O nome é sempre **OdontoLab**;
+  o logotipo é que se escreve "odonto LAB".
 
 ## Cores
 
 | Nome | Hex | Token Tailwind | Uso |
 |---|---|---|---|
-| Teal (primária) | `#0F766E` | `primary`, `teal-700` | Botões, links, "Lab", destaques |
-| Teal claro | `#14B8A6` | `teal-500` | Gradiente do símbolo, gráficos |
-| Tinta | `#0B1F24` | `tinta` | Títulos, textos fortes, fundo do backoffice e seções escuras |
-| Menta | `#99F6E4` | `menta` | Líquido do símbolo, detalhes sobre fundo escuro |
-| Menta forte | `#5EEAD4` | `teal-300` | "Lab" sobre fundo escuro |
-| Coral | `#FF7A59` | `coral` | Acento: chamadas, sublinhado do título, selo "Backoffice". Use pouco. |
-| Coral claro | `#FFB199` | `coral-claro` | Bolha menor, hover do coral |
+| Violeta | `#5B3DF0` | `primary`, `violeta`, `violeta-700` | Cor principal: botões, links, capas, fundos de destaque |
+| Lima | `#C8F250` | `secondary`, `lima` | Destaque: um selo, uma palavra, um botão por tela |
+| Tinta | `#12121C` | `tinta`, `foreground` | Texto, bordas dos cartões, seções escuras |
+| Papel | `#F2F4F7` | `papel`, `background` | Fundo das páginas |
 
-Proporção: muito branco, teal como cor de ação, tinta para peso e **coral só
-como tempero** (um ou dois pontos por tela). Texto sobre coral é sempre tinta,
-nunca branco.
+A escala `violeta-50` … `violeta-950` serve para fundos suaves e bordas
+(`violeta-700` é o Violeta da marca). Os tokens ficam em `src/app/globals.css`.
 
-Os tokens ficam em `src/app/globals.css`.
+**Contraste**: Violeta sobre branco ou Papel passa no AA para texto (6,2:1).
+Lima só funciona com texto **Tinta** por cima (14:1); branco sobre lima não
+(1,3:1).
 
 ## Tipografia
 
-- **Sora Bold/SemiBold**: títulos (`h1`–`h3` já usam `font-heading`) e o nome
-  da marca.
-- **Geist**: textos, botões e formulários.
+| Fonte | Uso | Token |
+|---|---|---|
+| **Bricolage Grotesque 800** | Títulos que param o dedo (`h1`–`h3`, logotipo) | `font-heading` |
+| **Instrument Sans** | Texto direto, para ler no celular sem esforço | `font-sans` |
+| **JetBrains Mono** | Rótulos e números ("LAB 01 · FIG. 01 · 02/06") | `font-mono`, classe `.rotulo` |
 
-As duas são livres (SIL Open Font License, em `assets/fontes/OFL.txt`).
+Todas livres (SIL Open Font License, em `assets/fontes/OFL.txt`). O site carrega
+pelo `next/font`; os TTFs em `assets/fontes/` são para o PDF do certificado e a
+imagem de compartilhamento.
+
+## Elementos
+
+- **Grade quadriculada**: `.grade-violeta` (sobre violeta) e `.fundo-marca`
+  (sobre papel).
+- **Rótulo**: `.rotulo` (mono, caixa alta, espaçado).
+- **Cartões**: fundo branco, `border-2 border-tinta`, cantos arredondados; o
+  cartão principal pode ter sombra sólida (`shadow-[8px_8px_0_0_var(--color-tinta)]`).
+- **Botões em pílula**: `rounded-full`; `variant="destaque"` é o botão Lima.
 
 ## Onde a marca aparece
 
-- **Landing**: logo no cabeçalho e no rodapé, título com sublinhado coral,
-  card de destaque em teal → tinta com ícone coral, chamada final em tinta com
-  botão coral.
-- **Área do aluno**: cabeçalho branco com o logo e menu em pílulas.
-- **Backoffice**: cabeçalho em tinta com logo claro e selo coral "Backoffice",
-  assim fica claro em qual área você está.
-- **Entrar, cadastro e senha**: logo grande sobre fundo branco com manchas
-  suaves de menta e coral (`.fundo-marca`).
-- **Certificado (PDF)**: símbolo e nome no topo, faixa teal com detalhe coral.
-- **Checkout do Asaas**: símbolo como imagem do produto.
+- **Landing**: topo violeta quadriculado com título em branco e lima, cartões
+  com borda Tinta, passos com selo de tabela periódica, chamada final em Lima
+  ("Resumo de bolso").
+- **Área do aluno**: fundo Papel, cabeçalho branco com o logo; capas das
+  disciplinas no catálogo; resumos com sumário, seções numeradas e caixas de
+  destaque.
+- **Backoffice**: cabeçalho em Tinta com logo claro e selo lima "Backoffice".
+- **Entrar, cadastro e senha**: logo grande e formulário em cartão sobre a grade
+  (`.fundo-marca`).
+- **Certificado (PDF)**: logotipo, "Certificado" em Bricolage, faixa violeta com
+  traço lima.
+- **E-mails**: selo + logotipo, cartão com borda Tinta, botão violeta em pílula.
+- **Checkout do Asaas**: o selo como imagem do produto.
 
 ## Voz
 
 - Fala com o estudante como um **professor próximo**: direto, sem jargão de
   marketing, sem prometer aprovação garantida.
-- Frases curtas e verbos de ação: "Estude", "Treine", "Revise", "Veja o que
-  faltou".
+- Frases curtas e verbos de ação: "Estude", "Treine", "Revise", "Salve",
+  "Veja o que faltou".
 - Termos da faculdade de verdade: disciplina, período, prova, rubrica, caso
   clínico.
-- Nada de "revolucionário", "melhor do Brasil" ou excesso de emojis.
+- Emojis com moderação (os carrosséis usam um ou dois por legenda).

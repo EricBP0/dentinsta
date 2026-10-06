@@ -18,12 +18,12 @@ export default async function ValidarCertificado({ params }: PageProps<"/certifi
 
   return (
     <main className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center gap-6 px-4 py-16">
-      <Link href="/" className="text-center text-xl font-bold text-teal-800">
+      <Link href="/" className="text-center text-xl font-bold text-violeta-800">
         {plataforma}
       </Link>
       {certificado ? (
-        <div className="space-y-5 rounded-2xl border border-teal-200 bg-white p-8 text-center shadow-sm">
-          <CircleCheck className="mx-auto size-12 text-teal-600" />
+        <div className="space-y-5 rounded-2xl border border-violeta-200 bg-white p-8 text-center shadow-sm">
+          <CircleCheck className="mx-auto size-12 text-violeta-600" />
           <div>
             <h1 className="text-xl font-bold text-slate-900">Certificado válido</h1>
             <p className="text-sm text-slate-500">Código {codigo.toUpperCase()}</p>
