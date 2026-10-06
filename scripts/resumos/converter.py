@@ -76,7 +76,7 @@ def juntar_runs(runs):
         else:
             saida.append(dict(r))
     for r in saida:
-        r["x"] = re.sub(r"\s+", " ", r["x"])
+        r["x"] = re.sub(r"\s+", " ", re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f]", "", r["x"]))
     if saida:
         saida[0]["x"] = saida[0]["x"].lstrip()
         saida[-1]["x"] = saida[-1]["x"].rstrip()

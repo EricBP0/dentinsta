@@ -59,6 +59,14 @@ function descricao(resumo) {
   return `${texto}.`;
 }
 
+/** Tira caracteres de controle (o Postgres recusa \u0000 em jsonb). */
+function limparTexto(valor) {
+  if (typeof valor === "string") return valor.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "");
+  if (Array.isArray(valor)) return valor.map(limparTexto);
+  if (valor && typeof valor === "object") return Object.fromEntries(Object.entries(valor).map(([k, v]) => [k, limparTexto(v)]));
+  return valor;
+}
+
 /** Troca "img/0001.webp" pelo caminho completo no bucket. */
 function prefixarFiguras(blocos, slug) {
   return blocos.map((b) => {
@@ -154,7 +162,7 @@ async function sincronizarModulos(disciplinaId, d, resumo, pdf) {
     }
 
     const config = {
-      resumo: { secoes: m.secoes.map((s) => ({ ...s, blocos: prefixarFiguras(s.blocos, d.slug) })) },
+      resumo: limparTexto({ secoes: m.secoes.map((s) => ({ ...s, blocos: prefixarFiguras(s.blocos, d.slug) })) }),
       pdf_caminho: pdf,
       pdf_pagina: m.pagina,
     };
