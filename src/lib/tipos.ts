@@ -1,4 +1,5 @@
 // Espelho das tabelas em supabase/migrations/0001_base.sql.
+import type { ConteudoResumo } from "@/lib/resumos/tipos";
 
 export type Papel = "aluno" | "professor" | "admin";
 export type StatusDisciplina = "rascunho" | "em_breve" | "publicada" | "arquivada";
@@ -54,6 +55,11 @@ export type ConfigItem = {
   duracao_min?: number;
   conteudo?: string;
   pdf_url?: string;
+  /** Resumo importado dos PDFs (scripts/resumos): texto estruturado do módulo. */
+  resumo?: ConteudoResumo;
+  /** PDF completo no bucket privado "resumos" e a página onde o módulo começa. */
+  pdf_caminho?: string;
+  pdf_pagina?: number;
   imagem_url?: string;
   nota_minima?: number;
 };

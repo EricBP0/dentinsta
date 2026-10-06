@@ -92,7 +92,7 @@ export default async function AdminDisciplina({ params }: PageProps<"/admin/disc
             <input name="carga_horaria_h" type="number" min={0} defaultValue={disciplina.carga_horaria_h} className={campo} />
           </Rotulo>
           <Rotulo texto="Capa (URL da imagem)">
-            <input name="capa_url" type="url" defaultValue={disciplina.capa_url ?? ""} className={campo} />
+            <input name="capa_url" defaultValue={disciplina.capa_url ?? ""} placeholder="/capas/nome.png ou https://…" className={campo} />
           </Rotulo>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">

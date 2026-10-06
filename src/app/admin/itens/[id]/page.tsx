@@ -51,6 +51,15 @@ export default async function AdminItem({ params }: PageProps<"/admin/itens/[id]
 
         {item.tipo === "resumo" && (
           <>
+            {(config.resumo || config.pdf_caminho) && (
+              <p className="rounded-lg bg-slate-50 p-3 text-sm text-slate-600">
+                Resumo importado dos PDFs
+                {config.resumo && ` · ${config.resumo.secoes.length} seções`}
+                {config.pdf_caminho && ` · PDF ${config.pdf_caminho}${config.pdf_pagina ? `, a partir da página ${config.pdf_pagina}` : ""}`}.
+                {" "}Para mudar esse conteúdo, rode a importação de novo (scripts/resumos). Os campos abaixo ficam como
+                complemento.
+              </p>
+            )}
             <Rotulo texto="Texto do resumo">
               <textarea name="conteudo" defaultValue={config.conteudo ?? ""} rows={14} className={campo} />
             </Rotulo>

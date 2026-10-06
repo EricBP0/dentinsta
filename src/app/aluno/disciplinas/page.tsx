@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BarraProgresso, BotaoRenovar } from "@/components/cadeado";
+import { CapaDisciplina } from "@/components/capa-disciplina";
 import { SurgirItem, SurgirLista } from "@/components/movimento";
 import { iaAtiva } from "@/lib/acesso";
 import { exigirLogin } from "@/lib/auth";
@@ -57,6 +58,7 @@ export default async function Catalogo() {
               key={d.id}
               className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 transition-shadow hover:shadow-md"
             >
+              {d.capa_url && <CapaDisciplina src={d.capa_url} nome={d.nome} />}
               <div className="flex items-start justify-between gap-2">
                 <h3 className="font-semibold text-slate-900">{d.nome}</h3>
                 {d.periodo_sugerido && (

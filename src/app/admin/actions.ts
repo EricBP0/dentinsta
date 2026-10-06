@@ -15,6 +15,13 @@ function texto(formData: FormData, campo: string) {
   return String(formData.get(campo) ?? "").trim();
 }
 
+/** Capa: URL externa ou arquivo do próprio site (ex.: /capas/cirurgia.png). */
+function capaOuNull(formData: FormData) {
+  const valor = texto(formData, "capa_url");
+  if (/^\/[^/\\]/.test(valor)) return valor;
+  return urlOuUndefined(formData, "capa_url") ?? null;
+}
+
 function numeroOuNull(formData: FormData, campo: string) {
   const valor = texto(formData, campo);
   if (!valor) return null;
@@ -75,7 +82,7 @@ export async function salvarDisciplina(formData: FormData) {
       nome: texto(formData, "nome"),
       slug: gerarSlug(texto(formData, "slug") || texto(formData, "nome")),
       descricao: texto(formData, "descricao"),
-      capa_url: urlOuUndefined(formData, "capa_url") ?? null,
+      capa_url: capaOuNull(formData),
       periodo_sugerido: numeroOuNull(formData, "periodo_sugerido"),
       carga_horaria_h: numeroOuNull(formData, "carga_horaria_h") ?? 0,
       status: escolher(texto(formData, "status"), STATUS_DISCIPLINA, "rascunho"),
@@ -171,7 +178,16 @@ export async function salvarItem(formData: FormData) {
   const { supabase } = await exigirEquipe();
   const id = texto(formData, "id");
 
+  // O resumo importado dos PDFs (scripts/resumos) não tem campo no formulário:
+  // mantém o que já está gravado em vez de apagar ao salvar.
+  const { data: atual, error: erroAtual } = await supabase.rpc("conteudo_item", { p_item_id: id });
+  if (erroAtual) falhar("Não foi possível ler o item", erroAtual);
+  const { resumo, pdf_caminho, pdf_pagina } = (atual ?? {}) as ConfigItem;
+
   const config: ConfigItem = {
+    resumo,
+    pdf_caminho,
+    pdf_pagina,
     video_url: urlOuUndefined(formData, "video_url"),
     duracao_min: numeroOuNull(formData, "duracao_min") ?? undefined,
     conteudo: texto(formData, "conteudo") || undefined,
