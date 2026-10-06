@@ -12,17 +12,17 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-// Cores da marca (docs/MARCA.md): Violeta, Lima, Tinta e Papel.
+// Cores da marca (docs/MARCA.md): Violeta, Verde-limão, Preto e Papel.
 const COR = {
-  violeta: "#5B3DF0",
-  tinta: "#12121C",
+  violeta: "#5A3FE0",
+  tinta: "#12101F",
   texto: "#3A3A48",
   suave: "#6B6B7B",
-  fundo: "#F2F4F7",
+  fundo: "#F6F5EE",
   borda: "#E2E3EA",
   lima: "#C8F250",
 };
-const FONTE = "'Segoe UI', Helvetica, Arial, sans-serif";
+const FONTE = "'Plus Jakarta Sans', 'Segoe UI', Helvetica, Arial, sans-serif";
 const MONO = "'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, 'Courier New', monospace";
 
 /** Link que passa pelo /auth/confirmar do site (funciona em qualquer aparelho). */
@@ -63,7 +63,7 @@ function paragrafo(texto) {
   return `<p style="margin:0 0 14px;font-size:16px;line-height:26px;color:${COR.texto}">${texto}</p>`;
 }
 
-/** Layout comum: logo, cartão branco com borda Tinta e faixa da marca, rodapé. */
+/** Layout comum: logo, cartão branco com borda Preto e faixa da marca, rodapé. */
 function layout({ assunto, preheader, titulo, corpo, aviso }) {
   return `<!doctype html>
 <html lang="pt-BR">
@@ -85,9 +85,8 @@ function layout({ assunto, preheader, titulo, corpo, aviso }) {
             <a href="{{ .SiteURL }}" target="_blank" style="text-decoration:none">
               <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                  <td style="padding-right:10px"><img src="{{ .SiteURL }}/marca/odontolab-simbolo-512.png" width="36" height="36" alt="" style="display:block;border:0;border-radius:8px"></td>
-                  <td style="font-family:${FONTE};font-size:24px;font-weight:800;letter-spacing:-0.8px;color:${COR.tinta}">odonto</td>
-                  <td style="padding-left:6px"><span style="display:inline-block;padding:3px 7px;border-radius:5px;background:${COR.violeta};font-family:${MONO};font-size:12px;font-weight:700;letter-spacing:1.5px;color:#FFFFFF">LAB</span></td>
+                  <td style="padding-right:10px"><img src="{{ .SiteURL }}/marca/odontolab-simbolo-512.png" width="40" height="40" alt="" style="display:block;border:0"></td>
+                  <td style="font-family:${FONTE};font-size:24px;font-weight:800;letter-spacing:-0.5px;color:${COR.tinta}">Odonto<span style="color:${COR.violeta}">Lab</span></td>
                 </tr>
               </table>
             </a>

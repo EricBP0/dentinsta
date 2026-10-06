@@ -1,6 +1,6 @@
 // Gera as capas das disciplinas (public/capas/<slug>.png) na identidade visual
-// nova: fundo violeta quadriculado, selo lima no estilo da tabela periódica e a
-// marca pequena no rodapé.
+// da marca: fundo violeta quadriculado, selo verde-limão no estilo da tabela
+// periódica, etiqueta "LAB" e a marca pequena no rodapé.
 //
 // Uso:
 //   node scripts/resumos/capas.mjs                 # todas
@@ -41,27 +41,27 @@ function html(d, numero) {
   const tamanho = d.nome.length > 28 ? 72 : d.nome.length > 16 ? 88 : 104;
   return `<!doctype html><html><head><meta charset="utf-8">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Instrument+Sans:wght@500&family=JetBrains+Mono:wght@500;700&display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;800&family=JetBrains+Mono:wght@500;700&display=block" rel="stylesheet">
 <style>
   * { margin: 0; box-sizing: border-box; }
-  body { width: 1200px; height: 800px; overflow: hidden; background: #5B3DF0; color: #fff; font-family: "Instrument Sans", sans-serif;
+  body { width: 1200px; height: 800px; overflow: hidden; background: #5A3FE0; color: #fff; font-family: "Plus Jakarta Sans", sans-serif; font-weight: 500;
     background-image: linear-gradient(rgba(255,255,255,.09) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(255,255,255,.09) 1.5px, transparent 1.5px);
     background-size: 80px 80px; background-position: -1px -1px; }
   .mono { font-family: "JetBrains Mono", monospace; text-transform: uppercase; letter-spacing: .14em; }
   .topo { position: absolute; top: 64px; left: 72px; right: 72px; display: flex; justify-content: space-between; align-items: center; font-size: 22px; font-weight: 500; }
-  .pilula { background: #C8F250; color: #12121C; border-radius: 10px; padding: 10px 16px; font-weight: 700; }
-  .selo { position: absolute; top: 148px; left: 72px; width: 216px; height: 216px; background: #C8F250; color: #12121C; border: 3px solid #12121C;
+  .pilula { background: #12101F; color: #C8F250; border-radius: 10px; padding: 10px 16px; font-weight: 700; }
+  .selo { position: absolute; top: 148px; left: 72px; width: 216px; height: 216px; background: #C8F250; color: #12101F;
     border-radius: 24px; padding: 22px 24px; display: flex; flex-direction: column; justify-content: space-between; }
   .selo .num { font-size: 26px; font-weight: 500; letter-spacing: .04em; }
-  .selo .sim { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 108px; line-height: .8; letter-spacing: -.04em; }
+  .selo .sim { font-weight: 800; font-size: 100px; line-height: .8; letter-spacing: -.04em; }
   .selo .sim sup { font-family: "JetBrains Mono", monospace; font-size: 30px; font-weight: 700; letter-spacing: 0; vertical-align: top; margin-left: 6px; }
   .selo .rot { font-size: 15px; font-weight: 700; letter-spacing: .08em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .texto { position: absolute; left: 72px; right: 72px; top: 400px; }
-  .titulo { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: ${tamanho}px; line-height: .95; letter-spacing: -.035em; }
+  .titulo { font-weight: 800; font-size: ${tamanho}px; line-height: 1; letter-spacing: -.035em; }
   .sub { margin-top: 22px; font-size: 30px; color: rgba(255,255,255,.88); }
   .rodape { position: absolute; left: 72px; right: 72px; bottom: 44px; display: flex; justify-content: space-between; align-items: center; }
-  .marca { display: flex; align-items: center; gap: 10px; font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 34px; letter-spacing: -.03em; }
-  .marca span { font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 20px; letter-spacing: .1em; background: #C8F250; color: #12121C; border-radius: 7px; padding: 4px 9px; }
+  .marca { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 32px; letter-spacing: -.03em; }
+  .marca span { font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 20px; letter-spacing: .1em; background: #C8F250; color: #12101F; border-radius: 7px; padding: 4px 9px; }
   .rodape .mono { font-size: 18px; color: rgba(255,255,255,.88); }
 </style></head><body>
   <div class="topo mono"><span class="pilula">Lab ${String(numero).padStart(2, "0")}</span><span>${escapar(d.area)}</span></div>

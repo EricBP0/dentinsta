@@ -102,11 +102,11 @@ export default function Inicio() {
           <section className="mx-auto grid max-w-6xl items-center gap-16 px-4 pb-24 pt-10 md:pt-16 lg:grid-cols-2">
             <div className="space-y-7">
               <div className="entrar flex flex-wrap items-center gap-3">
-                <span className="rotulo rounded-md bg-lima px-2.5 py-1 text-xs font-bold text-tinta">Lab 01</span>
+                <span className="rotulo rounded-md bg-tinta px-2.5 py-1 text-xs font-bold text-lima">Lab 01</span>
                 <span className="rotulo text-xs font-medium text-white/90">Graduação em Odontologia</span>
               </div>
               <div className="subir [animation-delay:50ms]">
-                <h1 className="text-5xl leading-[0.95] font-extrabold tracking-tighter sm:text-6xl lg:text-7xl">
+                <h1 className="text-[2.75rem] leading-[1.02] font-extrabold tracking-tight sm:text-6xl lg:text-[4rem]">
                   Passe nas provas da faculdade com <span className="text-lima">quem entende de Odontologia.</span>
                 </h1>
               </div>
@@ -157,7 +157,7 @@ export default function Inicio() {
             <div className="mx-auto max-w-6xl space-y-12 px-4">
               <Surgir className="max-w-2xl space-y-3">
                 <Rotulo className="text-violeta">Fig. 01 · Recursos</Rotulo>
-                <h2 className="text-4xl font-extrabold tracking-tighter text-tinta sm:text-5xl">Tudo para estudar em um só lugar</h2>
+                <h2 className="text-4xl font-extrabold tracking-tight text-tinta sm:text-5xl">Tudo para estudar em um só lugar</h2>
                 <p className="text-lg text-slate-600">Organizado por disciplina e período, do jeito que a faculdade cobra.</p>
               </Surgir>
               <SurgirLista className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -201,7 +201,7 @@ export default function Inicio() {
             <div className="mx-auto max-w-6xl space-y-12 px-4">
               <Surgir className="max-w-2xl space-y-3">
                 <Rotulo className="text-violeta">Fig. 02 · Como funciona</Rotulo>
-                <h2 className="text-4xl font-extrabold tracking-tighter text-tinta sm:text-5xl">Em poucos minutos você já está estudando</h2>
+                <h2 className="text-4xl font-extrabold tracking-tight text-tinta sm:text-5xl">Em poucos minutos você já está estudando</h2>
               </Surgir>
               <SurgirLista className="grid gap-6 md:grid-cols-3">
                 {PASSOS.map(({ icone: Icone, titulo, texto }, i) => (
@@ -237,7 +237,7 @@ export default function Inicio() {
             <div className="mx-auto max-w-6xl space-y-10 px-4">
               <Surgir className="mx-auto max-w-2xl space-y-3 text-center">
                 <Rotulo className="text-violeta">Fig. 03 · Preço</Rotulo>
-                <h2 className="text-4xl font-extrabold tracking-tighter text-tinta sm:text-5xl">Um pagamento, acesso para sempre</h2>
+                <h2 className="text-4xl font-extrabold tracking-tight text-tinta sm:text-5xl">Um pagamento, acesso para sempre</h2>
                 <p className="text-lg text-slate-600">Sem mensalidade. Pague uma vez e estude no seu ritmo.</p>
               </Surgir>
               <Surgir className="mx-auto max-w-md">
@@ -245,7 +245,7 @@ export default function Inicio() {
                   <span className="rotulo absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-md border-2 border-tinta bg-lima px-3 py-1 text-xs font-bold whitespace-nowrap text-tinta">
                     Acesso completo
                   </span>
-                  <p className="text-center font-heading text-5xl font-extrabold tracking-tighter text-tinta">
+                  <p className="text-center font-heading text-5xl font-extrabold tracking-tight text-tinta">
                     {PRECO.parcelas}x <span className="text-violeta">{formatarReais(PRECO.parcelaCentavos)}</span>
                   </p>
                   <p className="mt-1 text-center text-sm text-slate-500">
@@ -286,7 +286,7 @@ export default function Inicio() {
             <div className="mx-auto max-w-3xl space-y-10 px-4">
               <Surgir className="space-y-3 text-center">
                 <Rotulo className="text-violeta">Fig. 04 · Dúvidas</Rotulo>
-                <h2 className="text-4xl font-extrabold tracking-tighter text-tinta sm:text-5xl">Dúvidas frequentes</h2>
+                <h2 className="text-4xl font-extrabold tracking-tight text-tinta sm:text-5xl">Dúvidas frequentes</h2>
               </Surgir>
               <Surgir>
                 <Accordion type="single" collapsible className="rounded-2xl border-2 border-tinta bg-white px-6">
@@ -314,7 +314,7 @@ export default function Inicio() {
               >
                 <div className="relative space-y-5">
                   <Rotulo>Resumo de bolso</Rotulo>
-                  <h2 className="text-4xl font-extrabold tracking-tighter sm:text-6xl">Sua próxima prova começa hoje</h2>
+                  <h2 className="text-4xl font-extrabold tracking-tight sm:text-6xl">Sua próxima prova começa hoje</h2>
                   <p className="mx-auto max-w-xl text-lg">
                     Estude com método, treine com simulados e chegue na prova sabendo onde você precisa melhorar.
                   </p>

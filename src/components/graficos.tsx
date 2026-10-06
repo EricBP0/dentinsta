@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from "react";
 
 // Série única na cor da marca (validada: faixa de luminosidade, croma e contraste).
-const COR_SERIE = "#5b3df0"; // Violeta da marca
+const COR_SERIE = "#5a3fe0"; // Violeta da marca
 const COR_GRADE = "#e2e8f0"; // slate-200
 const COR_TEXTO = "#64748b"; // slate-500
 
@@ -188,7 +188,7 @@ export function GraficoLinha({
             {[ultimo, ...(ativo !== null && ativo !== ultimo ? [ativo] : [])].map((i) => (
               <circle key={i} cx={x(i)} cy={y(pontos[i].valor)} r={4} fill={COR_SERIE} stroke="white" strokeWidth={2} />
             ))}
-            <text x={x(ultimo) + 8} y={y(pontos[ultimo].valor)} dominantBaseline="middle" fontSize={12} fontWeight={600} fill="#12121c">
+            <text x={x(ultimo) + 8} y={y(pontos[ultimo].valor)} dominantBaseline="middle" fontSize={12} fontWeight={600} fill="#12101f">
               {formatar(pontos[ultimo].valor)}
             </text>
           </svg>
