@@ -4,31 +4,33 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Cores da marca OdontoLab (docs/MARCA.md): Violeta, Lima, Tinta e Papel. */
+/* Cores da marca OdontoLab (docs/MARCA.md): Violeta, Verde-limão, Preto, Papel e Lilás.
+ * "tinta" é o Preto da marca (o nome ficou no código). */
 @theme {
-  --color-violeta: #5b3df0;
+  --color-violeta: #5a3fe0;
   --color-lima: #c8f250;
   --color-lima-escuro: #b4dc3c;
-  --color-tinta: #12121c;
-  --color-papel: #f2f4f7;
+  --color-tinta: #12101f;
+  --color-papel: #f6f5ee;
+  --color-lilas: #cfc6ff;
 
-  /* Escala do violeta para fundos suaves, bordas e textos (700 = Violeta da marca). */
-  --color-violeta-50: oklch(0.97 0.018 285);
-  --color-violeta-100: oklch(0.94 0.04 285);
-  --color-violeta-200: oklch(0.88 0.08 284);
-  --color-violeta-300: oklch(0.79 0.13 283);
-  --color-violeta-400: oklch(0.69 0.19 282);
-  --color-violeta-500: oklch(0.6 0.23 281);
-  --color-violeta-600: oklch(0.56 0.245 281);
-  --color-violeta-700: #5b3df0;
-  --color-violeta-800: oklch(0.43 0.22 280);
-  --color-violeta-900: oklch(0.34 0.17 281);
-  --color-violeta-950: oklch(0.24 0.1 283);
+  /* Escala do violeta para fundos suaves, bordas e textos (700 = Violeta da marca, 200 ≈ Lilás). */
+  --color-violeta-50: oklch(0.97 0.017 287);
+  --color-violeta-100: oklch(0.94 0.035 287);
+  --color-violeta-200: #cfc6ff;
+  --color-violeta-300: oklch(0.77 0.12 286);
+  --color-violeta-400: oklch(0.67 0.17 285);
+  --color-violeta-500: oklch(0.59 0.2 284);
+  --color-violeta-600: oklch(0.55 0.215 283);
+  --color-violeta-700: #5a3fe0;
+  --color-violeta-800: oklch(0.42 0.19 282);
+  --color-violeta-900: oklch(0.33 0.15 283);
+  --color-violeta-950: oklch(0.23 0.09 285);
 }
 
 @theme inline {
-  --font-sans: var(--font-instrument-sans);
-  --font-heading: var(--font-bricolage);
+  --font-sans: var(--font-jakarta);
+  --font-heading: var(--font-jakarta);
   --font-mono: var(--font-jetbrains-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -71,71 +73,71 @@
 }
 
 :root {
-  --background: #f2f4f7; /* Papel */
-  --foreground: #12121c; /* Tinta */
+  --background: #f6f5ee; /* Papel */
+  --foreground: #12101f; /* Preto */
   --card: oklch(1 0 0);
-  --card-foreground: #12121c;
+  --card-foreground: #12101f;
   --popover: oklch(1 0 0);
-  --popover-foreground: #12121c;
-  /* Marca: Violeta como cor principal; Lima só como destaque (sempre com texto Tinta). */
-  --primary: #5b3df0;
+  --popover-foreground: #12101f;
+  /* Marca: Violeta como cor principal; Verde-limão só como destaque (sempre com texto Preto). */
+  --primary: #5a3fe0;
   --primary-foreground: oklch(1 0 0);
   --secondary: #c8f250;
-  --secondary-foreground: #12121c;
+  --secondary-foreground: #12101f;
   --muted: oklch(0.955 0.008 270);
   --muted-foreground: oklch(0.5 0.025 275);
-  --accent: oklch(0.95 0.035 285);
+  --accent: #ebe7ff; /* Lilás suave */
   --accent-foreground: oklch(0.43 0.22 280);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.9 0.01 275);
   --input: oklch(0.88 0.012 275);
-  --ring: #5b3df0;
-  --chart-1: #5b3df0;
+  --ring: #5a3fe0;
+  --chart-1: #5a3fe0;
   --chart-2: #c8f250;
-  --chart-3: #12121c;
-  --chart-4: oklch(0.79 0.13 283);
+  --chart-3: #12101f;
+  --chart-4: #cfc6ff;
   --chart-5: oklch(0.6 0.02 275);
   --radius: 0.75rem;
   --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: #12121c;
-  --sidebar-primary: #5b3df0;
+  --sidebar-foreground: #12101f;
+  --sidebar-primary: #5a3fe0;
   --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent: oklch(0.95 0.035 285);
-  --sidebar-accent-foreground: #12121c;
+  --sidebar-accent-foreground: #12101f;
   --sidebar-border: oklch(0.9 0.01 275);
-  --sidebar-ring: #5b3df0;
+  --sidebar-ring: #5a3fe0;
 }
 
 .dark {
-  --background: #12121c;
-  --foreground: #f2f4f7;
+  --background: #12101f;
+  --foreground: #f6f5ee;
   --card: oklch(0.23 0.02 284);
-  --card-foreground: #f2f4f7;
+  --card-foreground: #f6f5ee;
   --popover: oklch(0.23 0.02 284);
-  --popover-foreground: #f2f4f7;
+  --popover-foreground: #f6f5ee;
   --primary: oklch(0.69 0.19 282);
-  --primary-foreground: #12121c;
+  --primary-foreground: #12101f;
   --secondary: #c8f250;
-  --secondary-foreground: #12121c;
+  --secondary-foreground: #12101f;
   --muted: oklch(0.27 0.02 284);
   --muted-foreground: oklch(0.72 0.02 275);
   --accent: oklch(0.3 0.06 283);
-  --accent-foreground: #f2f4f7;
+  --accent-foreground: #f6f5ee;
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 16%);
   --ring: oklch(0.69 0.19 282);
   --chart-1: oklch(0.69 0.19 282);
   --chart-2: #c8f250;
-  --chart-3: #f2f4f7;
-  --chart-4: oklch(0.79 0.13 283);
+  --chart-3: #f6f5ee;
+  --chart-4: #cfc6ff;
   --chart-5: oklch(0.6 0.02 275);
   --sidebar: oklch(0.23 0.02 284);
-  --sidebar-foreground: #f2f4f7;
+  --sidebar-foreground: #f6f5ee;
   --sidebar-primary: oklch(0.69 0.19 282);
-  --sidebar-primary-foreground: #12121c;
+  --sidebar-primary-foreground: #12101f;
   --sidebar-accent: oklch(0.3 0.06 283);
-  --sidebar-accent-foreground: #f2f4f7;
+  --sidebar-accent-foreground: #f6f5ee;
   --sidebar-border: oklch(1 0 0 / 12%);
   --sidebar-ring: oklch(0.69 0.19 282);
 }

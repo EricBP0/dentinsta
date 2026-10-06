@@ -9,7 +9,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/80",
-        // Destaque da marca: Lima com texto Tinta (uma chamada por tela, no máximo).
+        // Destaque da marca: Verde-limão com texto Preto (uma chamada por tela, no máximo).
         destaque: "bg-lima font-semibold text-tinta hover:bg-lima-escuro",
         outline:
           "border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",

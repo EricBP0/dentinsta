@@ -1,9 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Fontes da marca lidas do disco para gerar o PDF do certificado.
+  // Fontes e ícone da marca lidos do disco para gerar o PDF do certificado.
   outputFileTracingIncludes: {
-    "/aluno/certificados/*/pdf": ["./assets/fontes/**/*"],
+    "/aluno/certificados/*/pdf": ["./assets/fontes/**/*", "./assets/marca/**/*"],
   },
 };
 

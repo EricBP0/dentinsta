@@ -1,18 +1,13 @@
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Instrument_Sans, JetBrains_Mono } from "next/font/google";
+import { JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
-// Tipografia da marca (docs/MARCA.md): títulos em Bricolage Grotesque, texto em
-// Instrument Sans e rótulos ("LAB 01 · FIG. 01") em JetBrains Mono.
-const bricolage = Bricolage_Grotesque({
-  variable: "--font-bricolage",
-  subsets: ["latin"],
-});
-
-const instrumentSans = Instrument_Sans({
-  variable: "--font-instrument-sans",
+// Tipografia da marca (docs/MARCA.md): Plus Jakarta Sans (ExtraBold nos títulos,
+// Medium no texto) e JetBrains Mono nos rótulos ("LAB 16 · RADIOLOGIA · FIG. 16").
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
   subsets: ["latin"],
 });
 
@@ -30,11 +25,11 @@ export const metadata: Metadata = {
   openGraph: { siteName: "OdontoLab", locale: "pt_BR", type: "website" },
 };
 
-export const viewport: Viewport = { themeColor: "#5B3DF0" };
+export const viewport: Viewport = { themeColor: "#5A3FE0" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="pt-BR" className={`${bricolage.variable} ${instrumentSans.variable} ${jetbrainsMono.variable} h-full antialiased`}>
+    <html lang="pt-BR" className={`${jakarta.variable} ${jetbrainsMono.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-background text-foreground">
         {children}
         <Analytics />
