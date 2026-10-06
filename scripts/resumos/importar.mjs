@@ -182,10 +182,7 @@ async function sincronizarModulos(disciplinaId, d, resumo, pdf) {
   }
 }
 
-const { data: ultima } = await supabase.from("disciplinas").select("ordem").order("ordem", { ascending: false }).limit(1).maybeSingle();
-let ordem = ultima?.ordem ?? 0;
-
-for (const d of disciplinas) {
+for (const [indice, d] of disciplinas.entries()) {
   if (filtro.length && !filtro.includes(d.slug)) continue;
   const pastaResumo = join(raiz, ".resumos", d.slug);
   if (!existsSync(join(pastaResumo, "resumo.json"))) {
@@ -195,7 +192,8 @@ for (const d of disciplinas) {
   const resumo = JSON.parse(readFileSync(join(pastaResumo, "resumo.json"), "utf8"));
   const inicio = Date.now();
   const { pdf, enviadas } = await subirMidia(d, pastaResumo);
-  const disciplinaId = await garantirDisciplina(d, resumo, ++ordem);
+  // Ordem do catálogo = posição em disciplinas.json (vale só para disciplina nova).
+  const disciplinaId = await garantirDisciplina(d, resumo, indice + 1);
   await sincronizarModulos(disciplinaId, d, resumo, pdf);
   console.log(
     `✓ ${d.slug}: ${resumo.modulos.length} módulos, ${enviadas} figuras enviadas (${Math.round((Date.now() - inicio) / 1000)}s)`,

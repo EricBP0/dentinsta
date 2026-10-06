@@ -37,6 +37,7 @@ FUNDO_CLARO = (0.91, 0.96, 0.97)
 FUNDO_TEAL = (0.08, 0.64, 0.71)
 LARANJA = (0.95, 0.65, 0.25)
 
+SUBTITULOS_GENERICOS = {"conteúdo completo", "aula", "resumo geral"}
 TOPO, RODAPE = 40, 795  # cabeçalho e rodapé repetidos em toda página
 LARGURA_MAX_IMG = 1400
 LIMITE_QUEBRA = 440  # x final a partir do qual a linha "encheu" (texto vai até ~544)
@@ -442,8 +443,9 @@ def converter(caminho_pdf, slug):
             titulo, sub = ler_capa(pagina)
             if titulo_geral is None:
                 titulo_geral = titulo
-            # Capa com o mesmo título do PDF: o nome do módulo está no subtítulo.
-            nome = sub if (titulo == titulo_geral and sub) else titulo
+            # Capa com o mesmo título do PDF: o nome do módulo está no subtítulo
+            # (a não ser que o subtítulo seja genérico, como "Conteúdo completo").
+            nome = sub if (titulo == titulo_geral and sub and sub.lower() not in SUBTITULOS_GENERICOS) else titulo
             m.novo_modulo(nome, numero_pagina)
             continue
         if tipo in ("sumario", "propaganda"):
