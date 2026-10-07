@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calcularJanela, dataEfetivaPublicacao, iaAtiva, situacaoItem } from "./acesso";
+import { calcularJanela, dataEfetivaPublicacao, iaAtiva, podeCorrigirComIa, situacaoItem } from "./acesso";
 
 const d = (iso: string) => new Date(iso);
 const acesso = calcularJanela(d("2026-01-15T00:00:00Z")); // janela até 2027-01-15
@@ -54,5 +54,16 @@ describe("iaAtiva", () => {
     expect(iaAtiva(acesso, d("2026-06-01"))).toBe(true);
     expect(iaAtiva(acesso, d("2027-01-16"))).toBe(false);
     expect(iaAtiva(null, d("2026-06-01"))).toBe(false);
+  });
+});
+
+describe("podeCorrigirComIa", () => {
+  it("equipe corrige mesmo sem compra", () => {
+    expect(podeCorrigirComIa(null, true, d("2026-06-01"))).toBe(true);
+  });
+  it("aluno segue a janela da IA", () => {
+    expect(podeCorrigirComIa(acesso, false, d("2026-06-01"))).toBe(true);
+    expect(podeCorrigirComIa(acesso, false, d("2027-01-16"))).toBe(false);
+    expect(podeCorrigirComIa(null, false, d("2026-06-01"))).toBe(false);
   });
 });

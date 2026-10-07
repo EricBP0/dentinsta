@@ -42,6 +42,11 @@ export function iaAtiva(acesso: Acesso | null, agora: Date = new Date()): boolea
   return acesso !== null && agora.getTime() <= acesso.iaAte.getTime();
 }
 
+/** Correção por IA: aluno com a IA na janela, ou equipe (que testa sem ter comprado). */
+export function podeCorrigirComIa(acesso: Acesso | null, equipe: boolean, agora: Date = new Date()): boolean {
+  return equipe || iaAtiva(acesso, agora);
+}
+
 /** Nova compra ou renovação: janela de 12 meses a partir da data informada. */
 export function calcularJanela(inicio: Date): Acesso {
   const fim = new Date(inicio);
