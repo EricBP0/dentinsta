@@ -1,18 +1,22 @@
 import {
   ArrowRight,
   Brain,
+  CalendarDays,
   ChartColumn,
   Check,
   FileText,
   GraduationCap,
   Layers,
+  MessageCircle,
   Network,
   PenLine,
   ShieldCheck,
   Smartphone,
   Sparkles,
   Stethoscope,
+  Users,
   Video,
+  Wallet,
 } from "lucide-react";
 import Link from "next/link";
 import { Logo } from "@/components/marca/logo";
@@ -47,6 +51,33 @@ const RECURSOS = [
   },
 ];
 
+const NOVIDADES = [
+  {
+    icone: MessageCircle,
+    selo: "Novo · IA",
+    titulo: "Chat de dúvidas com IA",
+    texto: "Travou numa matéria? Pergunte qualquer coisa de Odontologia e receba uma explicação didática na hora, como se fosse o professor.",
+    itens: [
+      "Qualquer dúvida de Odontologia, do básico à clínica",
+      "Explicação passo a passo, com os termos da prova",
+      "Histórico das conversas para revisar depois",
+      "10 perguntas por dia enquanto a sua IA estiver ativa",
+    ],
+  },
+  {
+    icone: Stethoscope,
+    selo: "Novo · Gestão",
+    titulo: "ClinicaON",
+    texto: "Uma clínica de bolso dentro da plataforma: organize atendimentos, pacientes, dinheiro e as provas do semestre num lugar só.",
+    itens: [
+      "Agenda do dia e da semana com tipos de consulta",
+      "Cadastro de pacientes com busca",
+      "Faturamento, custos e lucro do mês",
+      "Calendário de provas ligado às suas disciplinas",
+    ],
+  },
+];
+
 const PASSOS = [
   { icone: PenLine, titulo: "Crie sua conta", texto: "Escolha Pix ou cartão em até 12x. O acesso é liberado assim que o pagamento é confirmado." },
   { icone: Brain, titulo: "Estude por disciplina", texto: "Vídeos, resumos, mapas mentais e flashcards organizados por período e matéria." },
@@ -63,6 +94,16 @@ const DUVIDAS = [
     pergunta: "Como funciona a correção por IA?",
     resposta:
       "O professor define o gabarito e os critérios de cada questão discursiva. A IA compara sua resposta com esses critérios, dá a nota de cada um e explica o que você acertou e o que faltou. Se discordar, você pode pedir a revisão do professor.",
+  },
+  {
+    pergunta: "Como funciona o chat de dúvidas?",
+    resposta:
+      "Você pergunta qualquer coisa de Odontologia e a IA responde na hora, de forma didática. São 10 perguntas por dia enquanto a IA do seu acesso estiver ativa (12 meses após a compra ou a renovação). A IA pode errar: confira sempre com o material e o professor.",
+  },
+  {
+    pergunta: "O que é a ClinicaON?",
+    resposta:
+      "É uma área de gestão dentro da plataforma: agenda de consultas, cadastro de pacientes, controle de faturamento e custos e um calendário de provas. Vem junto com o seu acesso, sem custo extra.",
   },
   {
     pergunta: "Quais as formas de pagamento?",
@@ -112,8 +153,8 @@ export default function Inicio() {
               </div>
               <div className="entrar [animation-delay:100ms]">
                 <p className="max-w-xl text-lg text-white/90 sm:text-xl">
-                  Cada tema é um experimento: um resumo de bolso, flashcards, videoaulas e simulados com IA que corrige
-                  suas respostas como um professor.
+                  Cada tema é um experimento: um resumo de bolso, flashcards, videoaulas, simulados com IA que corrige
+                  suas respostas como um professor, um chat para tirar dúvidas e a ClinicaON para organizar sua rotina.
                 </p>
               </div>
               <div className="entrar flex flex-wrap gap-3 [animation-delay:150ms]">
@@ -196,11 +237,58 @@ export default function Inicio() {
             </div>
           </section>
 
+          {/* Novidades */}
+          <section id="novidades" className="scroll-mt-20 border-t-2 border-tinta bg-tinta py-24 text-white">
+            <div className="mx-auto max-w-6xl space-y-12 px-4">
+              <Surgir className="max-w-2xl space-y-3">
+                <Rotulo className="text-lima">Fig. 02 · Novidades</Rotulo>
+                <h2 className="text-4xl font-extrabold tracking-tight sm:text-5xl">Agora com chat de dúvidas e uma clínica de bolso</h2>
+                <p className="text-lg text-white/80">Duas ferramentas novas, incluídas no seu acesso.</p>
+              </Surgir>
+              <SurgirLista className="grid gap-6 lg:grid-cols-2">
+                {NOVIDADES.map(({ icone: Icone, selo, titulo, texto, itens }) => (
+                  <SurgirItem key={titulo}>
+                    <div className="flex h-full flex-col rounded-2xl border-2 border-white/15 bg-white/5 p-6 transition-transform hover:-translate-y-1 sm:p-8">
+                      <div className="mb-5 flex items-start justify-between gap-3">
+                        <div className="inline-flex size-12 items-center justify-center rounded-xl border-2 border-tinta bg-lima text-tinta">
+                          <Icone className="size-6" />
+                        </div>
+                        <span className="rotulo rounded-md bg-violeta px-2.5 py-1 text-[11px] font-bold">{selo}</span>
+                      </div>
+                      <h3 className="text-2xl font-extrabold tracking-tight">{titulo}</h3>
+                      <p className="mt-2 leading-relaxed text-white/80">{texto}</p>
+                      <ul className="mt-6 grid gap-2 text-sm text-white/90 sm:grid-cols-2">
+                        {itens.map((item) => (
+                          <li key={item} className="flex gap-2">
+                            <Check className="size-4 shrink-0 text-lima" /> {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </SurgirItem>
+                ))}
+              </SurgirLista>
+              <Surgir>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {[
+                    { icone: CalendarDays, texto: "Agenda semanal e consultas do dia" },
+                    { icone: Users, texto: "Pacientes organizados e fáceis de achar" },
+                    { icone: Wallet, texto: "Faturamento, custos e lucro sempre à mão" },
+                  ].map(({ icone: Icone, texto }) => (
+                    <p key={texto} className="flex items-center gap-3 rounded-xl border border-white/15 px-4 py-3 text-sm text-white/90">
+                      <Icone className="size-5 shrink-0 text-lima" /> {texto}
+                    </p>
+                  ))}
+                </div>
+              </Surgir>
+            </div>
+          </section>
+
           {/* Como funciona */}
           <section id="como-funciona" className="scroll-mt-20 border-y-2 border-tinta bg-white py-24">
             <div className="mx-auto max-w-6xl space-y-12 px-4">
               <Surgir className="max-w-2xl space-y-3">
-                <Rotulo className="text-violeta">Fig. 02 · Como funciona</Rotulo>
+                <Rotulo className="text-violeta">Fig. 03 · Como funciona</Rotulo>
                 <h2 className="text-4xl font-extrabold tracking-tight text-tinta sm:text-5xl">Em poucos minutos você já está estudando</h2>
               </Surgir>
               <SurgirLista className="grid gap-6 md:grid-cols-3">
@@ -236,7 +324,7 @@ export default function Inicio() {
           <section id="preco" className="fundo-marca scroll-mt-20 py-24">
             <div className="mx-auto max-w-6xl space-y-10 px-4">
               <Surgir className="mx-auto max-w-2xl space-y-3 text-center">
-                <Rotulo className="text-violeta">Fig. 03 · Preço</Rotulo>
+                <Rotulo className="text-violeta">Fig. 04 · Preço</Rotulo>
                 <h2 className="text-4xl font-extrabold tracking-tight text-tinta sm:text-5xl">Um pagamento, acesso para sempre</h2>
                 <p className="text-lg text-slate-600">Sem mensalidade. Pague uma vez e estude no seu ritmo.</p>
               </Surgir>
@@ -260,6 +348,8 @@ export default function Inicio() {
                       "Acesso vitalício ao conteúdo",
                       "Novas disciplinas e aulas por 12 meses",
                       "Simulados e correção por IA por 12 meses",
+                      "Chat de dúvidas com IA (10 perguntas por dia) por 12 meses",
+                      "ClinicaON: agenda, pacientes, financeiro e provas",
                       "Flashcards com repetição espaçada",
                       "Certificado por disciplina",
                     ].map((item) => (
@@ -285,7 +375,7 @@ export default function Inicio() {
           <section id="duvidas" className="scroll-mt-20 border-t-2 border-tinta bg-white py-24">
             <div className="mx-auto max-w-3xl space-y-10 px-4">
               <Surgir className="space-y-3 text-center">
-                <Rotulo className="text-violeta">Fig. 04 · Dúvidas</Rotulo>
+                <Rotulo className="text-violeta">Fig. 05 · Dúvidas</Rotulo>
                 <h2 className="text-4xl font-extrabold tracking-tight text-tinta sm:text-5xl">Dúvidas frequentes</h2>
               </Surgir>
               <Surgir>
