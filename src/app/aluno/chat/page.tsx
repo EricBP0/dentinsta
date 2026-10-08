@@ -69,7 +69,7 @@ export default async function PaginaChat({ searchParams }: PageProps<"/aluno/cha
 
   return (
     <div className="grid gap-6 lg:grid-cols-[240px_1fr]">
-      <aside className="space-y-3">
+      <aside className="min-w-0 space-y-3">
         <Link
           href="/aluno/chat"
           className="flex items-center justify-center gap-2 rounded-xl bg-violeta-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-violeta-800"

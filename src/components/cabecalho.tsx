@@ -12,7 +12,7 @@ const MENU = {
     { href: "/aluno/simulados", texto: "Simulados" },
     { href: "/aluno/flashcards", texto: "Flashcards" },
     { href: "/aluno/chat", texto: "Chat IA" },
-    { href: "/aluno/clinica", texto: "ClinicaON" },
+    { href: "/aluno/consultorio", texto: "Consultório" },
     { href: "/aluno/certificados", texto: "Certificados" },
   ],
   admin: [

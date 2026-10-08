@@ -67,13 +67,13 @@ const NOVIDADES = [
   {
     icone: Stethoscope,
     selo: "Novo · Gestão",
-    titulo: "ClinicaON",
-    texto: "Uma clínica de bolso dentro da plataforma: organize atendimentos, pacientes, dinheiro e as provas do semestre num lugar só.",
+    titulo: "Consultório",
+    texto: "Um consultório de bolso dentro da plataforma: organize atendimentos, pacientes, o caixa e as provas do semestre num lugar só.",
     itens: [
-      "Agenda do dia e da semana com tipos de consulta",
+      "Agenda da semana com linha do tempo do dia",
       "Cadastro de pacientes com busca",
-      "Faturamento, custos e lucro do mês",
-      "Calendário de provas ligado às suas disciplinas",
+      "Caixa com entradas, saídas e saldo do mês",
+      "Contagem regressiva para as provas",
     ],
   },
 ];
@@ -101,9 +101,9 @@ const DUVIDAS = [
       "Você pergunta qualquer coisa de Odontologia e a IA responde na hora, de forma didática. São 10 perguntas por dia enquanto a IA do seu acesso estiver ativa (12 meses após a compra ou a renovação). A IA pode errar: confira sempre com o material e o professor.",
   },
   {
-    pergunta: "O que é a ClinicaON?",
+    pergunta: "O que é o Consultório?",
     resposta:
-      "É uma área de gestão dentro da plataforma: agenda de consultas, cadastro de pacientes, controle de faturamento e custos e um calendário de provas. Vem junto com o seu acesso, sem custo extra.",
+      "É uma área de organização dentro da plataforma: agenda de atendimentos, cadastro de pacientes, caixa com entradas e saídas e a contagem regressiva das suas provas. Vem junto com o seu acesso, sem custo extra.",
   },
   {
     pergunta: "Quais as formas de pagamento?",
@@ -154,7 +154,7 @@ export default function Inicio() {
               <div className="entrar [animation-delay:100ms]">
                 <p className="max-w-xl text-lg text-white/90 sm:text-xl">
                   Cada tema é um experimento: um resumo de bolso, flashcards, videoaulas, simulados com IA que corrige
-                  suas respostas como um professor, um chat para tirar dúvidas e a ClinicaON para organizar sua rotina.
+                  suas respostas como um professor, um chat para tirar dúvidas e o Consultório para organizar sua rotina.
                 </p>
               </div>
               <div className="entrar flex flex-wrap gap-3 [animation-delay:150ms]">
@@ -242,7 +242,7 @@ export default function Inicio() {
             <div className="mx-auto max-w-6xl space-y-12 px-4">
               <Surgir className="max-w-2xl space-y-3">
                 <Rotulo className="text-lima">Fig. 02 · Novidades</Rotulo>
-                <h2 className="text-4xl font-extrabold tracking-tight sm:text-5xl">Agora com chat de dúvidas e uma clínica de bolso</h2>
+                <h2 className="text-4xl font-extrabold tracking-tight sm:text-5xl">Agora com chat de dúvidas e um consultório de bolso</h2>
                 <p className="text-lg text-white/80">Duas ferramentas novas, incluídas no seu acesso.</p>
               </Surgir>
               <SurgirLista className="grid gap-6 lg:grid-cols-2">
@@ -273,7 +273,7 @@ export default function Inicio() {
                   {[
                     { icone: CalendarDays, texto: "Agenda semanal e consultas do dia" },
                     { icone: Users, texto: "Pacientes organizados e fáceis de achar" },
-                    { icone: Wallet, texto: "Faturamento, custos e lucro sempre à mão" },
+                    { icone: Wallet, texto: "Entradas, saídas e saldo sempre à mão" },
                   ].map(({ icone: Icone, texto }) => (
                     <p key={texto} className="flex items-center gap-3 rounded-xl border border-white/15 px-4 py-3 text-sm text-white/90">
                       <Icone className="size-5 shrink-0 text-lima" /> {texto}
@@ -349,7 +349,7 @@ export default function Inicio() {
                       "Novas disciplinas e aulas por 12 meses",
                       "Simulados e correção por IA por 12 meses",
                       "Chat de dúvidas com IA (10 perguntas por dia) por 12 meses",
-                      "ClinicaON: agenda, pacientes, financeiro e provas",
+                      "Consultório: agenda, pacientes, caixa e provas",
                       "Flashcards com repetição espaçada",
                       "Certificado por disciplina",
                     ].map((item) => (

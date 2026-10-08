@@ -1,12 +1,12 @@
 -- =============================================================================
--- Chat de dúvidas com IA e ClinicaON (gestão de clínica para o aluno).
+-- Chat de dúvidas com IA e Consultório (gestão de consultório para o aluno).
 --
 -- Chat: só para quem está com a IA ativa (ou equipe), até 10 perguntas por dia
 -- (horário de Brasília). Cada pergunta reserva uma linha em uso_ia (tipo "chat")
 -- pela função reservar_pergunta_chat(), que conta e grava sob um lock por
 -- usuário: dois envios ao mesmo tempo não passam do limite.
 --
--- ClinicaON: pacientes, consultas, lançamentos financeiros e provas. Cada aluno
+-- Consultório: pacientes, consultas, lançamentos financeiros e provas. Cada aluno
 -- só enxerga e mexe no que é dele (RLS por usuario_id).
 -- =============================================================================
 
@@ -73,7 +73,7 @@ revoke execute on function reservar_pergunta_chat(integer) from public, anon;
 grant execute on function reservar_pergunta_chat(integer) to authenticated;
 
 -- -----------------------------------------------------------------------------
--- ClinicaON
+-- Consultório
 -- -----------------------------------------------------------------------------
 create table clinica_pacientes (
   id uuid primary key default gen_random_uuid(),

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  gradeDoMes,
+  diasAte,
   inicioConsulta,
   intervaloUtc,
   limitesDoMes,
@@ -8,7 +8,7 @@ import {
   reaisParaCentavos,
   semanaDe,
   somarMeses,
-} from "./clinica";
+} from "./consultorio";
 
 describe("reaisParaCentavos", () => {
   it("entende os formatos brasileiros", () => {
@@ -37,16 +37,16 @@ describe("datas", () => {
     expect(semanaDe("2026-10-11")[0]).toBe("2026-10-05");
   });
 
+  it("dias até", () => {
+    expect(diasAte("2026-10-08", "2026-10-08")).toBe(0);
+    expect(diasAte("2026-10-08", "2026-11-01")).toBe(24);
+    expect(diasAte("2026-10-08", "2026-10-01")).toBe(-7);
+  });
+
   it("meses", () => {
     expect(somarMeses("2026-12", 1)).toBe("2027-01");
     expect(somarMeses("2026-01", -1)).toBe("2025-12");
     expect(limitesDoMes("2026-02")).toEqual({ inicio: "2026-02-01", fim: "2026-02-28" });
-  });
-
-  it("grade do mês começa no domingo", () => {
-    const grade = gradeDoMes("2026-10"); // 1º de outubro de 2026 é quinta
-    expect(grade[0]).toEqual([null, null, null, null, "2026-10-01", "2026-10-02", "2026-10-03"]);
-    expect(grade.flat().filter(Boolean)).toHaveLength(31);
   });
 
   it("horário de Brasília", () => {

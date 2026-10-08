@@ -1,6 +1,6 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { intervaloUtc, limitesDoMes, type StatusConsulta, type TipoConsulta } from "./clinica";
+import { intervaloUtc, limitesDoMes, type StatusConsulta, type TipoConsulta } from "./consultorio";
 
 export type Consulta = {
   id: string;
