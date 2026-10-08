@@ -11,6 +11,8 @@ const MENU = {
     { href: "/aluno/disciplinas", texto: "Disciplinas" },
     { href: "/aluno/simulados", texto: "Simulados" },
     { href: "/aluno/flashcards", texto: "Flashcards" },
+    { href: "/aluno/chat", texto: "Chat IA" },
+    { href: "/aluno/clinica", texto: "ClinicaON" },
     { href: "/aluno/certificados", texto: "Certificados" },
   ],
   admin: [
