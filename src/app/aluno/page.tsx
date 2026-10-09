@@ -1,5 +1,6 @@
 import { ArrowDownRight, ArrowRight, ArrowUpRight, Flame, GraduationCap, Layers, Sparkles, TriangleAlert } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { BarraProgresso, SeloPlano } from "@/components/cadeado";
 import { GraficoColunas, GraficoLinha } from "@/components/graficos";
 import { BarraAnimada, NumeroAnimado, SurgirItem, SurgirLista } from "@/components/movimento";
@@ -22,8 +23,10 @@ import {
 } from "@/lib/painel";
 import { NOME_TIPO_ITEM } from "@/lib/tipos";
 import { PaginadoLocal } from "@/components/paginado-local";
+import { CARDS_NA_AMOSTRA, DIAS_ATE_ETAPA_2, ofertaPara, type Respostas } from "@/lib/perfil-cliente";
 import { CabecalhoPagina } from "@/components/sistema";
 
+type PerfilCliente = { respostas: Respostas; etapa1_em: string | null; etapa2_em: string | null; pulado_em: string | null };
 type SimuladoFeito = { id: string; nota: number; finalizado_em: string; disciplinas: { nome: string } };
 
 function dataCurta(dia: string) {
@@ -83,6 +86,7 @@ export default async function Painel() {
     { data: temas },
     { count: correcoesNoMes },
     { data: ultimoProgresso },
+    { data: perfilCliente },
   ] = await Promise.all([
     carregarCatalogo(supabase, perfil),
     carregarResumo(supabase),
@@ -115,7 +119,14 @@ export default async function Painel() {
       .order("atualizado_em", { ascending: false })
       .limit(1)
       .maybeSingle<{ item_id: string }>(),
+    supabase
+      .from("perfis_cliente")
+      .select("respostas, etapa1_em, etapa2_em, pulado_em")
+      .eq("usuario_id", perfil.id)
+      .maybeSingle<PerfilCliente>(),
   ]);
+  // Primeiro acesso de quem assina: o formulário "Personalize sua OdontoLab".
+  if (!equipe && acesso && !perfilCliente) redirect("/aluno/personalizar");
 
   // Notas
   const notas = (simulados ?? []).map((s) => ({ ...s, nota: Number(s.nota) }));
@@ -145,6 +156,21 @@ export default async function Painel() {
   // Essencial sem tudo: mostra o que falta e o Completo como a saída mais em conta.
   const faltando = acesso && !equipe ? TODOS_MODULOS.filter((m) => !acesso.modulos.includes(m)) : [];
 
+  // Respostas do formulário: disciplinas que preocupam, oferta e convite da etapa 2.
+  const respostas = perfilCliente?.respostas ?? {};
+  const preocupam = Array.isArray(respostas.p8)
+    ? disciplinas.filter((d) => (respostas.p8 as string[]).includes(d.id) && d.situacao === "liberada")
+    : [];
+  const oferta = equipe ? null : ofertaPara(respostas, acesso);
+  const etapa1Em = perfilCliente?.etapa1_em ? new Date(perfilCliente.etapa1_em) : null;
+  const convite: "etapa1" | "etapa2" | null = !acesso || equipe || !perfilCliente
+    ? null
+    : !etapa1Em
+      ? "etapa1"
+      : !perfilCliente.etapa2_em && agora.getTime() - etapa1Em.getTime() >= DIAS_ATE_ETAPA_2 * 864e5
+        ? "etapa2"
+        : null;
+
   return (
     <div className="space-y-8">
       <CabecalhoPagina
@@ -162,6 +188,47 @@ export default async function Painel() {
             <Link href="/assinar">Ver planos</Link>
           </Button>
         </div>
+      )}
+
+      {convite && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-tinta bg-lima/40 p-4 text-sm text-tinta">
+          <span>
+            {convite === "etapa1" ? (
+              <>
+                <strong>Personalize sua OdontoLab:</strong> 7 perguntas rápidas e o painel mostra o que importa para você.
+              </>
+            ) : (
+              <>
+                <strong>Complete seu perfil</strong> em 2 minutos
+                {!temModulo(acesso, "flashcards") && <> e ganhe {CARDS_NA_AMOSTRA} flashcards para revisar</>}.
+              </>
+            )}
+          </span>
+          <Button asChild>
+            <Link href="/aluno/personalizar">{convite === "etapa1" ? "Personalizar" : "Responder"}</Link>
+          </Button>
+        </div>
+      )}
+
+      {preocupam.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="text-lg font-extrabold tracking-tight text-tinta">Para você</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {preocupam.map((d) => (
+              <Link
+                key={d.id}
+                href={`/aluno/disciplinas/${d.slug}`}
+                className="group flex items-center justify-between gap-3 rounded-2xl border-2 border-tinta bg-white p-4 hover:shadow-md"
+              >
+                <span>
+                  <span className="block text-xs text-slate-500">Você marcou que preocupa</span>
+                  <strong className="text-slate-900">{d.nome}</strong>
+                </span>
+                <ArrowRight className="size-4 shrink-0 transition-transform group-hover:translate-x-1" />
+              </Link>
+            ))}
+          </div>
+        </section>
       )}
 
       {/* Próximos passos */}
@@ -376,7 +443,17 @@ export default async function Painel() {
         </div>
       </section>
 
-      {faltando.length > 0 && (
+      {oferta ? (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-tinta bg-lima/40 p-4 text-sm text-tinta">
+          <span>
+            <strong className="block">{oferta.titulo}</strong>
+            {oferta.texto}
+          </span>
+          <Button asChild>
+            <Link href={oferta.href}>{oferta.botao}</Link>
+          </Button>
+        </div>
+      ) : faltando.length > 0 && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-tinta bg-lima/40 p-4 text-sm text-tinta">
           <span>
             Seu plano ainda não tem {faltando.map((m) => MODULOS[m].nome).join(", ")}. No <strong>Completo</strong> você
