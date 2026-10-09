@@ -1,4 +1,4 @@
-import { LogOut } from "lucide-react";
+import { GraduationCap, LayoutDashboard, LogOut } from "lucide-react";
 import Link from "next/link";
 import { sair } from "@/app/entrar/actions";
 import { Logo } from "@/components/marca/logo";
@@ -54,8 +54,8 @@ export function Cabecalho({
         escuro ? "border-tinta bg-tinta/95 text-white" : "border-tinta bg-papel/95"
       }`}
     >
-      <div className="mx-auto flex max-w-5xl flex-col gap-2 px-4 py-3 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-center justify-between gap-4 md:justify-start">
+      <div className="mx-auto flex max-w-5xl flex-col gap-2 px-4 py-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex items-center justify-between gap-4 lg:justify-start">
           <Link href={escuro ? "/admin" : "/aluno"} className="flex items-center gap-2">
             <Logo tamanho="sm" claro={escuro} />
             {escuro && (
@@ -64,23 +64,13 @@ export function Cabecalho({
               </span>
             )}
           </Link>
-          <div className="flex items-center gap-2 md:hidden">
+          <div className="flex items-center gap-2 lg:hidden">
             <Conta perfil={perfil} escuro={escuro} iniciais={iniciais} />
           </div>
         </div>
         <div className="flex items-center gap-3">
           <Navegacao itens={itens} escuro={escuro} />
-          {perfil.papel !== "aluno" && (
-            <Link
-              href={escuro ? "/aluno" : "/admin"}
-              className={`hidden shrink-0 rounded-full border-2 px-3 py-1 text-sm font-semibold md:inline-block ${
-                escuro ? "border-lima text-lima hover:bg-lima hover:text-tinta" : "border-tinta text-tinta hover:bg-lima"
-              }`}
-            >
-              {escuro ? "Ver como aluno" : "Backoffice"}
-            </Link>
-          )}
-          <div className="hidden items-center gap-2 md:flex">
+          <div className="hidden shrink-0 items-center gap-2 lg:flex">
             <Conta perfil={perfil} escuro={escuro} iniciais={iniciais} />
           </div>
         </div>
@@ -90,8 +80,24 @@ export function Cabecalho({
 }
 
 function Conta({ perfil, escuro, iniciais }: { perfil: Perfil; escuro: boolean; iniciais: string }) {
+  // Equipe alterna entre as áreas. Só o ícone, para o menu caber inteiro.
+  const alternar = escuro
+    ? { href: "/aluno", texto: "Ver como aluno", Icone: GraduationCap }
+    : { href: "/admin", texto: "Ir para o Backoffice", Icone: LayoutDashboard };
   return (
     <>
+      {perfil.papel !== "aluno" && (
+        <Link
+          href={alternar.href}
+          aria-label={alternar.texto}
+          title={alternar.texto}
+          className={`flex size-8 items-center justify-center rounded-full border-2 transition-colors ${
+            escuro ? "border-lima text-lima hover:bg-lima hover:text-tinta" : "border-tinta text-tinta hover:bg-lima"
+          }`}
+        >
+          <alternar.Icone className="size-4" />
+        </Link>
+      )}
       <span
         title={perfil.nome || perfil.email}
         className={`flex size-8 items-center justify-center rounded-full text-xs font-bold ${

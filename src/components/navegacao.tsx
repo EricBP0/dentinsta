@@ -14,7 +14,7 @@ export function Navegacao({ itens, escuro = false }: { itens: ItemMenu[]; escuro
     .sort((a, b) => b.href.length - a.href.length)[0]?.href;
 
   return (
-    <nav className="-mx-4 flex gap-1 overflow-x-auto px-4 text-sm [scrollbar-width:none] md:mx-0 md:px-0">
+    <nav className="-mx-4 flex gap-1 overflow-x-auto px-4 text-sm [scrollbar-width:none] lg:mx-0 lg:px-0">
       {itens.map((item) => {
         const atual = item.href === ativo;
         return (
@@ -22,7 +22,7 @@ export function Navegacao({ itens, escuro = false }: { itens: ItemMenu[]; escuro
             key={item.href}
             href={item.href}
             aria-current={atual ? "page" : undefined}
-            className={`shrink-0 rounded-full px-3 py-1.5 transition-colors ${
+            className={`shrink-0 rounded-full px-2.5 py-1.5 transition-colors ${
               escuro
                 ? atual
                   ? "bg-lima font-bold text-tinta"
