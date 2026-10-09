@@ -16,7 +16,7 @@ describe("montarCheckoutAssinatura", () => {
     expect(corpo.billingTypes).toEqual(["CREDIT_CARD"]);
     expect(corpo.chargeTypes).toEqual(["RECURRENT"]);
     expect(corpo).toMatchObject({ subscription: { cycle: "MONTHLY", nextDueDate: "2026-10-09 12:00:00" } });
-    expect(corpo.items[0].value).toBe(32.8);
+    expect(corpo.items[0].value).toBe(49.8);
     expect(corpo.items[0].description).toBe("Assinatura mensal: Disciplinas, Chat IA");
     expect(corpo.externalReference).toBe("a1");
     expect(corpo.callback.successUrl).toBe("https://site.com/pagamento/concluido?assinatura=a1");
@@ -32,7 +32,7 @@ describe("montarCheckoutAssinatura", () => {
     expect(corpo.billingTypes).toEqual(["PIX", "CREDIT_CARD"]);
     expect(corpo.chargeTypes).toEqual(["DETACHED"]);
     expect(corpo).not.toHaveProperty("subscription");
-    expect(corpo.items[0].value).toBe(349);
+    expect(corpo.items[0].value).toBe(418.8);
   });
 
   it("anual parcelado: cartão em até 12x", () => {
@@ -43,7 +43,7 @@ describe("montarCheckoutAssinatura", () => {
       modalidadeAnual: "parcelado",
     });
     expect(corpo).toMatchObject({ chargeTypes: ["INSTALLMENT"], installment: { maxInstallmentCount: 12 } });
-    expect(corpo.items[0].value).toBe(599);
+    expect(corpo.items[0].value).toBe(718.8);
     expect(corpo.items[0].name.length).toBeLessThanOrEqual(30);
   });
 

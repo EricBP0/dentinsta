@@ -110,11 +110,12 @@ Se só as 8 videoaulas forem obrigatórias, assistir às 8 já emite o certifica
 
 ## 4. Pagamento (Asaas)
 
-> **Atualização: o modelo virou assinatura** (migration 0014). Planos Essencial
-> (Disciplinas por R$ 14,90 + módulos avulsos: Simulados R$ 14,90, Flashcards
-> R$ 9,90, Chat IA R$ 17,90, Consultório R$ 9,90), Completo (R$ 34,90/mês ou
-> R$ 349/ano) e Duplo (R$ 59,90/mês ou R$ 599/ano, duas pessoas). Mensal é
-> recorrente no cartão; anual é pagamento único. O acesso vale enquanto a
+> **Atualização: o modelo virou assinatura** (migration 0014). Anual em 12x sem
+> juros (ou à vista no Pix pelo mesmo total) / mensal: Essencial 12x R$ 14,90 /
+> R$ 22,90 (anual só com Disciplinas; no mensal somam-se os avulsos Simulados
+> R$ 22,90, Flashcards R$ 14,90, Chat IA R$ 26,90, Consultório R$ 14,90),
+> Completo 12x R$ 34,90 / R$ 49,90 e Duplo 12x R$ 59,90 / R$ 79,90 (duas
+> pessoas). Mensal é recorrente no cartão; anual é pagamento único. O acesso vale enquanto a
 > assinatura estiver paga (+3 dias de tolerância). As seções 4.1 a 4.1.2 abaixo
 > descrevem o modelo antigo (compra única com 12 meses de novidades) e ficam
 > como histórico. Preços: `src/lib/planos.ts`.

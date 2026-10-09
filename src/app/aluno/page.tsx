@@ -6,7 +6,7 @@ import { BarraAnimada, NumeroAnimado, SurgirItem, SurgirLista } from "@/componen
 import { Button } from "@/components/ui/button";
 import { temModulo } from "@/lib/acesso";
 import { formatarReais } from "@/lib/preco";
-import { MODULOS, PRECO_MENSAL, TODOS_MODULOS } from "@/lib/planos";
+import { MODULOS, PARCELA_ANUAL, TODOS_MODULOS } from "@/lib/planos";
 import { exigirLogin } from "@/lib/auth";
 import { carregarCatalogo, formatarData, type DisciplinaCatalogo } from "@/lib/catalogo";
 import { carregarResumo } from "@/lib/flashcards/sessao";
@@ -380,10 +380,10 @@ export default async function Painel() {
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-tinta bg-lima/40 p-4 text-sm text-tinta">
           <span>
             Seu plano ainda não tem {faltando.map((m) => MODULOS[m].nome).join(", ")}. No <strong>Completo</strong> você
-            leva tudo por {formatarReais(PRECO_MENSAL.completo)}/mês.
+            leva tudo por 12x {formatarReais(PARCELA_ANUAL.completo)} sem juros no anual.
           </span>
           <Button asChild>
-            <Link href="/assinar/escolher?plano=completo">Quero o Completo</Link>
+            <Link href="/assinar/escolher?plano=completo&ciclo=anual">Quero o Completo</Link>
           </Button>
         </div>
       )}
