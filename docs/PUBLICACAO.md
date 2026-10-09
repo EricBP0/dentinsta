@@ -111,8 +111,7 @@ no `main` (enquanto isso, o `main` só tem o planejamento).
    | `CERTIFICADO_RESPONSAVEL_CARGO` | Ex.: `CRO-SP 12345 · Coordenador pedagógico` |
 
    Opcionais: `IA_MODELO`, `IA_EFFORT`, `IA_COTA_MENSAL`, `IA_MODELO_GERACAO`,
-   `IA_EFFORT_GERACAO`, `PRECO_RENOVACAO_A_VISTA_CENTAVOS`,
-   `PRECO_RENOVACAO_PARCELADO_CENTAVOS`, `CERTIFICADO_PLATAFORMA`.
+   `IA_EFFORT_GERACAO`, `CERTIFICADO_PLATAFORMA`.
 
 3. Clique em **Deploy**. As funções rodam na região de São Paulo (`gru1`),
    definida no `vercel.json`.
@@ -198,7 +197,8 @@ Site URL do Supabase e fazer Redeploy).
    - Tipo de envio: sequencial
    - Eventos: `CHECKOUT_PAID`, `CHECKOUT_CANCELED`, `CHECKOUT_EXPIRED`,
      `PAYMENT_CONFIRMED`, `PAYMENT_RECEIVED`, `PAYMENT_REFUNDED`,
-     `PAYMENT_CHARGEBACK_REQUESTED`
+     `PAYMENT_CHARGEBACK_REQUESTED`, `SUBSCRIPTION_DELETED`,
+     `SUBSCRIPTION_INACTIVATED`
 3. No sandbox, pague com os cartões de teste do Asaas ou confirme o Pix pelo
    próprio painel do sandbox.
 
@@ -280,7 +280,8 @@ Marque cada item. Use uma conta de aluno separada (outro e-mail).
       correção, 7 dias de arrependimento, acesso vitalício e janela de 12 meses.
 - [ ] **Calibrar a correção por IA**: ~50 respostas reais corrigidas pelo
       professor comparadas com a IA (README, "Correção por IA").
-- [ ] **Preço da renovação** (`PRECO_RENOVACAO_*`), se já for oferecer.
+- [ ] **Assinatura no sandbox**: assine o mensal com cartão de teste, confira a
+  segunda cobrança (adiante a data no painel do sandbox), troque de plano e cancele.
 - [ ] Confirmar no Asaas as **bandeiras aceitas** (Elo, Hipercard) — a landing
       menciona "Elo, Visa, Mastercard e outras bandeiras".
 - [ ] Conferir as **taxas** do parcelado e da antecipação no Asaas.

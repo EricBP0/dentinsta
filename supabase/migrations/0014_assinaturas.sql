@@ -214,6 +214,11 @@ begin
     return false;
   end if;
   v_primeiro := not exists (select 1 from compras where assinatura_id = v_a.id and status = 'pago');
+  -- Redução pedida antes entra nesta cobrança (e é o plano que este pagamento paga).
+  if not v_primeiro and v_a.plano_proximo is not null then
+    v_a.plano := v_a.plano_proximo;
+    v_a.modulos := coalesce(v_a.modulos_proximos, v_a.modulos);
+  end if;
 
   insert into compras (usuario_id, assinatura_id, gateway_pagamento_id, tipo, modalidade, parcelas,
                        valor_total_centavos, status, pago_em, gateway_cliente_id, checkout_id, plano, ciclo)
@@ -234,9 +239,8 @@ begin
   set status = case when status = 'cancelada' then 'cancelada' else 'ativa' end,
       periodo_ate = v_fim,
       ativa_ate = v_fim + interval '3 days',
-      -- Redução pedida antes: vale a partir desta cobrança.
-      plano = case when not v_primeiro and plano_proximo is not null then plano_proximo else plano end,
-      modulos = case when not v_primeiro and modulos_proximos is not null then modulos_proximos else modulos end,
+      plano = v_a.plano,
+      modulos = v_a.modulos,
       plano_proximo = case when not v_primeiro then null else plano_proximo end,
       modulos_proximos = case when not v_primeiro then null else modulos_proximos end,
       gateway_assinatura_id = coalesce(gateway_assinatura_id, p_gateway_assinatura_id),

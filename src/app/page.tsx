@@ -24,9 +24,9 @@ import { CabecalhoLanding } from "@/components/landing/cabecalho-landing";
 import { PreviaProduto } from "@/components/landing/previa-produto";
 import { Movimento, Surgir, SurgirItem, SurgirLista } from "@/components/movimento";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { formatarReais, PRECO, totalParcelado } from "@/lib/preco";
+import { formatarReais } from "@/lib/preco";
+import { MODULOS, PRECO_ANUAL, PRECO_MENSAL, somaAvulsos, TODOS_MODULOS } from "@/lib/planos";
 
 const RECURSOS = [
   {
@@ -61,7 +61,7 @@ const NOVIDADES = [
       "Qualquer dúvida de Odontologia, do básico à clínica",
       "Explicação passo a passo, com os termos da prova",
       "Histórico das conversas para revisar depois",
-      "10 perguntas por dia enquanto a sua IA estiver ativa",
+      "10 perguntas por dia no Completo ou com o módulo Chat IA",
     ],
   },
   {
@@ -79,16 +79,19 @@ const NOVIDADES = [
 ];
 
 const PASSOS = [
-  { icone: PenLine, titulo: "Crie sua conta", texto: "Escolha Pix ou cartão em até 12x. O acesso é liberado assim que o pagamento é confirmado." },
+  { icone: PenLine, titulo: "Escolha seu plano", texto: "Mensal no cartão ou anual no Pix ou em até 12x. O acesso é liberado assim que o pagamento é confirmado." },
   { icone: Brain, titulo: "Estude por disciplina", texto: "Vídeos, resumos, mapas mentais e flashcards organizados por período e matéria." },
   { icone: ChartColumn, titulo: "Treine e acompanhe", texto: "Faça simulados, receba a correção comentada e reforce onde você errou." },
 ];
 
 const DUVIDAS = [
   {
-    pergunta: "O acesso é vitalício?",
-    resposta:
-      "Sim. Tudo o que for publicado até 12 meses depois da sua compra fica seu para sempre. Durante esses 12 meses você também recebe todas as novidades (disciplinas e aulas novas) e usa a IA. Depois, pode renovar para continuar recebendo novidades e usando a IA.",
+    pergunta: "Como funciona a assinatura?",
+    resposta: `É mensal e sem fidelidade. O Essencial (${formatarReais(MODULOS.disciplinas.precoCentavos)}/mês) libera as disciplinas, e você pode somar Simulados, Flashcards, Chat IA e Consultório. O Completo (${formatarReais(PRECO_MENSAL.completo)}/mês) tem tudo. Cancele quando quiser e use até o fim do período pago. Tudo o que for publicado enquanto você assina fica disponível para você.`,
+  },
+  {
+    pergunta: "Posso dividir com um colega?",
+    resposta: `Sim, no plano Duplo (${formatarReais(PRECO_MENSAL.duplo)}/mês): é o Completo para duas pessoas, cada uma com a própria conta e o próprio progresso. Sai ${formatarReais(PRECO_MENSAL.duplo / 2)} para cada.`,
   },
   {
     pergunta: "Como funciona a correção por IA?",
@@ -98,16 +101,16 @@ const DUVIDAS = [
   {
     pergunta: "Como funciona o chat de dúvidas?",
     resposta:
-      "Você pergunta qualquer coisa de Odontologia e a IA responde na hora, de forma didática. São 10 perguntas por dia enquanto a IA do seu acesso estiver ativa (12 meses após a compra ou a renovação). A IA pode errar: confira sempre com o material e o professor.",
+      "Você pergunta qualquer coisa de Odontologia e a IA responde na hora, de forma didática. São 10 perguntas por dia, no plano Completo, no Duplo ou com o módulo Chat IA. A IA pode errar: confira sempre com o material e o professor.",
   },
   {
     pergunta: "O que é o Consultório?",
     resposta:
-      "É uma área de organização dentro da plataforma: agenda de atendimentos, cadastro de pacientes, caixa com entradas e saídas e a contagem regressiva das suas provas. Vem junto com o seu acesso, sem custo extra.",
+      "É uma área de organização dentro da plataforma: agenda de atendimentos, cadastro de pacientes, caixa com entradas e saídas e a contagem regressiva das suas provas. Vem no Completo e no Duplo, ou como módulo do Essencial.",
   },
   {
     pergunta: "Quais as formas de pagamento?",
-    resposta: `À vista por ${formatarReais(PRECO.aVistaCentavos)} no Pix ou cartão, ou em até ${PRECO.parcelas}x de ${formatarReais(PRECO.parcelaCentavos)} sem juros no cartão de crédito. O pagamento é processado pelo Asaas.`,
+    resposta: `Mensal: no cartão de crédito, cobrado todo mês. Anual (Completo ou Duplo): à vista no Pix ou no cartão, ou em até 12x no cartão, e sai 2 meses mais barato (Completo por ${formatarReais(PRECO_ANUAL.completo)}/ano). O pagamento é processado pelo Asaas.`,
   },
   {
     pergunta: "O certificado vale como hora complementar?",
@@ -120,7 +123,7 @@ const DUVIDAS = [
   },
   {
     pergunta: "E se eu me arrepender?",
-    resposta: "Você tem 7 dias após a compra para desistir e receber o valor de volta, como garante o Código de Defesa do Consumidor.",
+    resposta: "Você tem 7 dias após a assinatura para desistir e receber o valor de volta, como garante o Código de Defesa do Consumidor. Depois disso, é só cancelar a renovação quando quiser.",
   },
 ];
 
@@ -130,8 +133,6 @@ function Rotulo({ children, className = "" }: { children: React.ReactNode; class
 }
 
 export default function Inicio() {
-  const desconto = Math.round((1 - PRECO.aVistaCentavos / totalParcelado()) * 100);
-
   return (
     <Movimento>
       <div className="relative flex-1 overflow-x-clip bg-papel">
@@ -243,7 +244,7 @@ export default function Inicio() {
               <Surgir className="max-w-2xl space-y-3">
                 <Rotulo className="text-lima">Fig. 02 · Novidades</Rotulo>
                 <h2 className="text-4xl font-extrabold tracking-tight sm:text-5xl">Agora com chat de dúvidas e um consultório de bolso</h2>
-                <p className="text-lg text-white/80">Duas ferramentas novas, incluídas no seu acesso.</p>
+                <p className="text-lg text-white/80">Duas ferramentas novas, no plano Completo ou como módulo avulso.</p>
               </Surgir>
               <SurgirLista className="grid gap-6 lg:grid-cols-2">
                 {NOVIDADES.map(({ icone: Icone, selo, titulo, texto, itens }) => (
@@ -324,50 +325,94 @@ export default function Inicio() {
           <section id="preco" className="fundo-marca scroll-mt-20 py-24">
             <div className="mx-auto max-w-6xl space-y-10 px-4">
               <Surgir className="mx-auto max-w-2xl space-y-3 text-center">
-                <Rotulo className="text-violeta">Fig. 04 · Preço</Rotulo>
-                <h2 className="text-4xl font-extrabold tracking-tight text-tinta sm:text-5xl">Um pagamento, acesso para sempre</h2>
-                <p className="text-lg text-slate-600">Sem mensalidade. Pague uma vez e estude no seu ritmo.</p>
+                <Rotulo className="text-violeta">Fig. 04 · Planos</Rotulo>
+                <h2 className="text-4xl font-extrabold tracking-tight text-tinta sm:text-5xl">Tudo da plataforma por menos de R$ 1,20 por dia</h2>
+                <p className="text-lg text-slate-600">
+                  Separado, tudo sairia {formatarReais(somaAvulsos())}/mês. No Completo, {formatarReais(PRECO_MENSAL.completo)}. Sem
+                  fidelidade: cancele quando quiser.
+                </p>
               </Surgir>
-              <Surgir className="mx-auto max-w-md">
-                <div className="relative rounded-3xl border-2 border-tinta bg-white p-8 shadow-[8px_8px_0_0_var(--color-tinta)]">
-                  <span className="rotulo absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-md border-2 border-tinta bg-lima px-3 py-1 text-xs font-bold whitespace-nowrap text-tinta">
-                    Acesso completo
-                  </span>
-                  <p className="text-center font-heading text-5xl font-extrabold tracking-tight text-tinta">
-                    {PRECO.parcelas}x <span className="text-violeta">{formatarReais(PRECO.parcelaCentavos)}</span>
-                  </p>
-                  <p className="mt-1 text-center text-sm text-slate-500">
-                    sem juros no cartão · total {formatarReais(totalParcelado())}
-                  </p>
-                  <p className="mt-4 text-center text-lg text-tinta">
-                    ou <strong>{formatarReais(PRECO.aVistaCentavos)}</strong> à vista
-                    <Badge variant="secondary" className="rotulo ml-2 align-middle text-[10px]">{desconto}% off</Badge>
-                  </p>
-                  <ul className="mt-8 space-y-3 text-slate-700">
-                    {[
-                      "Acesso vitalício ao conteúdo",
-                      "Novas disciplinas e aulas por 12 meses",
-                      "Simulados e correção por IA por 12 meses",
-                      "Chat de dúvidas com IA (10 perguntas por dia) por 12 meses",
-                      "Consultório: agenda, pacientes, caixa e provas",
-                      "Flashcards com repetição espaçada",
-                      "Certificado por disciplina",
-                    ].map((item) => (
-                      <li key={item} className="flex gap-3">
-                        <Check className="size-5 shrink-0 text-violeta" /> {item}
+              <SurgirLista className="grid items-start gap-6 lg:grid-cols-3">
+                <SurgirItem>
+                  <div className="flex h-full flex-col rounded-3xl border-2 border-tinta bg-white p-7">
+                    <Rotulo className="text-violeta">Essencial</Rotulo>
+                    <p className="mt-2 font-heading text-4xl font-extrabold tracking-tight text-tinta">
+                      {formatarReais(MODULOS.disciplinas.precoCentavos)}
+                      <span className="text-base font-semibold text-slate-500">/mês</span>
+                    </p>
+                    <p className="text-sm text-slate-600">As disciplinas, e você soma o que quiser.</p>
+                    <ul className="mt-6 space-y-2.5 text-sm text-slate-700">
+                      <li className="flex gap-2">
+                        <Check className="size-5 shrink-0 text-violeta" /> {MODULOS.disciplinas.descricao}
                       </li>
-                    ))}
-                  </ul>
-                  <Button size="lg" className="mt-8 h-12 w-full rounded-full text-base" asChild>
-                    <Link href="/assinar">
-                      Quero começar <ArrowRight data-icon="inline-end" />
-                    </Link>
-                  </Button>
-                  <p className="mt-4 flex items-center justify-center gap-1.5 text-xs text-slate-500">
-                    <ShieldCheck className="size-4" /> Pagamento seguro · Pix ou cartão · 7 dias para desistir
-                  </p>
-                </div>
-              </Surgir>
+                      {TODOS_MODULOS.filter((m) => m !== "disciplinas").map((m) => (
+                        <li key={m} className="flex gap-2 text-slate-500">
+                          <span className="w-5 shrink-0 text-center font-bold text-violeta">+</span>
+                          {MODULOS[m].nome} por {formatarReais(MODULOS[m].precoCentavos)}
+                        </li>
+                      ))}
+                    </ul>
+                    <Button variant="outline" size="lg" className="mt-8 h-12 w-full rounded-full text-base" asChild>
+                      <Link href="/assinar">Montar meu plano</Link>
+                    </Button>
+                  </div>
+                </SurgirItem>
+                <SurgirItem>
+                  <div className="relative flex h-full flex-col rounded-3xl border-2 border-tinta bg-tinta p-7 text-white shadow-[8px_8px_0_0_var(--color-lima)] lg:-mt-4">
+                    <span className="rotulo absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-md border-2 border-tinta bg-lima px-3 py-1 text-xs font-bold whitespace-nowrap text-tinta">
+                      Mais escolhido
+                    </span>
+                    <Rotulo className="text-lima">Completo</Rotulo>
+                    <p className="mt-2 text-sm text-white/60 line-through">{formatarReais(somaAvulsos())}/mês</p>
+                    <p className="font-heading text-5xl font-extrabold tracking-tight">
+                      {formatarReais(PRECO_MENSAL.completo)}
+                      <span className="text-base font-semibold text-white/70">/mês</span>
+                    </p>
+                    <p className="text-sm text-white/80">ou {formatarReais(PRECO_ANUAL.completo)} no anual (2 meses grátis)</p>
+                    <ul className="mt-6 space-y-2.5 text-sm">
+                      {TODOS_MODULOS.map((m) => (
+                        <li key={m} className="flex gap-2">
+                          <Check className="size-5 shrink-0 text-lima" /> {MODULOS[m].nome}
+                          <span className="ml-auto text-white/50 line-through">{formatarReais(MODULOS[m].precoCentavos)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <Button size="lg" className="mt-8 h-12 w-full rounded-full bg-lima text-base text-tinta hover:bg-lima/90" asChild>
+                      <Link href="/assinar/escolher?plano=completo&ciclo=mensal">
+                        Quero o Completo <ArrowRight data-icon="inline-end" />
+                      </Link>
+                    </Button>
+                  </div>
+                </SurgirItem>
+                <SurgirItem>
+                  <div className="flex h-full flex-col rounded-3xl border-2 border-tinta bg-white p-7">
+                    <Rotulo className="text-violeta">Duplo</Rotulo>
+                    <p className="mt-2 font-heading text-4xl font-extrabold tracking-tight text-tinta">
+                      {formatarReais(PRECO_MENSAL.duplo)}
+                      <span className="text-base font-semibold text-slate-500">/mês</span>
+                    </p>
+                    <p className="text-sm text-slate-600">
+                      O Completo para você e um colega: {formatarReais(PRECO_MENSAL.duplo / 2)} para cada.
+                    </p>
+                    <ul className="mt-6 space-y-2.5 text-sm text-slate-700">
+                      {["Tudo do Completo, para duas contas", "Cada um com o próprio progresso", "Convite pelo e-mail, depois de assinar"].map(
+                        (item) => (
+                          <li key={item} className="flex gap-2">
+                            <Users className="size-5 shrink-0 text-violeta" /> {item}
+                          </li>
+                        ),
+                      )}
+                    </ul>
+                    <Button variant="outline" size="lg" className="mt-8 h-12 w-full rounded-full text-base" asChild>
+                      <Link href="/assinar/escolher?plano=duplo&ciclo=mensal">Assinar o Duplo</Link>
+                    </Button>
+                  </div>
+                </SurgirItem>
+              </SurgirLista>
+              <p className="flex items-center justify-center gap-1.5 text-center text-xs text-slate-500">
+                <ShieldCheck className="size-4 shrink-0" /> Pagamento seguro pelo Asaas · mensal no cartão · anual no Pix ou em até 12x · 7 dias
+                para desistir
+              </p>
             </div>
           </section>
 

@@ -110,6 +110,15 @@ Se só as 8 videoaulas forem obrigatórias, assistir às 8 já emite o certifica
 
 ## 4. Pagamento (Asaas)
 
+> **Atualização: o modelo virou assinatura** (migration 0014). Planos Essencial
+> (Disciplinas por R$ 14,90 + módulos avulsos: Simulados R$ 14,90, Flashcards
+> R$ 9,90, Chat IA R$ 17,90, Consultório R$ 9,90), Completo (R$ 34,90/mês ou
+> R$ 349/ano) e Duplo (R$ 59,90/mês ou R$ 599/ano, duas pessoas). Mensal é
+> recorrente no cartão; anual é pagamento único. O acesso vale enquanto a
+> assinatura estiver paga (+3 dias de tolerância). As seções 4.1 a 4.1.2 abaixo
+> descrevem o modelo antigo (compra única com 12 meses de novidades) e ficam
+> como histórico. Preços: `src/lib/planos.ts`.
+
 > Trocado da Stripe para o Asaas: a Stripe não oferece parcelamento de cartão para
 > contas brasileiras nem aceita Elo/Hipercard. O Asaas parcela, aceita todas as
 > bandeiras e emite nota fiscal de serviço automaticamente.
