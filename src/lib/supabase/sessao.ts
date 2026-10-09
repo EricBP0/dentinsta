@@ -34,7 +34,8 @@ export async function atualizarSessao(request: NextRequest) {
   if (!logado && ROTAS_PROTEGIDAS.some((rota) => pathname.startsWith(rota))) {
     const url = request.nextUrl.clone();
     url.pathname = "/entrar";
-    url.search = `?proximo=${encodeURIComponent(pathname)}`;
+    // Mantém a busca (ex.: plano escolhido) para voltar ao mesmo lugar depois do login.
+    url.search = `?proximo=${encodeURIComponent(pathname + request.nextUrl.search)}`;
     return NextResponse.redirect(url);
   }
 
