@@ -2,40 +2,43 @@
 
 import { revalidatePath } from "next/cache";
 import { exigirEquipe } from "@/lib/auth";
-import { ehStatus, MENSAGEM_MAX } from "@/lib/feedback";
+import { erroDeEnvio, type EstadoMensagem } from "@/lib/feedback";
 
-function revalidar() {
-  // O aviso de feedbacks abertos fica no menu do backoffice.
+function revalidar(id: string) {
+  // O aviso de conversas aguardando a equipe fica no menu do backoffice.
   revalidatePath("/admin", "layout");
+  revalidatePath(`/admin/feedbacks/${id}`);
 }
 
-export async function responderFeedback(formData: FormData) {
-  const { supabase, perfil } = await exigirEquipe();
-  const id = String(formData.get("id") ?? "");
-  const resposta = String(formData.get("resposta") ?? "").trim().slice(0, MENSAGEM_MAX);
-  if (!resposta) throw new Error("Escreva a resposta.");
-
-  const { error } = await supabase
-    .from("feedbacks")
-    .update({
-      resposta,
-      status: "respondido",
-      respondido_por: perfil.id,
-      respondido_em: new Date().toISOString(),
-      resposta_vista: false,
-    })
-    .eq("id", id);
-  if (error) throw new Error("Não foi possível salvar a resposta.");
-  revalidar();
+/** Mensagem da equipe na conversa (reabre se estava encerrada). */
+export async function responderFeedback(_: EstadoMensagem, formData: FormData): Promise<EstadoMensagem> {
+  const { supabase } = await exigirEquipe();
+  const id = String(formData.get("feedback_id") ?? "");
+  const { error } = await supabase.rpc("enviar_mensagem_feedback", {
+    p_feedback_id: id,
+    p_texto: String(formData.get("texto") ?? ""),
+  });
+  if (error) return { erro: erroDeEnvio(error.message) };
+  revalidar(id);
+  return { enviado: Date.now() };
 }
 
-/** Arquivar (sem resposta necessária) ou reabrir. */
+/** Encerra a conversa ou reabre (volta a aguardar quem deve a próxima mensagem). */
 export async function alterarStatusFeedback(formData: FormData) {
   const { supabase } = await exigirEquipe();
   const id = String(formData.get("id") ?? "");
-  const status = String(formData.get("status") ?? "");
-  if (!ehStatus(status)) throw new Error("Status inválido.");
+  let status = "arquivado";
+  if (formData.get("acao") === "reabrir") {
+    const { data: ultima } = await supabase
+      .from("feedback_mensagens")
+      .select("da_equipe")
+      .eq("feedback_id", id)
+      .order("criado_em", { ascending: false })
+      .limit(1)
+      .maybeSingle<{ da_equipe: boolean }>();
+    status = ultima?.da_equipe ? "respondido" : "aberto";
+  }
   const { error } = await supabase.from("feedbacks").update({ status }).eq("id", id);
-  if (error) throw new Error("Não foi possível alterar o feedback.");
-  revalidar();
+  if (error) throw new Error("Não foi possível alterar a conversa.");
+  revalidar(id);
 }
