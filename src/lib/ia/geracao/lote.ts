@@ -33,6 +33,8 @@ export type Geracao = {
   config: ConfigGeracao;
   status: "processando" | "importando" | "concluida" | "erro";
   batch_id: string | null;
+  /** "provedor:modelo" do lote atual (registros antigos: só o modelo). */
+  modelo: string | null;
 };
 
 async function montarPedido(geracao: Geracao) {
@@ -86,8 +88,11 @@ async function montarPedido(geracao: Geracao) {
   };
 }
 
-/** Baixa o material, monta o pedido e envia o lote. Grava o batch_id na geração. */
-export async function enviarLoteGeracao(geracao: Geracao) {
+/**
+ * Baixa o material, monta o pedido e envia o lote. Grava o batch_id na geração.
+ * `depoisDe`: reenvio para a reserva, depois de o lote desse modelo falhar.
+ */
+export async function enviarLoteGeracao(geracao: Geracao, depoisDe?: string) {
   const admin = criarClienteAdmin();
 
   const arquivos: ArquivoMaterial[] = [];
@@ -105,6 +110,7 @@ export async function enviarLoteGeracao(geracao: Geracao) {
     "geracao",
     { sistema, schema, partes: [...material, { tipo: "texto", texto: pedido }], maxTokens: 32000 },
     geracao.id,
+    { depoisDe },
   );
 
   await admin.from("geracoes_questoes").update({ batch_id: idLote, modelo }).eq("id", geracao.id);
@@ -195,7 +201,10 @@ async function importarResultado(geracao: Geracao, estado: Extract<EstadoLote, {
         tokens_cache: estado.uso.cache,
       });
     }
-    if ("erro" in estado) return falhar(geracao.id, estado.erro);
+    if ("erro" in estado) {
+      if (await reenviarParaReserva(geracao, estado.erro)) return;
+      return falhar(geracao.id, `${estado.erro}${geracao.modelo ? ` (${geracao.modelo})` : ""}`);
+    }
 
     const { gerados, descartados, observacoes } = await salvarResultado(geracao, estado.texto);
     await admin
@@ -212,6 +221,23 @@ async function importarResultado(geracao: Geracao, estado: Extract<EstadoLote, {
     console.error("Falha ao importar geração", { geracaoId: geracao.id, erro });
     return falhar(geracao.id, "Falha ao importar o resultado. Tente gerar novamente.");
   }
+}
+
+/**
+ * O lote terminou com erro: manda o mesmo pedido para o próximo modelo da lista
+ * (ex.: Gemini falhou → Claude). Devolve false se não há reserva ou o envio falhou.
+ */
+async function reenviarParaReserva(geracao: Geracao, motivo: string): Promise<boolean> {
+  if (!geracao.modelo) return false;
+  try {
+    await enviarLoteGeracao(geracao, geracao.modelo);
+  } catch (erro) {
+    console.error("Geração: reserva também falhou", { geracaoId: geracao.id, erro });
+    return false;
+  }
+  console.warn("Geração: lote falhou, reenviado para a reserva", { geracaoId: geracao.id, modelo: geracao.modelo, motivo });
+  await criarClienteAdmin().from("geracoes_questoes").update({ status: "processando" }).eq("id", geracao.id);
+  return true;
 }
 
 /** Confere os lotes em andamento e importa os que terminaram. */

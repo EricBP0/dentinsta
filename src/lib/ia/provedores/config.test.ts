@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { alvosDoUso, custoEstimado, esforcoDoUso, lerLista } from "./config";
+import { alvosDepoisDe, alvosDoUso, custoEstimado, esforcoDoUso, lerLista } from "./config";
 
 const chaves = { GEMINI_API_KEY: "g", ANTHROPIC_API_KEY: "a" };
 
@@ -59,5 +59,16 @@ describe("custoEstimado", () => {
   });
   it("modelo desconhecido não tem estimativa", () => {
     expect(custoEstimado("modelo-novo", uso)).toBeNull();
+  });
+});
+
+describe("alvosDepoisDe", () => {
+  const lista = lerLista("gemini:gemini-3.6-flash,anthropic:claude-opus-5-5,claude-haiku-5-5");
+  it("a reserva é o que vem depois do modelo que falhou", () => {
+    expect(alvosDepoisDe(lista, "gemini:gemini-3.6-flash").map((a) => a.modelo)).toEqual(["claude-opus-5-5", "claude-haiku-5-5"]);
+    expect(alvosDepoisDe(lista, "claude-haiku-5-5")).toEqual([]);
+  });
+  it("modelo que saiu da lista: tenta todos os outros", () => {
+    expect(alvosDepoisDe(lista, "gemini:gemini-3.8-flash")).toHaveLength(3);
   });
 });

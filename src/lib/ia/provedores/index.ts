@@ -1,6 +1,6 @@
 import "server-only";
 import { provedorAnthropic } from "./anthropic";
-import { alvosDoUso, esforcoDoUso, type UsoIA } from "./config";
+import { alvosDepoisDe, alvosDoUso, esforcoDoUso, type UsoIA } from "./config";
 import { provedorGemini } from "./gemini";
 import { fluxoComReserva, tentarEmOrdem } from "./reserva";
 import type { EstadoLote, Fluxo, MensagemConversa, NomeProvedor, PedidoEstruturado, Provedor, RespostaEstruturada } from "./tipos";
@@ -27,11 +27,18 @@ export function conversar(params: { sistema: string; historico: MensagemConversa
 /**
  * Envia um pedido em lote. Devolve o id a gravar ("provedor:id") e o modelo
  * escolhido. Se o envio falhar (ex.: material grande demais), tenta o próximo.
+ * `depoisDe`: reenvio de um lote que falhou; só tenta os modelos seguintes a ele.
  */
-export function enviarLote<T>(uso: UsoIA, pedido: Omit<PedidoEstruturado<T>, "esforco">, referencia: string) {
+export function enviarLote<T>(
+  uso: UsoIA,
+  pedido: Omit<PedidoEstruturado<T>, "esforco">,
+  referencia: string,
+  opcoes: { depoisDe?: string } = {},
+) {
   const esforco = esforcoDoUso(uso);
+  const alvos = opcoes.depoisDe ? alvosDepoisDe(alvosDoUso(uso), opcoes.depoisDe) : alvosDoUso(uso);
   return tentarEmOrdem(
-    alvosDoUso(uso),
+    alvos,
     async (alvo) => {
       const id = await PROVEDORES[alvo.provedor].enviarLote(alvo.modelo, { ...pedido, esforco }, referencia);
       return { idLote: `${alvo.provedor}:${id}`, modelo: `${alvo.provedor}:${alvo.modelo}` };
