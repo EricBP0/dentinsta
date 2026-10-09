@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export type ItemMenu = { href: string; texto: string };
+export type ItemMenu = { href: string; texto: string; aviso?: number };
 
 /** Menu com o item da página atual destacado. Rola na horizontal no celular. */
 export function Navegacao({ itens, escuro = false }: { itens: ItemMenu[]; escuro?: boolean }) {
@@ -33,6 +33,16 @@ export function Navegacao({ itens, escuro = false }: { itens: ItemMenu[]; escuro
             }`}
           >
             {item.texto}
+            {Boolean(item.aviso) && (
+              <span
+                aria-label={`${item.aviso} ${item.aviso === 1 ? "novidade" : "novidades"}`}
+                className={`ml-1.5 inline-flex min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] leading-5 font-bold ${
+                  escuro ? "bg-white text-tinta" : "bg-lima text-tinta"
+                }`}
+              >
+                {item.aviso! > 99 ? "99+" : item.aviso}
+              </span>
+            )}
           </Link>
         );
       })}
