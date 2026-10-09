@@ -1,9 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { paraData, situacaoItem, type Acesso, type SituacaoItem } from "@/lib/acesso";
+import { acessoDasAssinaturas, COLUNAS_ASSINATURA, situacaoItem, type Acesso, type AssinaturaRow, type SituacaoItem } from "@/lib/acesso";
 import { progressoObrigatorio, type ProgressoObrigatorio } from "@/lib/certificado/regra";
 import {
   COLUNAS_ITEM,
-  type AcessoRow,
   type Disciplina,
   type Item,
   type Modulo,
@@ -15,23 +14,25 @@ export type ModuloCatalogo = Modulo & { itens: ItemCatalogo[] };
 export type DisciplinaCatalogo = Disciplina & {
   modulos: ModuloCatalogo[];
   progresso: ProgressoObrigatorio;
-  /** "liberada": tem algo para abrir. "renove": tudo bloqueado pela janela. */
-  situacao: "em_breve" | "liberada" | "renove" | "sem_acesso";
+  /** "liberada": tem algo para abrir. "bloqueada": o plano não inclui nada dela. */
+  situacao: "em_breve" | "liberada" | "bloqueada" | "sem_acesso";
 };
 
+/** Assinatura válida do usuário (como titular ou convidado do Duplo), ou null. */
 export async function carregarAcesso(supabase: SupabaseClient, perfil: Perfil): Promise<Acesso | null> {
   const { data } = await supabase
-    .from("acessos")
-    .select("usuario_id, compra_em, novidades_ate, ia_ate")
-    .eq("usuario_id", perfil.id)
-    .maybeSingle<AcessoRow>();
-  if (!data) return null;
-  return { novidadesAte: new Date(data.novidades_ate), iaAte: new Date(data.ia_ate) };
+    .from("assinaturas")
+    .select(COLUNAS_ASSINATURA)
+    .or(`usuario_id.eq.${perfil.id},convidado_id.eq.${perfil.id}`)
+    .in("status", ["ativa", "cancelada"])
+    .gte("ativa_ate", new Date().toISOString())
+    .overrideTypes<AssinaturaRow[], { merge: false }>();
+  return acessoDasAssinaturas(data ?? [], perfil.id);
 }
 
 /**
  * Monta o catálogo do aluno. O RLS já filtra o que está publicado; aqui só
- * calculamos o cadeado ("renove") e o progresso. Filtre por slug para uma disciplina.
+ * calculamos o cadeado (o plano inclui o item?) e o progresso. Filtre por slug para uma disciplina.
  */
 export async function carregarCatalogo(
   supabase: SupabaseClient,
@@ -74,15 +75,7 @@ export async function carregarCatalogo(
       itens: (modulo.itens ?? []).map((item) => ({
         ...item,
         concluido: concluidos.has(item.id),
-        situacao: situacaoItem({
-          acesso,
-          equipe,
-          datas: {
-            item: paraData(item.primeira_publicacao_em),
-            modulo: paraData(modulo.primeira_publicacao_em),
-            disciplina: paraData(disciplina.primeira_publicacao_em),
-          },
-        }),
+        situacao: situacaoItem({ acesso, equipe, tipo: item.tipo }),
       })),
     }));
 
@@ -99,7 +92,7 @@ export async function carregarCatalogo(
     let situacao: DisciplinaCatalogo["situacao"];
     if (disciplina.status === "em_breve") situacao = "em_breve";
     else if (!acesso && !equipe) situacao = "sem_acesso";
-    else if (todosItens.length > 0 && todosItens.every((i) => i.situacao === "renove")) situacao = "renove";
+    else if (todosItens.length > 0 && todosItens.every((i) => i.situacao === "bloqueado")) situacao = "bloqueada";
     else situacao = "liberada";
 
     return {

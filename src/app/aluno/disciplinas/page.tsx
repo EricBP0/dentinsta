@@ -1,12 +1,12 @@
 import { LayoutList, Rows3 } from "lucide-react";
 import Link from "next/link";
-import { BarraProgresso, BotaoRenovar } from "@/components/cadeado";
+import { BarraProgresso, BotaoPlano, hrefDoPlano, SeloPlano } from "@/components/cadeado";
+import { moduloDoItem } from "@/lib/acesso";
 import { Carrossel } from "@/components/catalogo/carrossel";
 import { ThumbConteudo } from "@/components/catalogo/thumb-conteudo";
 import { SurgirItem, SurgirLista } from "@/components/movimento";
-import { iaAtiva } from "@/lib/acesso";
 import { exigirLogin } from "@/lib/auth";
-import { carregarCatalogo, formatarData, type DisciplinaCatalogo } from "@/lib/catalogo";
+import { carregarCatalogo, type DisciplinaCatalogo } from "@/lib/catalogo";
 import { correspondeBusca, lerPagina, montarQuery, paginar, textoParam } from "@/lib/listagem";
 import { thumbDaDisciplina } from "@/lib/thumbs";
 import { NOME_TIPO_ITEM, type TipoItem } from "@/lib/tipos";
@@ -61,10 +61,10 @@ export default async function Catalogo({ searchParams }: PageProps<"/aluno/disci
     (a, b) => a - b,
   );
 
-  const itensBloqueados = disciplinas
+  // Hoje só os decks de flashcards podem ficar fora do plano.
+  const decksBloqueados = disciplinas
     .flatMap((d) => d.modulos.flatMap((m) => m.itens))
-    .filter((i) => i.situacao === "renove").length;
-  const disciplinasBloqueadas = disciplinas.filter((d) => d.situacao === "renove").length;
+    .filter((i) => i.situacao === "bloqueado").length;
 
   return (
     <div className="space-y-8">
@@ -79,23 +79,16 @@ export default async function Catalogo({ searchParams }: PageProps<"/aluno/disci
 
         {acesso && (
           <div className="flex flex-wrap gap-3 text-sm">
-            {iaAtiva(acesso) ? (
-              <span className="rounded-full border-2 border-tinta bg-lima px-3 py-1 font-semibold text-tinta">
-                Novidades e IA liberadas até {formatarData(acesso.novidadesAte)}
-              </span>
-            ) : (
-              <BotaoRenovar texto="Renove para usar a IA" />
-            )}
+            <SeloPlano acesso={acesso} />
           </div>
         )}
 
-        {itensBloqueados > 0 && (
+        {acesso && decksBloqueados > 0 && (
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-tinta bg-amber-50 p-4 text-sm text-amber-900">
             <span>
-              {itensBloqueados} {itensBloqueados === 1 ? "novo conteúdo" : "novos conteúdos"}
-              {disciplinasBloqueadas > 0 && ` e ${disciplinasBloqueadas} ${disciplinasBloqueadas === 1 ? "disciplina" : "disciplinas"}`} desde o seu acesso.
+              {decksBloqueados} {decksBloqueados === 1 ? "deck de flashcards está" : "decks de flashcards estão"} fora do seu plano.
             </span>
-            <BotaoRenovar />
+            <BotaoPlano modulo="flashcards" texto="Somar os Flashcards" />
           </div>
         )}
       </section>
@@ -222,8 +215,8 @@ export default async function Catalogo({ searchParams }: PageProps<"/aluno/disci
                         href={
                           item.situacao === "liberado"
                             ? `/aluno/itens/${item.id}`
-                            : item.situacao === "renove"
-                              ? "/renovar"
+                            : item.situacao === "bloqueado"
+                              ? hrefDoPlano(moduloDoItem(item.tipo))
                               : "/assinar"
                         }
                       />
@@ -249,7 +242,7 @@ function AcaoDisciplina({ d }: { d: DisciplinaCatalogo }) {
       </Link>
     );
   if (d.situacao === "em_breve") return <span className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700">Em breve</span>;
-  if (d.situacao === "renove") return <BotaoRenovar />;
+  if (d.situacao === "bloqueada") return <BotaoPlano />;
   return (
     <Link href="/assinar" className="text-sm font-medium text-violeta-700 underline">
       Liberar acesso

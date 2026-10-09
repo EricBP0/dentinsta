@@ -1,7 +1,7 @@
-import { MessageCircle, Plus, Sparkles } from "lucide-react";
+import { MessageCircle, Plus } from "lucide-react";
 import Link from "next/link";
-import { BotaoRenovar } from "@/components/cadeado";
-import { podeCorrigirComIa } from "@/lib/acesso";
+import { AreaBloqueada } from "@/components/cadeado";
+import { temModulo } from "@/lib/acesso";
 import { exigirLogin } from "@/lib/auth";
 import { carregarAcesso } from "@/lib/catalogo";
 import { limiteDiarioChat } from "@/lib/ia/chat";
@@ -16,27 +16,8 @@ type Mensagem = { id: string; papel: "user" | "assistant"; conteudo: string };
 export default async function PaginaChat({ searchParams }: PageProps<"/aluno/chat">) {
   const { supabase, perfil } = await exigirLogin();
   const acesso = await carregarAcesso(supabase, perfil);
-  const liberado = podeCorrigirComIa(acesso, perfil.papel !== "aluno");
-
-  if (!liberado) {
-    return (
-      <div className="mx-auto max-w-xl space-y-4 rounded-2xl border-2 border-tinta bg-white p-8 text-center">
-        <div className="mx-auto grid size-12 place-items-center rounded-xl bg-violeta-50 text-violeta-700">
-          <Sparkles className="size-6" />
-        </div>
-        <h1 className="text-xl font-bold text-tinta">Tire dúvidas com a IA</h1>
-        <p className="text-slate-600">
-          Pergunte qualquer coisa de Odontologia e receba uma explicação na hora. O chat faz parte da IA da plataforma.
-        </p>
-        {acesso ? (
-          <BotaoRenovar texto="Renove para usar o chat" />
-        ) : (
-          <Link href="/assinar" className="font-medium text-violeta-700 underline">
-            Liberar acesso
-          </Link>
-        )}
-      </div>
-    );
+  if (!temModulo(acesso, "chat", perfil.papel !== "aluno")) {
+    return <AreaBloqueada modulo="chat" temAssinatura={Boolean(acesso)} />;
   }
 
   const { c } = await searchParams;

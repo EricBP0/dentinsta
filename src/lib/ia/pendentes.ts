@@ -1,5 +1,5 @@
 import "server-only";
-import { podeCorrigirComIa } from "@/lib/acesso";
+import { acessoDasAssinaturas, COLUNAS_ASSINATURA, temModulo, type AssinaturaRow } from "@/lib/acesso";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
 import type { Papel } from "@/lib/tipos";
 import { cotaMensal, inicioDoMes } from "./cota";
@@ -41,18 +41,19 @@ export async function corrigirPendentes(simuladoId: string) {
   if (!respostas?.length) return;
 
   const usuarioId = respostas[0].usuario_id;
-  const [{ data: acesso }, { data: perfil }] = await Promise.all([
+  const [{ data: assinaturas }, { data: perfil }] = await Promise.all([
     admin
-      .from("acessos")
-      .select("novidades_ate, ia_ate")
-      .eq("usuario_id", usuarioId)
-      .maybeSingle<{ novidades_ate: string; ia_ate: string }>(),
+      .from("assinaturas")
+      .select(COLUNAS_ASSINATURA)
+      .or(`usuario_id.eq.${usuarioId},convidado_id.eq.${usuarioId}`)
+      .overrideTypes<AssinaturaRow[], { merge: false }>(),
     admin.from("perfis").select("papel").eq("id", usuarioId).maybeSingle<{ papel: Papel }>(),
   ]);
-  // A equipe (admin e professor) testa os simulados sem ter comprado: libera a IA
-  // como já acontece com o conteúdo. A cota mensal continua valendo.
-  const iaAtiva = podeCorrigirComIa(
-    acesso && { novidadesAte: new Date(acesso.novidades_ate), iaAte: new Date(acesso.ia_ate) },
+  // A correção por IA vem com o módulo Simulados. A equipe (admin e professor)
+  // testa sem assinar; a cota mensal continua valendo para todos.
+  const iaAtiva = temModulo(
+    acessoDasAssinaturas(assinaturas ?? [], usuarioId),
+    "simulados",
     (perfil?.papel ?? "aluno") !== "aluno",
   );
 

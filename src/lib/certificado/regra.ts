@@ -1,5 +1,6 @@
 // Certificado: 100% dos itens obrigatórios concluídos (docs/PLANEJAMENTO.md, seção 3).
-// Itens bloqueados ("renove") não contam — senão o aluno nunca completaria.
+// Itens fora do plano (ex.: deck de flashcards sem o módulo) não contam — senão o
+// aluno nunca completaria.
 
 export type ItemParaCertificado = {
   id: string;

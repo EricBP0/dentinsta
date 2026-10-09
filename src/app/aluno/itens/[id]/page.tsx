@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BotaoRenovar } from "@/components/cadeado";
+import { BotaoPlano } from "@/components/cadeado";
+import { moduloDoItem } from "@/lib/acesso";
 import { ResumoEstruturado } from "@/components/resumo/resumo-estruturado";
 import { SessaoEstudo } from "@/app/aluno/flashcards/sessao-estudo";
 import { exigirLogin } from "@/lib/auth";
@@ -30,7 +31,7 @@ export default async function PaginaItem({ params }: PageProps<"/aluno/itens/[id
       .eq("item_id", id)
       .maybeSingle<{ concluido: boolean }>(),
   ]);
-  // null = item bloqueado para este aluno (a função confere a janela de acesso).
+  // null = item bloqueado para este aluno (a função confere o plano dele).
   const config = conteudo as ConfigItem | null;
   const disciplina = item.modulos.disciplinas;
   const concluido = progresso?.concluido ?? false;
@@ -59,8 +60,12 @@ export default async function PaginaItem({ params }: PageProps<"/aluno/itens/[id
         </>
       ) : (
         <div className="flex flex-col items-start gap-3 rounded-2xl border-2 border-tinta bg-amber-50 p-6 text-amber-900">
-          <p>Este conteúdo foi publicado depois do seu período de novidades.</p>
-          <BotaoRenovar />
+          <p>
+            {moduloDoItem(item.tipo) === "flashcards"
+              ? "Os flashcards não fazem parte do seu plano."
+              : "Este conteúdo é para assinantes."}
+          </p>
+          <BotaoPlano modulo={moduloDoItem(item.tipo)} texto="Ver planos" />
         </div>
       )}
     </div>

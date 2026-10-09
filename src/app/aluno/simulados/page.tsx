@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { BotaoRenovar } from "@/components/cadeado";
-import { iaAtiva } from "@/lib/acesso";
+import { AreaBloqueada } from "@/components/cadeado";
+import { temModulo } from "@/lib/acesso";
 import { exigirLogin } from "@/lib/auth";
 import { carregarCatalogo, formatarData } from "@/lib/catalogo";
 import { cotaMensal, inicioDoMes } from "@/lib/ia/cota";
@@ -44,7 +44,7 @@ export default async function Simulados() {
       return { id: d.id, nome: d.nome, temas: ((data ?? []) as { tema: string }[]).map((t) => t.tema) };
     }),
   );
-  const comIa = equipe || iaAtiva(acesso);
+  if (!temModulo(acesso, "simulados", equipe)) return <AreaBloqueada modulo="simulados" temAssinatura={Boolean(acesso)} />;
   const cota = cotaMensal();
 
   return (
@@ -54,22 +54,12 @@ export default async function Simulados() {
         titulo="Simulados"
         descricao="Monte um simulado com questões do banco da sua disciplina."
       >
-        {comIa ? (
-          <span className="rounded-full bg-tinta px-3 py-1 text-xs font-semibold text-lima">
-            Correções por IA este mês: {usadas ?? 0} de {cota}
-          </span>
-        ) : (
-          <BotaoRenovar texto="Renove para usar a IA" />
-        )}
+        <span className="rounded-full bg-tinta px-3 py-1 text-xs font-semibold text-lima">
+          Correções por IA este mês: {usadas ?? 0} de {cota}
+        </span>
       </CabecalhoPagina>
 
-      {!acesso && !equipe ? (
-        <p className="rounded-2xl border-2 border-tinta bg-violeta-50 p-4 text-sm text-violeta-900">
-          Você ainda não tem acesso. <Link href="/assinar" className="font-medium underline">Liberar acesso</Link>
-        </p>
-      ) : (
-        <NovoSimulado disciplinas={temasPorDisciplina} iaAtiva={comIa} />
-      )}
+      <NovoSimulado disciplinas={temasPorDisciplina} iaAtiva />
 
       <section>
         <h2 className="mb-3 text-lg font-extrabold tracking-tight text-tinta">Seus simulados</h2>

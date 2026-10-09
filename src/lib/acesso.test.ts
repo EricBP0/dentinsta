@@ -1,69 +1,66 @@
 import { describe, expect, it } from "vitest";
-import { calcularJanela, dataEfetivaPublicacao, iaAtiva, podeCorrigirComIa, situacaoItem } from "./acesso";
+import { acessoDasAssinaturas, situacaoItem, temModulo, type AssinaturaRow } from "./acesso";
 
-const d = (iso: string) => new Date(iso);
-const acesso = calcularJanela(d("2026-01-15T00:00:00Z")); // janela até 2027-01-15
+const agora = new Date("2026-10-10T12:00:00Z");
+const linha = (parcial: Partial<AssinaturaRow>): AssinaturaRow => ({
+  id: "a1",
+  usuario_id: "eu",
+  plano: "essencial",
+  ciclo: "mensal",
+  modulos: ["disciplinas"],
+  status: "ativa",
+  periodo_ate: "2026-11-01T00:00:00Z",
+  ativa_ate: "2026-11-04T00:00:00Z",
+  origem: "asaas",
+  ...parcial,
+});
 
-describe("calcularJanela", () => {
-  it("dá 12 meses de novidades e de IA", () => {
-    expect(acesso.novidadesAte.toISOString()).toBe("2027-01-15T00:00:00.000Z");
-    expect(acesso.iaAte.toISOString()).toBe("2027-01-15T00:00:00.000Z");
+describe("acessoDasAssinaturas", () => {
+  it("sem assinatura válida não há acesso", () => {
+    expect(acessoDasAssinaturas([], "eu", agora)).toBeNull();
+    expect(acessoDasAssinaturas([linha({ ativa_ate: "2026-10-01T00:00:00Z" })], "eu", agora)).toBeNull();
+    expect(acessoDasAssinaturas([linha({ status: "pendente" })], "eu", agora)).toBeNull();
+    expect(acessoDasAssinaturas([linha({ status: "encerrada" })], "eu", agora)).toBeNull();
+  });
+  it("cancelada continua valendo até o fim do período", () => {
+    expect(acessoDasAssinaturas([linha({ status: "cancelada" })], "eu", agora)?.status).toBe("cancelada");
+  });
+  it("convidado do Duplo não é titular", () => {
+    const acesso = acessoDasAssinaturas(
+      [linha({ usuario_id: "titular", plano: "duplo", modulos: ["disciplinas", "simulados", "flashcards", "chat", "consultorio"] })],
+      "eu",
+      agora,
+    );
+    expect(acesso?.titular).toBe(false);
+    expect(acesso?.modulos).toHaveLength(5);
+  });
+  it("soma os módulos de mais de uma assinatura válida", () => {
+    const acesso = acessoDasAssinaturas(
+      [linha({ modulos: ["disciplinas", "chat"] }), linha({ id: "a2", modulos: ["disciplinas", "simulados"], ativa_ate: "2026-12-01T00:00:00Z" })],
+      "eu",
+      agora,
+    );
+    expect(acesso?.assinaturaId).toBe("a2");
+    expect(acesso?.modulos).toEqual(["disciplinas", "simulados", "chat"]);
   });
 });
 
-describe("dataEfetivaPublicacao", () => {
-  it("usa a publicação mais tardia entre item, módulo e disciplina", () => {
-    expect(
-      dataEfetivaPublicacao({
-        item: d("2026-01-01"),
-        modulo: d("2027-03-01"),
-        disciplina: d("2025-06-01"),
-      }),
-    ).toEqual(d("2027-03-01"));
+describe("temModulo e situacaoItem", () => {
+  const essencial = acessoDasAssinaturas([linha({ modulos: ["disciplinas", "chat"] })], "eu", agora);
+  it("libera só o que o plano tem", () => {
+    expect(temModulo(essencial, "chat", false, agora)).toBe(true);
+    expect(temModulo(essencial, "simulados", false, agora)).toBe(false);
   });
-});
-
-describe("situacaoItem", () => {
-  const antigo = { item: d("2025-05-01"), modulo: d("2025-05-01"), disciplina: d("2025-05-01") };
-  const dentro = { item: d("2026-12-01"), modulo: d("2025-05-01"), disciplina: d("2025-05-01") };
-  const depois = { item: d("2027-02-01"), modulo: d("2025-05-01"), disciplina: d("2025-05-01") };
-
-  it("libera conteúdo anterior à compra", () => {
-    expect(situacaoItem({ acesso, datas: antigo })).toBe("liberado");
+  it("vence junto com a assinatura", () => {
+    expect(temModulo(essencial, "chat", false, new Date("2026-11-05T00:00:00Z"))).toBe(false);
   });
-  it("libera conteúdo publicado dentro da janela", () => {
-    expect(situacaoItem({ acesso, datas: dentro })).toBe("liberado");
+  it("equipe usa tudo", () => {
+    expect(temModulo(null, "consultorio", true)).toBe(true);
+    expect(situacaoItem({ acesso: null, tipo: "flashcards", equipe: true })).toBe("liberado");
   });
-  it("pede renovação para conteúdo publicado depois da janela", () => {
-    expect(situacaoItem({ acesso, datas: depois })).toBe("renove");
-  });
-  it("bloqueia módulo novo dentro de disciplina antiga", () => {
-    const moduloNovo = { item: d("2025-05-01"), modulo: d("2027-02-01"), disciplina: d("2025-05-01") };
-    expect(situacaoItem({ acesso, datas: moduloNovo })).toBe("renove");
-  });
-  it("sem compra não libera nada", () => {
-    expect(situacaoItem({ acesso: null, datas: antigo })).toBe("sem_acesso");
-  });
-  it("equipe vê tudo", () => {
-    expect(situacaoItem({ acesso: null, datas: depois, equipe: true })).toBe("liberado");
-  });
-});
-
-describe("iaAtiva", () => {
-  it("fica ativa durante a janela e para depois", () => {
-    expect(iaAtiva(acesso, d("2026-06-01"))).toBe(true);
-    expect(iaAtiva(acesso, d("2027-01-16"))).toBe(false);
-    expect(iaAtiva(null, d("2026-06-01"))).toBe(false);
-  });
-});
-
-describe("podeCorrigirComIa", () => {
-  it("equipe corrige mesmo sem compra", () => {
-    expect(podeCorrigirComIa(null, true, d("2026-06-01"))).toBe(true);
-  });
-  it("aluno segue a janela da IA", () => {
-    expect(podeCorrigirComIa(acesso, false, d("2026-06-01"))).toBe(true);
-    expect(podeCorrigirComIa(acesso, false, d("2027-01-16"))).toBe(false);
-    expect(podeCorrigirComIa(null, false, d("2026-06-01"))).toBe(false);
+  it("flashcards dependem do módulo; o resto, de Disciplinas", () => {
+    expect(situacaoItem({ acesso: essencial, tipo: "video" })).toBe("liberado");
+    expect(situacaoItem({ acesso: essencial, tipo: "flashcards" })).toBe("bloqueado");
+    expect(situacaoItem({ acesso: null, tipo: "video" })).toBe("sem_acesso");
   });
 });

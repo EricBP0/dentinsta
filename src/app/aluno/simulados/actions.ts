@@ -9,9 +9,8 @@ import { corrigirPendentes } from "@/lib/ia/pendentes";
 export type EstadoSimulado = { erro?: string };
 
 const MENSAGENS: Record<string, string> = {
-  "sem acesso": "Você ainda não tem acesso ao conteúdo.",
+  "sem acesso": "Os simulados não fazem parte do seu plano.",
   "disciplina indisponível": "Esta disciplina não está disponível para você.",
-  "renove para usar a IA": "Questões discursivas usam a IA. Renove para liberar.",
   "nenhuma questão encontrada com esses filtros": "Nenhuma questão encontrada com esses filtros. Tente outros.",
 };
 
