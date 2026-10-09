@@ -41,7 +41,21 @@ function servidorGemini(req: http.IncomingMessage, res: http.ServerResponse, cor
   }
   if (url.includes(":batchGenerateContent")) {
     res.writeHead(200, { "content-type": "application/json" });
-    return res.end(JSON.stringify({ name: "batches/lote1", metadata: { state: "BATCH_STATE_PENDING" } }));
+    const nome = textoDo(corpo).includes("FALHAR_NO_LOTE") ? "batches/lote2" : "batches/lote1";
+    return res.end(JSON.stringify({ name: nome, metadata: { state: "BATCH_STATE_PENDING" } }));
+  }
+  if (url.includes("/batches/lote2")) {
+    // Como aconteceu em produção: o lote "termina", mas o item vem com erro.
+    res.writeHead(200, { "content-type": "application/json" });
+    return res.end(
+      JSON.stringify({
+        name: "batches/lote2",
+        metadata: {
+          state: "BATCH_STATE_SUCCEEDED",
+          output: { inlinedResponses: { inlinedResponses: [{ error: { code: 400, message: "Request contains an invalid argument." } }] } },
+        },
+      }),
+    );
   }
   if (url.includes("/batches/lote1")) {
     res.writeHead(200, { "content-type": "application/json" });
@@ -154,7 +168,9 @@ describe("Gemini como principal", () => {
     expect({ idLote, modelo }).toEqual({ idLote: "gemini:batches/lote1", modelo: "gemini:gemini-3.6-flash" });
     const pedido = ultimaDo(":batchGenerateContent").corpo;
     expect(textoDo(pedido)).toContain("application/pdf");
-    expect(textoDo(pedido)).toContain("MEDIUM");
+    expect(textoDo(pedido)).toContain("responseJsonSchema");
+    // O lote do Gemini recusa thinkingConfig: não vai no pedido.
+    expect(textoDo(pedido)).not.toContain("thinkingConfig");
     expect(await ia.consultarLote(idLote, "g1")).toMatchObject({ terminado: true, texto: JSON_OK, modelo: "gemini-3.6-flash" });
   });
 });
@@ -178,6 +194,19 @@ describe("Claude de reserva", () => {
     for await (const p of fluxo.pedacos) texto += p;
     expect(texto).toBe("Resposta do Claude");
     expect((await fluxo.fim).modelo).toBe("claude-opus-5-5");
+  });
+
+  it("lote com erro no item: vira erro, e o reenvio vai para o Claude", async () => {
+    const pedido = { sistema: "Gere", partes: [{ tipo: "texto" as const, texto: "FALHAR_NO_LOTE" }], schema, maxTokens: 32000 };
+    const enviado = await ia.enviarLote("geracao", pedido, "g2");
+    expect(enviado.idLote).toBe("gemini:batches/lote2");
+    expect(await ia.consultarLote(enviado.idLote, "g2")).toEqual({ terminado: true, erro: "Request contains an invalid argument." });
+
+    const antes = chamadas.length;
+    const reserva = await ia.enviarLote("geracao", pedido, "g2", { depoisDe: enviado.modelo });
+    // Só a Anthropic recebeu o reenvio (o Gemini, que falhou, fica de fora).
+    expect(chamadas.slice(antes).map((c) => c.url)).toEqual(["/v1/messages/batches"]);
+    expect(reserva.modelo).toBe("anthropic:claude-opus-5-5");
   });
 
   it("lotes antigos (id sem provedor) continuam sendo lidos na Anthropic", async () => {

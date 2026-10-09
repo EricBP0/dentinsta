@@ -66,11 +66,16 @@ function partes(lista: Parte[]): Part[] {
   });
 }
 
-function configuracao(sistema: string, esforco: Esforco, maxTokens: number, schema?: z.ZodType): GenerateContentConfig {
+function configuracao(
+  sistema: string,
+  esforco: Esforco | null,
+  maxTokens: number,
+  schema?: z.ZodType,
+): GenerateContentConfig {
   return {
     systemInstruction: sistema,
     maxOutputTokens: maxTokens,
-    thinkingConfig: { thinkingLevel: NIVEL[esforco] },
+    ...(esforco && { thinkingConfig: { thinkingLevel: NIVEL[esforco] } }),
     safetySettings: SEGURANCA,
     ...(schema && { responseMimeType: "application/json", responseJsonSchema: schemaParaGemini(schema) }),
   };
@@ -173,7 +178,9 @@ export const provedorGemini: Provedor = {
       src: [
         {
           contents,
-          config: configuracao(pedido.sistema, pedido.esforco, pedido.maxTokens, pedido.schema),
+          // Sem thinkingConfig: o lote do Gemini já recusou esse campo
+          // (github.com/googleapis/python-genai/issues/1103). O padrão é "medium".
+          config: configuracao(pedido.sistema, null, pedido.maxTokens, pedido.schema),
           metadata: { referencia },
         },
       ],

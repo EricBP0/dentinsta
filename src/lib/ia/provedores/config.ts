@@ -60,6 +60,16 @@ export function alvosDoUso(
   return alvos.filter((a) => comChave[a.provedor]);
 }
 
+/**
+ * Os modelos da lista que vêm depois de `usado` ("gemini:gemini-3.6-flash", ou
+ * só o nome do modelo nos registros antigos): a reserva de um lote que falhou.
+ */
+export function alvosDepoisDe(alvos: Alvo[], usado: string): Alvo[] {
+  const igual = (a: Alvo) => `${a.provedor}:${a.modelo}` === usado || a.modelo === usado;
+  const posicao = alvos.findIndex(igual);
+  return posicao >= 0 ? alvos.slice(posicao + 1) : alvos.filter((a) => !igual(a));
+}
+
 const EFFORTS: Esforco[] = ["low", "medium", "high", "xhigh", "max"];
 
 /** Quanto a IA "pensa" antes de responder (mais esforço = mais tokens cobrados). */
