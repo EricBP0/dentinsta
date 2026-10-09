@@ -11,8 +11,8 @@ const campo =
 
 export function FormularioFeedback() {
   const [estado, acao, enviando] = useActionState<EstadoFeedback, FormData>(enviarFeedback, {});
-  // Depois de enviar, a chave nova limpa o formulário.
-  return <Campos key={estado.enviado ?? 0} estado={estado} acao={acao} enviando={enviando} />;
+  // Depois de enviar, a action abre a conversa nova.
+  return <Campos estado={estado} acao={acao} enviando={enviando} />;
 }
 
 function Campos({ estado, acao, enviando }: { estado: EstadoFeedback; acao: (f: FormData) => void; enviando: boolean }) {
@@ -22,7 +22,7 @@ function Campos({ estado, acao, enviando }: { estado: EstadoFeedback; acao: (f: 
       <div className="space-y-1">
         <h2 className="font-extrabold tracking-tight text-tinta">Mande seu feedback</h2>
         <p className="text-sm text-slate-600">
-          Sugestões, erros que encontrou, pedidos de conteúdo ou elogios. A equipe lê tudo e responde por aqui.
+          Sugestões, erros que encontrou, pedidos de conteúdo ou elogios. Vira uma conversa: a equipe responde e você pode responder de volta.
         </p>
       </div>
       <label className="block space-y-1">
@@ -52,9 +52,6 @@ function Campos({ estado, acao, enviando }: { estado: EstadoFeedback; acao: (f: 
         </span>
       </label>
       {estado.erro && <p className="rounded-xl bg-red-50 p-3 text-sm text-red-800">{estado.erro}</p>}
-      {estado.enviado && !estado.erro && (
-        <p className="rounded-xl bg-violeta-50 p-3 text-sm text-violeta-900">Recebemos seu feedback. Obrigado!</p>
-      )}
       <button disabled={enviando} className={botaoEscuro}>
         <Send className="size-4" /> {enviando ? "Enviando…" : "Enviar feedback"}
       </button>
