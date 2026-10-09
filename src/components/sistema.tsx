@@ -118,3 +118,25 @@ export function Indicador({
     </div>
   );
 }
+
+/**
+ * Esqueleto mostrado na hora em que o usuário troca de página (loading.tsx),
+ * enquanto o servidor monta a página nova. Sem ele o clique parece não
+ * responder até tudo carregar.
+ */
+export function PaginaCarregando({ tom = "violeta" }: { tom?: "violeta" | "tinta" }) {
+  return (
+    <div className="space-y-8" aria-busy="true" aria-live="polite">
+      <span className="sr-only">Carregando…</span>
+      <div
+        className={`${tom === "violeta" ? "grade-violeta" : "grade-tinta"} h-36 animate-pulse rounded-3xl border-2 border-tinta sm:h-40`}
+      />
+      <div className="grid gap-4 md:grid-cols-3">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="h-28 animate-pulse rounded-2xl border-2 border-tinta/20 bg-white/70" />
+        ))}
+      </div>
+      <div className="h-64 animate-pulse rounded-2xl border-2 border-tinta/20 bg-white/70" />
+    </div>
+  );
+}
