@@ -19,6 +19,7 @@ import {
   type DesempenhoTema,
 } from "@/lib/painel";
 import { NOME_TIPO_ITEM } from "@/lib/tipos";
+import { PaginadoLocal } from "@/components/paginado-local";
 import { CabecalhoPagina } from "@/components/sistema";
 
 type SimuladoFeito = { id: string; nota: number; finalizado_em: string; disciplinas: { nome: string } };
@@ -132,6 +133,8 @@ export default async function Painel() {
   const flashcardsHoje = resumoFlashcards.reduce((s, r) => s + r.vencidos, 0);
   const reforcar = temasParaReforcar(
     ((temas ?? []) as DesempenhoTema[]).map((t) => ({ ...t, respondidas: Number(t.respondidas), media: Number(t.media) })),
+    3,
+    Infinity,
   );
   const liberadas = disciplinas.filter((d) => d.situacao === "liberada");
   const concluidas = liberadas.filter((d) => d.progresso.completo);
@@ -314,7 +317,7 @@ export default async function Painel() {
           <h2 className="font-extrabold tracking-tight text-tinta">Onde reforçar</h2>
           <p className="mb-4 text-xs text-slate-500">Temas com menor média nos últimos 90 dias (mínimo de 3 questões)</p>
           {reforcar.length ? (
-            <ul className="space-y-4">
+            <PaginadoLocal porPagina={5} rotulo="onde reforçar" className="space-y-4">
               {reforcar.map((t) => (
                 <li key={`${t.disciplina}-${t.tema}`} className="space-y-1.5">
                   <div className="flex items-baseline justify-between gap-3 text-sm">
@@ -333,7 +336,7 @@ export default async function Painel() {
                   </p>
                 </li>
               ))}
-            </ul>
+            </PaginadoLocal>
           ) : (
             <p className="rounded-xl bg-slate-50 p-6 text-center text-sm text-slate-500">
               Responda mais questões nos simulados para descobrir seus pontos fracos.
@@ -349,7 +352,7 @@ export default async function Painel() {
           <h2 className="font-extrabold tracking-tight text-tinta">Progresso e certificados</h2>
           <p className="mb-4 text-xs text-slate-500">Conclua os itens obrigatórios para ganhar o certificado</p>
           {liberadas.length ? (
-            <ul className="space-y-4">
+            <PaginadoLocal porPagina={5} rotulo="progresso das disciplinas" className="space-y-4">
               {liberadas.map((d) => (
                 <li key={d.id}>
                   <Link href={`/aluno/disciplinas/${d.slug}`} className="block space-y-1.5">
@@ -365,7 +368,7 @@ export default async function Painel() {
                   </Link>
                 </li>
               ))}
-            </ul>
+            </PaginadoLocal>
           ) : (
             <p className="rounded-xl bg-slate-50 p-6 text-center text-sm text-slate-500">Nenhuma disciplina liberada ainda.</p>
           )}

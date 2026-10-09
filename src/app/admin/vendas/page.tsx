@@ -1,5 +1,7 @@
-import { botaoPerigo, botaoPrimario, botaoSecundario, campo, Selo } from "@/components/admin-ui";
+import { botaoPerigo, botaoPrimario, campo, Selo } from "@/components/admin-ui";
 import { exigirAdmin } from "@/lib/auth";
+import { faixa, lerPagina, termoIlike, textoParam, totalDePaginas } from "@/lib/listagem";
+import { BarraBusca, FiltroSelect, Paginacao, ResumoLista } from "@/components/listagem";
 import { formatarData } from "@/lib/catalogo";
 import { inicioDoMes } from "@/lib/ia/cota";
 import { formatarReais } from "@/lib/preco";
@@ -35,20 +37,55 @@ const SELO_STATUS: Record<string, string> = {
   expirado: "rascunho",
 };
 
-export default async function Vendas({ searchParams }: PageProps<"/admin/vendas">) {
-  const { status, busca, aviso } = await searchParams;
-  const { supabase } = await exigirAdmin();
-  const filtroStatus = typeof status === "string" && status ? status : null;
-  const termo = typeof busca === "string" ? busca.trim() : "";
+const STATUS_COMPRA: [string, string][] = [
+  ["pago", "Pagos"],
+  ["pendente", "Pendentes"],
+  ["reembolsado", "Reembolsados"],
+  ["contestado", "Chargeback"],
+  ["cancelado", "Cancelados"],
+  ["expirado", "Expirados"],
+];
+const POR_PAGINA = 20;
+const ALUNOS_POR_PAGINA = 10;
 
+export default async function Vendas({ searchParams }: PageProps<"/admin/vendas">) {
+  const params = await searchParams;
+  const { aviso } = params;
+  const { supabase } = await exigirAdmin();
+  // Pagamentos: q, status, tipo, pagina. Alunos: busca, palunos.
+  const buscaPagamento = textoParam(params.q);
+  const filtroStatus = STATUS_COMPRA.some(([v]) => v === textoParam(params.status)) ? textoParam(params.status) : "";
+  const filtroTipo = ["compra", "renovacao"].includes(textoParam(params.tipo)) ? textoParam(params.tipo) : "";
+  const paginaAtual = lerPagina(params.pagina);
+  const buscaAluno = textoParam(params.busca);
+  const termo = termoIlike(buscaAluno);
+  const paginaAlunos = lerPagina(params.palunos);
+  const termoPagamento = termoIlike(buscaPagamento);
+
+  // Com busca, o join com perfis vira "inner" para filtrar pelo aluno.
   let consulta = supabase
     .from("compras")
-    .select("id, tipo, modalidade, parcelas, valor_total_centavos, status, criado_em, pago_em, perfis(nome, email)")
+    .select(
+      `id, tipo, modalidade, parcelas, valor_total_centavos, status, criado_em, pago_em, perfis${termoPagamento ? "!inner" : ""}(nome, email)`,
+      { count: "exact" },
+    )
     .order("criado_em", { ascending: false })
-    .limit(100);
+    .range(...faixa(paginaAtual, POR_PAGINA));
   if (filtroStatus) consulta = consulta.eq("status", filtroStatus);
+  if (filtroTipo) consulta = consulta.eq("tipo", filtroTipo);
+  if (termoPagamento)
+    consulta = consulta.or(`nome.ilike.%${termoPagamento}%,email.ilike.%${termoPagamento}%`, { referencedTable: "perfis" });
 
-  const [{ data: compras }, { data: pagasMes }, { count: totalAlunos }, { count: comAcesso }, { data: alunos }] =
+  const filtrosPagamentos = { q: buscaPagamento, status: filtroStatus, tipo: filtroTipo };
+  const filtrosAlunos = { busca: buscaAluno, palunos: paginaAlunos > 1 ? paginaAlunos : null };
+
+  const [
+    { data: compras, count: totalCompras },
+    { data: pagasMes },
+    { count: totalAlunos },
+    { count: comAcesso },
+    { data: alunos, count: alunosEncontrados },
+  ] =
     await Promise.all([
       consulta.overrideTypes<Compra[], { merge: false }>(),
       supabase
@@ -62,11 +99,12 @@ export default async function Vendas({ searchParams }: PageProps<"/admin/vendas"
       termo
         ? supabase
             .from("perfis")
-            .select("id, nome, email, criado_em, acessos(novidades_ate, origem)")
-            .or(`email.ilike.%${termo.replace(/[%,()]/g, "")}%,nome.ilike.%${termo.replace(/[%,()]/g, "")}%`)
-            .limit(20)
+            .select("id, nome, email, criado_em, acessos(novidades_ate, origem)", { count: "exact" })
+            .or(`email.ilike.%${termo}%,nome.ilike.%${termo}%`)
+            .order("nome")
+            .range(...faixa(paginaAlunos, ALUNOS_POR_PAGINA))
             .overrideTypes<Aluno[], { merge: false }>()
-        : Promise.resolve({ data: [] as Aluno[] }),
+        : Promise.resolve({ data: [] as Aluno[], count: 0 }),
     ]);
 
   const receitaMes = (pagasMes ?? []).reduce((soma, c) => soma + c.valor_total_centavos, 0);
@@ -99,11 +137,18 @@ export default async function Vendas({ searchParams }: PageProps<"/admin/vendas"
 
       <section className="space-y-3 rounded-2xl border-2 border-tinta bg-white p-5">
         <h2 className="font-extrabold tracking-tight text-tinta">Alunos</h2>
-        <form className="flex gap-2">
-          <input name="busca" defaultValue={termo} placeholder="Buscar por nome ou e-mail" className={campo} />
-          <button className={`${botaoSecundario} px-4`}>Buscar</button>
-        </form>
+        <BarraBusca
+          acao="/admin/vendas"
+          nome="busca"
+          busca={buscaAluno}
+          placeholder="Buscar aluno por nome ou e-mail"
+          manter={filtrosPagamentos}
+          limpar={Boolean(buscaAluno)}
+        />
         {termo && (alunos ?? []).length === 0 && <p className="text-sm text-slate-600">Nenhum aluno encontrado.</p>}
+        {termo && (
+          <ResumoLista pagina={paginaAlunos} porPagina={ALUNOS_POR_PAGINA} total={alunosEncontrados ?? 0} nome={["aluno", "alunos"]} />
+        )}
         <ul className="divide-y divide-slate-100">
           {(alunos ?? []).map((a) => (
             <li key={a.id} className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm">
@@ -129,6 +174,14 @@ export default async function Vendas({ searchParams }: PageProps<"/admin/vendas"
             </li>
           ))}
         </ul>
+        <Paginacao
+          acao="/admin/vendas"
+          chave="palunos"
+          pagina={paginaAlunos}
+          totalPaginas={totalDePaginas(alunosEncontrados, ALUNOS_POR_PAGINA)}
+          params={{ ...filtrosPagamentos, pagina: paginaAtual > 1 ? paginaAtual : null, busca: buscaAluno }}
+          rolar={false}
+        />
 
         <form action={liberarAcesso} className="flex flex-wrap items-end gap-2 border-t border-slate-100 pt-4">
           <label className="flex-1 space-y-1">
@@ -147,21 +200,27 @@ export default async function Vendas({ searchParams }: PageProps<"/admin/vendas"
       </section>
 
       <section className="space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="font-extrabold tracking-tight text-tinta">Pagamentos</h2>
-          <form className="flex gap-2">
-            <select name="status" defaultValue={filtroStatus ?? ""} className={`${campo} w-auto`}>
-              <option value="">Todos</option>
-              <option value="pago">Pagos</option>
-              <option value="pendente">Pendentes</option>
-              <option value="reembolsado">Reembolsados</option>
-              <option value="contestado">Chargeback</option>
-              <option value="cancelado">Cancelados</option>
-              <option value="expirado">Expirados</option>
-            </select>
-            <button className={`${botaoSecundario} px-4`}>Filtrar</button>
-          </form>
-        </div>
+        <h2 className="font-extrabold tracking-tight text-tinta">Pagamentos</h2>
+        <BarraBusca
+          acao="/admin/vendas"
+          busca={buscaPagamento}
+          placeholder="Buscar pagamento pelo aluno"
+          manter={filtrosAlunos}
+          limpar={Boolean(buscaPagamento || filtroStatus || filtroTipo)}
+        >
+          <FiltroSelect nome="status" valor={filtroStatus} rotulo="Status" todos="Todos os status" opcoes={STATUS_COMPRA} />
+          <FiltroSelect
+            nome="tipo"
+            valor={filtroTipo}
+            rotulo="Tipo"
+            todos="Compras e renovações"
+            opcoes={[
+              ["compra", "Compras"],
+              ["renovacao", "Renovações"],
+            ]}
+          />
+        </BarraBusca>
+        <ResumoLista pagina={paginaAtual} porPagina={POR_PAGINA} total={totalCompras ?? 0} nome={["pagamento", "pagamentos"]} />
         <ul className="divide-y divide-slate-100 rounded-2xl border-2 border-tinta bg-white">
           {(compras ?? []).length === 0 && <li className="p-4 text-sm text-slate-600">Nenhum pagamento.</li>}
           {(compras ?? []).map((c) => (
@@ -181,6 +240,13 @@ export default async function Vendas({ searchParams }: PageProps<"/admin/vendas"
             </li>
           ))}
         </ul>
+        <Paginacao
+          acao="/admin/vendas"
+          pagina={paginaAtual}
+          totalPaginas={totalDePaginas(totalCompras, POR_PAGINA)}
+          params={{ ...filtrosPagamentos, ...filtrosAlunos }}
+          rolar={false}
+        />
       </section>
     </div>
   );

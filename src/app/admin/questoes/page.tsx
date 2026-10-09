@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { botaoPerigo, botaoSecundario, campo, Selo } from "@/components/admin-ui";
+import { botaoPerigo, botaoSecundario, Selo } from "@/components/admin-ui";
 import { exigirEquipe } from "@/lib/auth";
+import { faixa, lerPagina, termoIlike, textoParam, totalDePaginas } from "@/lib/listagem";
 import { NOME_DIFICULDADE } from "@/lib/questoes/questao";
+import { BarraBusca, FiltroSelect, Paginacao, ResumoLista } from "@/components/listagem";
 import { alternarStatusQuestao, excluirQuestao } from "./actions";
 import { botaoMarca, CabecalhoPagina } from "@/components/sistema";
 
@@ -16,9 +18,16 @@ type LinhaQuestao = {
   fonte: string;
 };
 
+const POR_PAGINA = 25;
+
 export default async function AdminQuestoes({ searchParams }: PageProps<"/admin/questoes">) {
-  const { disciplina, status, tipo, geracao } = await searchParams;
-  const geracaoId = typeof geracao === "string" ? geracao : null;
+  const params = await searchParams;
+  const geracaoId = textoParam(params.geracao) || null;
+  const busca = textoParam(params.q);
+  const status = textoParam(params.status);
+  const tipo = textoParam(params.tipo);
+  const dificuldade = textoParam(params.dificuldade);
+  const paginaAtual = lerPagina(params.pagina);
   const { supabase } = await exigirEquipe();
 
   const { data: disciplinas } = await supabase
@@ -26,22 +35,42 @@ export default async function AdminQuestoes({ searchParams }: PageProps<"/admin/
     .select("id, nome")
     .order("ordem")
     .overrideTypes<{ id: string; nome: string }[], { merge: false }>();
-  const disciplinaId = geracaoId ? undefined : typeof disciplina === "string" ? disciplina : disciplinas?.[0]?.id;
+  // Sem escolha, abre na primeira disciplina; "todas" lista o banco inteiro.
+  const escolhida = textoParam(params.disciplina);
+  const disciplinaId = geracaoId || escolhida === "todas" ? undefined : escolhida || disciplinas?.[0]?.id;
+
+  const termo = termoIlike(busca);
+  const condicoes: [string, string | number][] = [];
+  if (disciplinaId) condicoes.push(["disciplina_id", disciplinaId]);
+  if (geracaoId) condicoes.push(["geracao_id", geracaoId]);
+  if (status === "aprovada" || status === "rascunho") condicoes.push(["status", status]);
+  if (tipo === "objetiva" || tipo === "discursiva") condicoes.push(["tipo", tipo]);
+  if (["1", "2", "3"].includes(dificuldade)) condicoes.push(["dificuldade", Number(dificuldade)]);
+  const buscaOr = termo ? `enunciado.ilike.%${termo}%,tema.ilike.%${termo}%,fonte.ilike.%${termo}%` : null;
 
   let consulta = supabase
     .from("questoes")
-    .select("id, tema, tipo, enunciado, dificuldade, status, origem, fonte")
+    .select("id, tema, tipo, enunciado, dificuldade, status, origem, fonte", { count: "exact" })
     .order("tema")
     .order("criado_em", { ascending: false })
-    .limit(500);
-  if (disciplinaId) consulta = consulta.eq("disciplina_id", disciplinaId);
-  if (geracaoId) consulta = consulta.eq("geracao_id", geracaoId);
-  if (status === "aprovada" || status === "rascunho") consulta = consulta.eq("status", status);
-  if (tipo === "objetiva" || tipo === "discursiva") consulta = consulta.eq("tipo", tipo);
-  const { data: questoes } = await consulta.overrideTypes<LinhaQuestao[], { merge: false }>();
+    .range(...faixa(paginaAtual, POR_PAGINA));
+  let contagemAprovadas = supabase.from("questoes").select("id", { count: "exact", head: true }).eq("status", "aprovada");
+  for (const [coluna, valor] of condicoes) {
+    consulta = consulta.eq(coluna, valor);
+    contagemAprovadas = contagemAprovadas.eq(coluna, valor);
+  }
+  if (buscaOr) {
+    consulta = consulta.or(buscaOr);
+    contagemAprovadas = contagemAprovadas.or(buscaOr);
+  }
+  const [{ data: questoes, count }, { count: aprovadas }] = await Promise.all([
+    consulta.overrideTypes<LinhaQuestao[], { merge: false }>(),
+    contagemAprovadas,
+  ]);
 
   const lista = questoes ?? [];
-  const aprovadas = lista.filter((q) => q.status === "aprovada").length;
+  const total = count ?? 0;
+  const filtros = { disciplina: geracaoId ? null : escolhida, geracao: geracaoId, q: busca, status, tipo, dificuldade };
 
   return (
     <div className="space-y-6">
@@ -49,7 +78,7 @@ export default async function AdminQuestoes({ searchParams }: PageProps<"/admin/
         tom="tinta"
         rotulo="Backoffice · Questões"
         titulo="Banco de questões"
-        descricao={`${lista.length} questões · ${aprovadas} aprovadas (entram nos simulados)`}
+        descricao={`${total} questões · ${aprovadas ?? 0} aprovadas (entram nos simulados)`}
       >
         <Link href={`/admin/questoes/gerar?disciplina=${disciplinaId ?? ""}`} className={botaoSecundario + " px-4 py-2 text-sm"}>
           ✨ Gerar com IA
@@ -72,24 +101,34 @@ export default async function AdminQuestoes({ searchParams }: PageProps<"/admin/
         </p>
       )}
 
-      <form className="flex flex-wrap gap-2">
-        <select name="disciplina" defaultValue={disciplinaId} className={`${campo} w-auto`}>
-          {(disciplinas ?? []).map((d) => (
-            <option key={d.id} value={d.id}>{d.nome}</option>
-          ))}
-        </select>
-        <select name="tipo" defaultValue={typeof tipo === "string" ? tipo : ""} className={`${campo} w-auto`}>
-          <option value="">Todos os tipos</option>
-          <option value="objetiva">Objetivas</option>
-          <option value="discursiva">Discursivas</option>
-        </select>
-        <select name="status" defaultValue={typeof status === "string" ? status : ""} className={`${campo} w-auto`}>
-          <option value="">Todos os status</option>
-          <option value="aprovada">Aprovadas</option>
-          <option value="rascunho">Rascunhos</option>
-        </select>
-        <button className={botaoSecundario + " px-4"}>Filtrar</button>
-      </form>
+      <section className="space-y-3">
+        <BarraBusca
+          acao="/admin/questoes"
+          busca={busca}
+          placeholder="Buscar no enunciado, tema ou fonte"
+          manter={{ geracao: geracaoId }}
+          limpar={Boolean(busca || status || tipo || dificuldade)}
+        >
+          {!geracaoId && (
+            <FiltroSelect
+              nome="disciplina"
+              valor={disciplinaId ?? "todas"}
+              rotulo="Disciplina"
+              opcoes={[["todas", "Todas as disciplinas"], ...(disciplinas ?? []).map((d): [string, string] => [d.id, d.nome])]}
+            />
+          )}
+          <FiltroSelect nome="tipo" valor={tipo} rotulo="Tipo" todos="Todos os tipos" opcoes={[["objetiva", "Objetivas"], ["discursiva", "Discursivas"]]} />
+          <FiltroSelect nome="status" valor={status} rotulo="Status" todos="Todos os status" opcoes={[["aprovada", "Aprovadas"], ["rascunho", "Rascunhos"]]} />
+          <FiltroSelect
+            nome="dificuldade"
+            valor={dificuldade}
+            rotulo="Dificuldade"
+            todos="Todas as dificuldades"
+            opcoes={Object.entries(NOME_DIFICULDADE)}
+          />
+        </BarraBusca>
+        <ResumoLista pagina={paginaAtual} porPagina={POR_PAGINA} total={total} nome={["questão", "questões"]} />
+      </section>
 
       {!disciplinas?.length && (
         <p className="text-sm text-slate-600">
@@ -126,6 +165,8 @@ export default async function AdminQuestoes({ searchParams }: PageProps<"/admin/
           </li>
         ))}
       </ul>
+
+      <Paginacao acao="/admin/questoes" pagina={paginaAtual} totalPaginas={totalDePaginas(count, POR_PAGINA)} params={filtros} />
     </div>
   );
 }

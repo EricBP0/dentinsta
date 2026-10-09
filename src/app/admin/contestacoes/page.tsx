@@ -1,5 +1,7 @@
 import { botaoPrimario, botaoSecundario, campo, Selo } from "@/components/admin-ui";
 import { exigirEquipe } from "@/lib/auth";
+import { faixa, lerPagina, termoIlike, textoParam, totalDePaginas } from "@/lib/listagem";
+import { BarraBusca, FiltroSelect, Paginacao, ResumoLista } from "@/components/listagem";
 import { formatarData } from "@/lib/catalogo";
 import type { Feedback } from "@/lib/ia/rubrica";
 import { responderContestacao } from "./actions";
@@ -21,21 +23,37 @@ type Contestacao = {
   };
 };
 
+const POR_PAGINA = 10;
+const STATUS: [string, string][] = [
+  ["aberta", "Abertas"],
+  ["aceita", "Aceitas"],
+  ["recusada", "Recusadas"],
+  ["todas", "Todas"],
+];
+
 export default async function AdminContestacoes({ searchParams }: PageProps<"/admin/contestacoes">) {
-  const { status } = await searchParams;
-  const filtro = status === "todas" ? null : "aberta";
+  const params = await searchParams;
+  const status = STATUS.some(([v]) => v === textoParam(params.status)) ? textoParam(params.status) : "aberta";
+  const filtro = status === "todas" ? null : status;
+  const busca = textoParam(params.q);
+  const termo = termoIlike(busca);
+  const paginaAtual = lerPagina(params.pagina);
   const { supabase } = await exigirEquipe();
 
+  // Com busca, o join com perfis vira "inner" para filtrar pelo aluno.
   let consulta = supabase
     .from("contestacoes")
     .select(
-      "id, motivo, status, resposta_equipe, criado_em, perfis(nome, email), respostas(id, resposta, nota, feedback, questoes(enunciado))",
+      `id, motivo, status, resposta_equipe, criado_em, perfis${termo ? "!inner" : ""}(nome, email), respostas(id, resposta, nota, feedback, questoes(enunciado))`,
+      { count: "exact" },
     )
     .order("criado_em", { ascending: false })
-    .limit(100);
+    .range(...faixa(paginaAtual, POR_PAGINA));
   if (filtro) consulta = consulta.eq("status", filtro);
-  const { data } = await consulta.overrideTypes<Contestacao[], { merge: false }>();
+  if (termo) consulta = consulta.or(`nome.ilike.%${termo}%,email.ilike.%${termo}%`, { referencedTable: "perfis" });
+  const { data, count } = await consulta.overrideTypes<Contestacao[], { merge: false }>();
   const contestacoes = data ?? [];
+  const filtros = { q: busca, status: status === "aberta" ? null : status };
 
   return (
     <div className="space-y-6">
@@ -44,13 +62,20 @@ export default async function AdminContestacoes({ searchParams }: PageProps<"/ad
         rotulo="Backoffice · Correção"
         titulo="Contestações de correção"
         descricao="Alunos que discordaram da nota da IA. Use os casos para melhorar gabaritos e rubricas."
-      >
-        <a href={filtro ? "?status=todas" : "?"} className={botaoSecundario + " px-3 py-2 text-sm"}>
-          {filtro ? "Ver todas" : "Só abertas"}
-        </a>
-      </CabecalhoPagina>
+      />
 
-      {contestacoes.length === 0 && <p className="text-sm text-slate-600">Nenhuma contestação {filtro ? "aberta" : ""}.</p>}
+      <section className="space-y-3">
+        <BarraBusca acao="/admin/contestacoes" busca={busca} placeholder="Buscar aluno por nome ou e-mail" limpar={Boolean(busca || filtros.status)}>
+          <FiltroSelect nome="status" valor={status} rotulo="Status" opcoes={STATUS} />
+        </BarraBusca>
+        <ResumoLista pagina={paginaAtual} porPagina={POR_PAGINA} total={count ?? 0} nome={["contestação", "contestações"]} />
+      </section>
+
+      {contestacoes.length === 0 && (
+        <p className="text-sm text-slate-600">
+          {busca ? "Nenhuma contestação encontrada com essa busca." : `Nenhuma contestação${filtro ? ` ${filtro}` : ""}.`}
+        </p>
+      )}
 
       {contestacoes.map((c) => (
         <article key={c.id} className="space-y-4 rounded-2xl border-2 border-tinta bg-white p-5">
@@ -104,6 +129,8 @@ export default async function AdminContestacoes({ searchParams }: PageProps<"/ad
           )}
         </article>
       ))}
+
+      <Paginacao acao="/admin/contestacoes" pagina={paginaAtual} totalPaginas={totalDePaginas(count, POR_PAGINA)} params={filtros} />
     </div>
   );
 }

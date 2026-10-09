@@ -14,19 +14,34 @@ const MENU = {
     { href: "/aluno/chat", texto: "Chat IA" },
     { href: "/aluno/consultorio", texto: "Consultório" },
     { href: "/aluno/certificados", texto: "Certificados" },
+    { href: "/aluno/feedback", texto: "Feedback" },
   ],
   admin: [
     { href: "/admin", texto: "Disciplinas" },
     { href: "/admin/questoes", texto: "Questões" },
     { href: "/admin/contestacoes", texto: "Contestações" },
+    { href: "/admin/feedbacks", texto: "Feedbacks" },
     { href: "/admin/vendas", texto: "Vendas", soAdmin: true },
   ],
 };
 
-/** Cabeçalho das áreas logadas: claro para o aluno, escuro (tinta) para o backoffice. */
-export function Cabecalho({ perfil, area }: { perfil: Perfil; area: "aluno" | "admin" }) {
+/**
+ * Cabeçalho das áreas logadas: claro para o aluno, escuro (tinta) para o backoffice.
+ * `avisos` põe um número ao lado do item do menu (ex.: respostas novas).
+ */
+export function Cabecalho({
+  perfil,
+  area,
+  avisos = {},
+}: {
+  perfil: Perfil;
+  area: "aluno" | "admin";
+  avisos?: Record<string, number>;
+}) {
   const escuro = area === "admin";
-  const itens = MENU[area].filter((item) => !("soAdmin" in item) || perfil.papel === "admin");
+  const itens = MENU[area]
+    .filter((item) => !("soAdmin" in item) || perfil.papel === "admin")
+    .map((item) => ({ href: item.href, texto: item.texto, aviso: avisos[item.href] }));
   const iniciais = (perfil.nome || perfil.email)
     .split(/\s+/)
     .slice(0, 2)

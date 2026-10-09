@@ -1,12 +1,33 @@
 import Link from "next/link";
 import { exigirLogin } from "@/lib/auth";
 import { carregarCatalogo } from "@/lib/catalogo";
-import { carregarResumo, carregarSessao } from "@/lib/flashcards/sessao";
+import { carregarResumo, carregarSessao, type ResumoDeck } from "@/lib/flashcards/sessao";
+import { correspondeBusca, lerPagina, paginar, textoParam } from "@/lib/listagem";
 import { SessaoEstudo } from "./sessao-estudo";
+import { BarraBusca, FiltroSelect, Paginacao, ResumoLista } from "@/components/listagem";
 import { botaoMarca, CabecalhoPagina } from "@/components/sistema";
 
+const SITUACOES = {
+  revisar: "Com cards para revisar",
+  novos: "Com cards novos",
+  em_dia: "Em dia",
+} as const;
+const POR_PAGINA = 15;
+
+function situacaoDeck(resumo: ResumoDeck | undefined, filtro: string) {
+  if (!filtro) return true;
+  if (!resumo) return false;
+  if (filtro === "revisar") return resumo.vencidos > 0;
+  if (filtro === "novos") return resumo.vistos < resumo.total;
+  return resumo.vencidos === 0 && resumo.vistos === resumo.total;
+}
+
 export default async function RevisaoDoDia({ searchParams }: PageProps<"/aluno/flashcards">) {
-  const { estudar } = await searchParams;
+  const params = await searchParams;
+  const { estudar } = params;
+  const busca = textoParam(params.q);
+  const disciplina = textoParam(params.disciplina);
+  const situacao = textoParam(params.situacao);
   const { supabase, perfil } = await exigirLogin();
   const [{ disciplinas }, resumo] = await Promise.all([carregarCatalogo(supabase, perfil), carregarResumo(supabase)]);
 
@@ -15,7 +36,13 @@ export default async function RevisaoDoDia({ searchParams }: PageProps<"/aluno/f
     d.modulos.flatMap((m) =>
       m.itens
         .filter((i) => i.tipo === "flashcards" && i.situacao === "liberado")
-        .map((i) => ({ id: i.id, titulo: i.titulo, disciplina: d.nome, resumo: resumo.find((r) => r.item_id === i.id) })),
+        .map((i) => ({
+          id: i.id,
+          titulo: i.titulo,
+          disciplina: d.nome,
+          disciplinaSlug: d.slug,
+          resumo: resumo.find((r) => r.item_id === i.id),
+        })),
     ),
   );
   const nomesDecks = Object.fromEntries(decks.map((d) => [d.id, `${d.disciplina} · ${d.titulo}`]));
@@ -35,6 +62,16 @@ export default async function RevisaoDoDia({ searchParams }: PageProps<"/aluno/f
     );
   }
 
+  const filtrados = decks.filter(
+    (d) =>
+      (!disciplina || d.disciplinaSlug === disciplina) &&
+      situacaoDeck(d.resumo, situacao) &&
+      correspondeBusca(busca, d.titulo, d.disciplina),
+  );
+  const pagina = paginar(filtrados, lerPagina(params.pagina), POR_PAGINA);
+  const filtros = { q: busca, disciplina, situacao };
+  const disciplinasComDeck = [...new Map(decks.map((d) => [d.disciplinaSlug, d.disciplina])).entries()];
+
   return (
     <div className="space-y-8">
       <CabecalhoPagina
@@ -49,9 +86,31 @@ export default async function RevisaoDoDia({ searchParams }: PageProps<"/aluno/f
         )}
       </CabecalhoPagina>
 
+      {decks.length > 0 && (
+        <section className="space-y-3">
+          <BarraBusca
+            acao="/aluno/flashcards"
+            busca={busca}
+            placeholder="Buscar deck ou disciplina"
+            limpar={Boolean(busca || disciplina || situacao)}
+          >
+            <FiltroSelect
+              nome="disciplina"
+              valor={disciplina}
+              rotulo="Disciplina"
+              todos="Todas as disciplinas"
+              opcoes={disciplinasComDeck}
+            />
+            <FiltroSelect nome="situacao" valor={situacao} rotulo="Situação" todos="Todos os decks" opcoes={Object.entries(SITUACOES)} />
+          </BarraBusca>
+          <ResumoLista pagina={pagina.pagina} porPagina={POR_PAGINA} total={pagina.total} nome={["deck", "decks"]} />
+        </section>
+      )}
+
       <ul className="divide-y divide-slate-100 rounded-2xl border-2 border-tinta bg-white">
         {decks.length === 0 && <li className="p-4 text-sm text-slate-600">Nenhum deck de flashcards liberado ainda.</li>}
-        {decks.map((d) => (
+        {decks.length > 0 && pagina.total === 0 && <li className="p-4 text-sm text-slate-600">Nenhum deck encontrado com essa busca.</li>}
+        {pagina.itens.map((d) => (
           <li key={d.id}>
             <Link href={`/aluno/itens/${d.id}`} className="flex flex-wrap items-center justify-between gap-2 p-4 hover:bg-slate-50">
               <div>
@@ -76,6 +135,8 @@ export default async function RevisaoDoDia({ searchParams }: PageProps<"/aluno/f
           </li>
         ))}
       </ul>
+
+      <Paginacao acao="/aluno/flashcards" pagina={pagina.pagina} totalPaginas={pagina.totalPaginas} params={filtros} />
     </div>
   );
 }
