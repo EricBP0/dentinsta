@@ -1,5 +1,5 @@
 import "server-only";
-import Anthropic from "@anthropic-ai/sdk";
+import { conversar } from "./provedores";
 
 /** Perguntas por dia (horário de Brasília) para cada aluno com a IA ativa. */
 export function limiteDiarioChat(): number {
@@ -7,7 +7,6 @@ export function limiteDiarioChat(): number {
   return Number.isInteger(valor) && valor > 0 ? valor : 10;
 }
 
-export const MODELO_CHAT = process.env.IA_MODELO_CHAT || "claude-opus-5-5";
 export const TAMANHO_MAXIMO_PERGUNTA = 4000;
 /** Quantas mensagens anteriores da conversa vão junto com a pergunta. */
 export const MENSAGENS_DE_CONTEXTO = 20;
@@ -24,26 +23,15 @@ Como responder:
 - Se a pergunta não for de Odontologia ou da área da saúde ligada a ela, diga com gentileza que só ajuda com dúvidas de Odontologia.
 - Não invente referências. Se não souber, diga que não sabe.`;
 
-let cliente: Anthropic | null = null;
-function anthropic() {
-  cliente ??= new Anthropic();
-  return cliente;
-}
-
 export type MensagemChat = { papel: "user" | "assistant"; conteudo: string };
 
-/** Abre o streaming da resposta. Se o modelo recusar por engano, a API tenta outro modelo. */
+/**
+ * Abre a resposta em partes. Os modelos (e a ordem de reserva) vêm de IA_CHAT
+ * (src/lib/ia/provedores/config.ts): se um falhar ou recusar antes de
+ * responder, o próximo assume.
+ */
 export function responderChat(historico: MensagemChat[]) {
-  return anthropic().beta.messages.stream({
-    model: MODELO_CHAT,
-    max_tokens: 8000,
-    betas: ["server-side-fallback-2026-07-01"],
-    fallbacks: "default",
-    output_config: { effort: "low" },
-    cache_control: { type: "ephemeral" },
-    system: INSTRUCOES,
-    messages: historico.map((m) => ({ role: m.papel, content: m.conteudo })),
-  });
+  return conversar({ sistema: INSTRUCOES, historico, maxTokens: 8000 });
 }
 
 /** Título da conversa a partir da primeira pergunta. */

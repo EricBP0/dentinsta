@@ -1,8 +1,9 @@
 import "server-only";
-import Anthropic from "@anthropic-ai/sdk";
-import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
+import type { z } from "zod";
 import { removerRepetidos, validarCard, type CardNovo } from "@/lib/flashcards/cards";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
+import { consultarLote, enviarLote } from "../provedores";
+import type { EstadoLote } from "../provedores/tipos";
 import { montarBlocosMaterial, type ArquivoMaterial } from "./material";
 import {
   converterQuestoesGeradas,
@@ -16,17 +17,9 @@ import {
   type TipoMaterial,
 } from "./prompt";
 
-// Geração roda em lote (Batch API): 50% mais barato e sem limite de tempo da
-// requisição. Qualidade importa mais que na correção, por isso esforço "medium".
-const MODELO_GERACAO = process.env.IA_MODELO_GERACAO || "claude-opus-5-5";
-const EFFORTS = ["low", "medium", "high", "xhigh", "max"] as const;
-type Effort = (typeof EFFORTS)[number];
-const EFFORT_GERACAO: Effort = EFFORTS.includes(process.env.IA_EFFORT_GERACAO as Effort)
-  ? (process.env.IA_EFFORT_GERACAO as Effort)
-  : "medium";
-
-const FORMATO_QUESTOES = zodOutputFormat(SaidaGeracaoSchema);
-const FORMATO_FLASHCARDS = zodOutputFormat(SaidaFlashcardsSchema);
+// Geração roda em lote: 50% mais barato e sem limite de tempo da requisição.
+// Os modelos (e a ordem de reserva) vêm de IA_GERACAO; o esforço, de
+// IA_EFFORT_GERACAO (padrão "medium": qualidade importa mais que na correção).
 
 export type Geracao = {
   id: string;
@@ -41,12 +34,6 @@ export type Geracao = {
   status: "processando" | "importando" | "concluida" | "erro";
   batch_id: string | null;
 };
-
-let cliente: Anthropic | null = null;
-function anthropic() {
-  cliente ??= new Anthropic();
-  return cliente;
-}
 
 async function montarPedido(geracao: Geracao) {
   const admin = criarClienteAdmin();
@@ -67,8 +54,8 @@ async function montarPedido(geracao: Geracao) {
         .overrideTypes<{ frente: string }[], { merge: false }>(),
     ]);
     return {
-      system: INSTRUCOES_FLASHCARDS,
-      schema: FORMATO_FLASHCARDS.schema,
+      sistema: INSTRUCOES_FLASHCARDS,
+      schema: SaidaFlashcardsSchema as z.ZodType,
       pedido: montarPedidoFlashcards({
         disciplina: disciplina?.nome ?? "",
         deck: deck?.titulo ?? "",
@@ -87,8 +74,8 @@ async function montarPedido(geracao: Geracao) {
     .limit(150)
     .overrideTypes<{ tema: string; enunciado: string }[], { merge: false }>();
   return {
-    system: INSTRUCOES_GERACAO,
-    schema: FORMATO_QUESTOES.schema,
+    sistema: INSTRUCOES_GERACAO,
+    schema: SaidaGeracaoSchema as z.ZodType,
     pedido: montarPedidoGeracao({
       disciplina: disciplina?.nome ?? "",
       tipoMaterial: geracao.tipo_material,
@@ -112,27 +99,15 @@ export async function enviarLoteGeracao(geracao: Geracao) {
   const material = await montarBlocosMaterial(arquivos, geracao.texto);
   if (!material.length) throw new Error("O material enviado está vazio.");
 
-  const { system, schema, pedido } = await montarPedido(geracao);
-  const lote = await anthropic().messages.batches.create({
-    requests: [
-      {
-        custom_id: geracao.id,
-        params: {
-          model: MODELO_GERACAO,
-          max_tokens: 32000,
-          system,
-          output_config: { effort: EFFORT_GERACAO, format: { type: "json_schema", schema } },
-          // Material primeiro, pedido no fim: melhor desempenho com documentos longos.
-          messages: [{ role: "user", content: [...material, { type: "text", text: pedido }] }],
-        },
-      },
-    ],
-  });
+  const { sistema, schema, pedido } = await montarPedido(geracao);
+  // Material primeiro, pedido no fim: melhor desempenho com documentos longos.
+  const { idLote, modelo } = await enviarLote(
+    "geracao",
+    { sistema, schema, partes: [...material, { tipo: "texto", texto: pedido }], maxTokens: 32000 },
+    geracao.id,
+  );
 
-  await admin
-    .from("geracoes_questoes")
-    .update({ batch_id: lote.id, modelo: MODELO_GERACAO })
-    .eq("id", geracao.id);
+  await admin.from("geracoes_questoes").update({ batch_id: idLote, modelo }).eq("id", geracao.id);
 }
 
 async function falhar(geracaoId: string, mensagem: string) {
@@ -147,7 +122,7 @@ async function salvarResultado(geracao: Geracao, texto: string) {
   const admin = criarClienteAdmin();
 
   if (geracao.alvo === "flashcards") {
-    const saida = FORMATO_FLASHCARDS.parse(texto);
+    const saida = SaidaFlashcardsSchema.parse(JSON.parse(texto));
     const validos: CardNovo[] = [];
     let descartados = 0;
     for (const c of saida.cards) {
@@ -180,7 +155,7 @@ async function salvarResultado(geracao: Geracao, texto: string) {
     return { gerados: unicos.length, descartados: descartados + repetidos, observacoes: saida.observacoes };
   }
 
-  const saida = FORMATO_QUESTOES.parse(texto);
+  const saida = SaidaGeracaoSchema.parse(JSON.parse(texto));
   const { questoes, descartadas } = converterQuestoesGeradas(saida.questoes);
   if (questoes.length) {
     const { error } = await admin.from("questoes").insert(
@@ -198,7 +173,7 @@ async function salvarResultado(geracao: Geracao, texto: string) {
 }
 
 /** Importa o resultado de um lote terminado. Idempotente: só uma execução "reivindica" a geração. */
-async function importarResultado(geracao: Geracao) {
+async function importarResultado(geracao: Geracao, estado: Extract<EstadoLote, { terminado: true }>) {
   const admin = criarClienteAdmin();
   const { data: reivindicada } = await admin
     .from("geracoes_questoes")
@@ -210,44 +185,29 @@ async function importarResultado(geracao: Geracao) {
   if (!reivindicada) return;
 
   try {
-    for await (const item of await anthropic().messages.batches.results(geracao.batch_id!)) {
-      if (item.custom_id !== geracao.id) continue;
-      if (item.result.type !== "succeeded") {
-        return falhar(geracao.id, `A IA não concluiu a geração (${item.result.type}). Tente novamente.`);
-      }
-      const mensagem = item.result.message;
+    if (estado.uso) {
       await admin.from("uso_ia").insert({
         usuario_id: geracao.criado_por,
         tipo: geracao.alvo === "flashcards" ? "geracao_flashcards" : "geracao",
-        modelo: mensagem.model,
-        tokens_entrada: mensagem.usage.input_tokens,
-        tokens_saida: mensagem.usage.output_tokens,
-        tokens_cache: mensagem.usage.cache_read_input_tokens ?? 0,
+        modelo: estado.modelo ?? "",
+        tokens_entrada: estado.uso.entrada,
+        tokens_saida: estado.uso.saida,
+        tokens_cache: estado.uso.cache,
       });
-      if (mensagem.stop_reason === "refusal") {
-        return falhar(geracao.id, "A IA recusou este material. Revise o conteúdo e tente de novo.");
-      }
-      if (mensagem.stop_reason === "max_tokens") {
-        return falhar(geracao.id, "A resposta ficou longa demais. Peça menos itens por geração.");
-      }
-
-      const texto = mensagem.content.find((b) => b.type === "text");
-      if (texto?.type !== "text") return falhar(geracao.id, "Resposta da IA vazia. Tente novamente.");
-      const { gerados, descartados, observacoes } = await salvarResultado(geracao, texto.text);
-
-      await admin
-        .from("geracoes_questoes")
-        .update({
-          status: "concluida",
-          questoes_geradas: gerados,
-          questoes_descartadas: descartados,
-          observacoes: observacoes.trim() || null,
-          concluido_em: new Date().toISOString(),
-        })
-        .eq("id", geracao.id);
-      return;
     }
-    return falhar(geracao.id, "Resultado da geração não encontrado.");
+    if ("erro" in estado) return falhar(geracao.id, estado.erro);
+
+    const { gerados, descartados, observacoes } = await salvarResultado(geracao, estado.texto);
+    await admin
+      .from("geracoes_questoes")
+      .update({
+        status: "concluida",
+        questoes_geradas: gerados,
+        questoes_descartadas: descartados,
+        observacoes: observacoes.trim() || null,
+        concluido_em: new Date().toISOString(),
+      })
+      .eq("id", geracao.id);
   } catch (erro) {
     console.error("Falha ao importar geração", { geracaoId: geracao.id, erro });
     return falhar(geracao.id, "Falha ao importar o resultado. Tente gerar novamente.");
@@ -267,8 +227,8 @@ export async function sincronizarGeracoes() {
   await Promise.all(
     (pendentes ?? []).map(async (geracao) => {
       try {
-        const lote = await anthropic().messages.batches.retrieve(geracao.batch_id!);
-        if (lote.processing_status === "ended") await importarResultado(geracao);
+        const estado = await consultarLote(geracao.batch_id!, geracao.id);
+        if (estado.terminado) await importarResultado(geracao, estado);
       } catch (erro) {
         console.error("Falha ao consultar lote", { geracaoId: geracao.id, erro });
       }

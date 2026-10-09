@@ -22,6 +22,7 @@ const MENU = {
     { href: "/admin/contestacoes", texto: "Contestações" },
     { href: "/admin/feedbacks", texto: "Feedbacks" },
     { href: "/admin/vendas", texto: "Vendas", soAdmin: true },
+    { href: "/admin/ia", texto: "IA", soAdmin: true },
   ],
 };
 

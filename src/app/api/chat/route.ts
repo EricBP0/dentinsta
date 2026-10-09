@@ -90,15 +90,13 @@ export async function POST(request: Request) {
     async start(controle) {
       let texto = "";
       try {
-        const stream = responderChat(historico);
-        for await (const evento of stream) {
-          if (evento.type === "content_block_delta" && evento.delta.type === "text_delta") {
-            texto += evento.delta.text;
-            controle.enqueue(codificador.encode(evento.delta.text));
-          }
+        const resposta = responderChat(historico);
+        for await (const pedaco of resposta.pedacos) {
+          texto += pedaco;
+          controle.enqueue(codificador.encode(pedaco));
         }
-        const final = await stream.finalMessage();
-        if (final.stop_reason === "refusal" && !texto) {
+        const final = await resposta.fim;
+        if (final.recusado && !texto) {
           texto = RESPOSTA_RECUSADA;
           controle.enqueue(codificador.encode(texto));
         }
@@ -107,10 +105,10 @@ export async function POST(request: Request) {
           admin
             .from("uso_ia")
             .update({
-              modelo: final.model,
-              tokens_entrada: final.usage.input_tokens,
-              tokens_saida: final.usage.output_tokens,
-              tokens_cache: final.usage.cache_read_input_tokens ?? 0,
+              modelo: final.modelo,
+              tokens_entrada: final.uso.entrada,
+              tokens_saida: final.uso.saida,
+              tokens_cache: final.uso.cache,
             })
             .eq("id", usoId),
           admin.from("chat_conversas").update({ atualizado_em: new Date().toISOString() }).eq("id", conversa),

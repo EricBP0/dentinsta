@@ -86,12 +86,12 @@ describe("material", () => {
     expect(validarArquivos([{ nome: "a.pdf", tipo: "application/pdf", tamanho: 1024 }])).toBeNull();
   });
 
-  it("monta PDF como documento e texto colado como documento de texto", async () => {
+  it("monta PDF como arquivo e texto colado como texto com título", async () => {
     const blocos = await montarBlocosMaterial(
       [{ nome: "apostila.pdf", tipo: "application/pdf", dados: Buffer.from("%PDF-1.4") }],
       "Anotações da aula",
     );
-    expect(blocos[0]).toMatchObject({ type: "document", title: "apostila.pdf", source: { type: "base64" } });
-    expect(blocos[1]).toMatchObject({ type: "document", source: { type: "text", data: "Anotações da aula" } });
+    expect(blocos[0]).toMatchObject({ tipo: "pdf", nome: "apostila.pdf" });
+    expect(blocos[1]).toMatchObject({ tipo: "texto", titulo: "Texto enviado pelo professor", texto: "Anotações da aula" });
   });
 });
