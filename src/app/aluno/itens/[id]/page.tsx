@@ -8,6 +8,7 @@ import { carregarResumo, carregarSessao } from "@/lib/flashcards/sessao";
 import { assinarMidiaResumo } from "@/lib/resumos/midia";
 import { COLUNAS_ITEM, NOME_TIPO_ITEM, type ConfigItem, type Item } from "@/lib/tipos";
 import { marcarConcluido } from "./actions";
+import { botaoContorno, botaoEscuro, CabecalhoPagina } from "@/components/sistema";
 
 export default async function PaginaItem({ params }: PageProps<"/aluno/itens/[id]">) {
   const { id } = await params;
@@ -39,10 +40,7 @@ export default async function PaginaItem({ params }: PageProps<"/aluno/itens/[id
       <Link href={`/aluno/disciplinas/${disciplina.slug}`} className="text-sm text-slate-600 hover:text-slate-900">
         ← {disciplina.nome}
       </Link>
-      <header>
-        <p className="text-sm text-slate-500">{NOME_TIPO_ITEM[item.tipo]}</p>
-        <h1 className="text-2xl font-bold text-tinta">{item.titulo}</h1>
-      </header>
+      <CabecalhoPagina rotulo={`${disciplina.nome} · ${NOME_TIPO_ITEM[item.tipo]}`} titulo={item.titulo} />
 
       {config && item.tipo === "flashcards" ? (
         <Deck itemId={item.id} usuarioId={perfil.id} concluido={concluido} />
@@ -53,16 +51,14 @@ export default async function PaginaItem({ params }: PageProps<"/aluno/itens/[id
             <input type="hidden" name="item_id" value={item.id} />
             <input type="hidden" name="concluido" value={String(!concluido)} />
             <button
-              className={`rounded-lg px-4 py-2 text-sm font-medium ${
-                concluido ? "border border-slate-300 text-slate-700" : "bg-violeta-700 text-white hover:bg-violeta-800"
-              }`}
+              className={concluido ? botaoContorno : botaoEscuro}
             >
               {concluido ? "✅ Concluído — desmarcar" : "Marcar como concluído"}
             </button>
           </form>
         </>
       ) : (
-        <div className="flex flex-col items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-6 text-amber-900">
+        <div className="flex flex-col items-start gap-3 rounded-2xl border-2 border-tinta bg-amber-50 p-6 text-amber-900">
           <p>Este conteúdo foi publicado depois do seu período de novidades.</p>
           <BotaoRenovar />
         </div>
@@ -110,7 +106,7 @@ function ConteudoItem({ tipo, config }: { tipo: Item["tipo"]; config: ConfigItem
       return (
         <div className="space-y-4">
           {config.conteudo && (
-            <article className="whitespace-pre-wrap rounded-xl border border-slate-200 bg-white p-6 leading-relaxed text-slate-800">
+            <article className="whitespace-pre-wrap rounded-2xl border-2 border-tinta bg-white p-6 leading-relaxed text-slate-800">
               {config.conteudo}
             </article>
           )}
@@ -126,7 +122,7 @@ function ConteudoItem({ tipo, config }: { tipo: Item["tipo"]; config: ConfigItem
       return config.imagem_url ? (
         <a href={config.imagem_url} target="_blank" className="block">
           {/* eslint-disable-next-line @next/next/no-img-element -- imagem de origem externa configurável */}
-          <img src={config.imagem_url} alt="Mapa mental" className="w-full rounded-xl border border-slate-200" />
+          <img src={config.imagem_url} alt="Mapa mental" className="w-full rounded-2xl border-2 border-tinta" />
           <span className="mt-2 block text-sm text-violeta-700 underline">Abrir em tamanho real</span>
         </a>
       ) : (

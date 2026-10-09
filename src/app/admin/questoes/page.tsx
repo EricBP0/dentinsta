@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { botaoPerigo, botaoPrimario, botaoSecundario, campo, Selo } from "@/components/admin-ui";
+import { botaoPerigo, botaoSecundario, campo, Selo } from "@/components/admin-ui";
 import { exigirEquipe } from "@/lib/auth";
 import { NOME_DIFICULDADE } from "@/lib/questoes/questao";
 import { alternarStatusQuestao, excluirQuestao } from "./actions";
+import { botaoMarca, CabecalhoPagina } from "@/components/sistema";
 
 type LinhaQuestao = {
   id: string;
@@ -44,31 +45,28 @@ export default async function AdminQuestoes({ searchParams }: PageProps<"/admin/
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-tinta">Banco de questões</h1>
-          <p className="text-sm text-slate-600">
-            {lista.length} questões · {aprovadas} aprovadas (entram nos simulados)
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Link href={`/admin/questoes/gerar?disciplina=${disciplinaId ?? ""}`} className={botaoSecundario + " px-4 py-2 text-sm"}>
-            ✨ Gerar com IA
-          </Link>
-          <Link href="/admin/questoes/geracoes" className={botaoSecundario + " px-4 py-2 text-sm"}>
-            Gerações
-          </Link>
-          <Link href={`/admin/questoes/importar?disciplina=${disciplinaId ?? ""}`} className={botaoSecundario + " px-4 py-2 text-sm"}>
-            Importar planilha
-          </Link>
-          <Link href={`/admin/questoes/nova?disciplina=${disciplinaId ?? ""}`} className={botaoPrimario}>
-            Nova questão
-          </Link>
-        </div>
-      </header>
+      <CabecalhoPagina
+        tom="tinta"
+        rotulo="Backoffice · Questões"
+        titulo="Banco de questões"
+        descricao={`${lista.length} questões · ${aprovadas} aprovadas (entram nos simulados)`}
+      >
+        <Link href={`/admin/questoes/gerar?disciplina=${disciplinaId ?? ""}`} className={botaoSecundario + " px-4 py-2 text-sm"}>
+          ✨ Gerar com IA
+        </Link>
+        <Link href="/admin/questoes/geracoes" className={botaoSecundario + " px-4 py-2 text-sm"}>
+          Gerações
+        </Link>
+        <Link href={`/admin/questoes/importar?disciplina=${disciplinaId ?? ""}`} className={botaoSecundario + " px-4 py-2 text-sm"}>
+          Importar planilha
+        </Link>
+        <Link href={`/admin/questoes/nova?disciplina=${disciplinaId ?? ""}`} className={botaoMarca}>
+          Nova questão
+        </Link>
+      </CabecalhoPagina>
 
       {geracaoId && (
-        <p className="rounded-xl border border-sky-200 bg-sky-50 p-3 text-sm text-sky-900">
+        <p className="rounded-2xl border-2 border-tinta bg-sky-50 p-3 text-sm text-sky-900">
           Mostrando as questões de uma geração por IA. Abra cada uma para revisar e aprove (clique em
           &quot;Rascunho&quot;) as que estiverem boas. <Link href="/admin/questoes" className="underline">Ver todas</Link>
         </p>
@@ -99,7 +97,7 @@ export default async function AdminQuestoes({ searchParams }: PageProps<"/admin/
         </p>
       )}
 
-      <ul className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">
+      <ul className="divide-y divide-slate-100 rounded-2xl border-2 border-tinta bg-white">
         {lista.length === 0 && <li className="p-4 text-sm text-slate-600">Nenhuma questão encontrada.</li>}
         {lista.map((q) => (
           <li key={q.id} className="flex flex-wrap items-start justify-between gap-3 p-4">

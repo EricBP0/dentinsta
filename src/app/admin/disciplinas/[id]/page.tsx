@@ -30,6 +30,7 @@ import {
   salvarDisciplina,
   salvarModulo,
 } from "../../actions";
+import { CabecalhoPagina } from "@/components/sistema";
 
 export default async function AdminDisciplina({ params }: PageProps<"/admin/disciplinas/[id]">) {
   const { id } = await params;
@@ -66,12 +67,13 @@ export default async function AdminDisciplina({ params }: PageProps<"/admin/disc
         ← Disciplinas
       </Link>
 
-      <form action={salvarDisciplina} className="space-y-4 rounded-xl border border-slate-200 bg-white p-6">
+      <CabecalhoPagina tom="tinta" rotulo="Backoffice · Disciplina" titulo={disciplina.nome}>
+        <Selo status={disciplina.status} texto={NOME_STATUS_DISCIPLINA[disciplina.status]} />
+      </CabecalhoPagina>
+
+      <form action={salvarDisciplina} className="space-y-4 rounded-2xl border-2 border-tinta bg-white p-6">
         <input type="hidden" name="id" value={disciplina.id} />
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <h1 className="text-xl font-bold text-slate-900">{disciplina.nome}</h1>
-          <Selo status={disciplina.status} texto={NOME_STATUS_DISCIPLINA[disciplina.status]} />
-        </div>
+        <h2 className="text-lg font-extrabold tracking-tight text-tinta">Dados da disciplina</h2>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <Rotulo texto="Nome">
@@ -119,10 +121,10 @@ export default async function AdminDisciplina({ params }: PageProps<"/admin/disc
       </form>
 
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-slate-900">Módulos e itens</h2>
+        <h2 className="text-lg font-extrabold tracking-tight text-tinta">Módulos e itens</h2>
 
         {(modulos ?? []).map((modulo, indice) => (
-          <div key={modulo.id} className="rounded-xl border border-slate-200 bg-white">
+          <div key={modulo.id} className="rounded-2xl border-2 border-tinta bg-white">
             <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 p-3">
               <form action={salvarModulo} className="flex flex-1 flex-wrap items-center gap-2">
                 <input type="hidden" name="id" value={modulo.id} />

@@ -35,8 +35,8 @@ export function Cabecalho({ perfil, area }: { perfil: Perfil; area: "aluno" | "a
 
   return (
     <header
-      className={`sticky top-0 z-30 border-b backdrop-blur ${
-        escuro ? "border-white/10 bg-tinta/95 text-white" : "border-slate-200/80 bg-white/90"
+      className={`sticky top-0 z-30 border-b-2 backdrop-blur ${
+        escuro ? "border-tinta bg-tinta/95 text-white" : "border-tinta bg-papel/95"
       }`}
     >
       <div className="mx-auto flex max-w-5xl flex-col gap-2 px-4 py-3 md:flex-row md:items-center md:justify-between">
@@ -58,8 +58,8 @@ export function Cabecalho({ perfil, area }: { perfil: Perfil; area: "aluno" | "a
           {perfil.papel !== "aluno" && (
             <Link
               href={escuro ? "/aluno" : "/admin"}
-              className={`hidden shrink-0 rounded-full border px-3 py-1.5 text-sm md:inline-block ${
-                escuro ? "border-white/20 text-violeta-100 hover:bg-white/10" : "border-violeta-200 text-violeta-800 hover:bg-violeta-50"
+              className={`hidden shrink-0 rounded-full border-2 px-3 py-1 text-sm font-semibold md:inline-block ${
+                escuro ? "border-lima text-lima hover:bg-lima hover:text-tinta" : "border-tinta text-tinta hover:bg-lima"
               }`}
             >
               {escuro ? "Ver como aluno" : "Backoffice"}
@@ -79,8 +79,8 @@ function Conta({ perfil, escuro, iniciais }: { perfil: Perfil; escuro: boolean; 
     <>
       <span
         title={perfil.nome || perfil.email}
-        className={`flex size-8 items-center justify-center rounded-full text-xs font-semibold ${
-          escuro ? "bg-white/15 text-white" : "bg-secondary text-secondary-foreground"
+        className={`flex size-8 items-center justify-center rounded-full text-xs font-bold ${
+          escuro ? "border-2 border-lima bg-tinta text-lima" : "border-2 border-tinta bg-lima text-tinta"
         }`}
       >
         {iniciais}

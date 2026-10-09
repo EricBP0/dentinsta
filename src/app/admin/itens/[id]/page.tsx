@@ -6,6 +6,7 @@ import { isoParaLocal } from "@/lib/datas";
 import { COLUNAS_ITEM, NOME_TIPO_ITEM, type ConfigItem, type Item } from "@/lib/tipos";
 import { GerenciarCards } from "../../flashcards/gerenciar-cards";
 import { salvarItem } from "../../actions";
+import { CabecalhoPagina } from "@/components/sistema";
 
 export default async function AdminItem({ params }: PageProps<"/admin/itens/[id]">) {
   const { id } = await params;
@@ -28,9 +29,10 @@ export default async function AdminItem({ params }: PageProps<"/admin/itens/[id]
         ← {item.modulos.titulo}
       </Link>
 
-      <form action={salvarItem} className="space-y-4 rounded-xl border border-slate-200 bg-white p-6">
+      <CabecalhoPagina tom="tinta" rotulo={`Backoffice · ${NOME_TIPO_ITEM[item.tipo]}`} titulo={item.titulo} />
+
+      <form action={salvarItem} className="space-y-4 rounded-2xl border-2 border-tinta bg-white p-6">
         <input type="hidden" name="id" value={item.id} />
-        <p className="text-sm text-slate-500">{NOME_TIPO_ITEM[item.tipo]}</p>
 
         <Rotulo texto="Título">
           <input name="titulo" defaultValue={item.titulo} required className={campo} />

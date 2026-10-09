@@ -27,10 +27,10 @@ export async function GerenciarCards({ itemId }: { itemId: string }) {
   const rascunhos = cards.filter((c) => c.status === "rascunho").length;
 
   return (
-    <section className="space-y-6 rounded-xl border border-slate-200 bg-white p-6">
+    <section className="space-y-6 rounded-2xl border-2 border-tinta bg-white p-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-slate-900">Cards do deck</h2>
+          <h2 className="text-lg font-extrabold tracking-tight text-tinta">Cards do deck</h2>
           <p className="text-sm text-slate-600">
             {cards.length} cards · {cards.length - rascunhos} publicados
             {rascunhos > 0 && ` · ${rascunhos} rascunhos (os alunos não veem)`}

@@ -26,7 +26,7 @@ export function FormularioQuestao({
   const [tipo, setTipo] = useState(questao?.tipo ?? "objetiva");
 
   return (
-    <form action={acao} className="space-y-4 rounded-xl border border-slate-200 bg-white p-6">
+    <form action={acao} className="space-y-4 rounded-2xl border-2 border-tinta bg-white p-6">
       <input type="hidden" name="id" value={questao?.id ?? ""} />
       {questao?.origem === "ia" && (
         <p className="rounded-lg bg-sky-50 p-3 text-sm text-sky-900">

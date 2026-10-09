@@ -22,10 +22,10 @@ export default async function ValidarCertificado({ params }: PageProps<"/certifi
         {plataforma}
       </Link>
       {certificado ? (
-        <div className="space-y-5 rounded-2xl border border-violeta-200 bg-white p-8 text-center shadow-sm">
+        <div className="space-y-5 rounded-2xl border-2 border-tinta bg-white p-8 text-center shadow-sm">
           <CircleCheck className="mx-auto size-12 text-violeta-600" />
           <div>
-            <h1 className="text-xl font-bold text-slate-900">Certificado válido</h1>
+            <h1 className="text-2xl font-extrabold tracking-tight text-tinta">Certificado válido</h1>
             <p className="text-sm text-slate-500">Código {codigo.toUpperCase()}</p>
           </div>
           <dl className="space-y-3 text-left text-sm">
@@ -51,9 +51,9 @@ export default async function ValidarCertificado({ params }: PageProps<"/certifi
           <p className="text-xs text-slate-500">Certificado de curso livre, emitido pela plataforma {plataforma}.</p>
         </div>
       ) : (
-        <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-8 text-center">
+        <div className="space-y-3 rounded-2xl border-2 border-tinta bg-white p-8 text-center">
           <CircleX className="mx-auto size-12 text-slate-400" />
-          <h1 className="text-xl font-bold text-slate-900">Certificado não encontrado</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-tinta">Certificado não encontrado</h1>
           <p className="text-sm text-slate-600">Confira se o código foi digitado corretamente.</p>
         </div>
       )}

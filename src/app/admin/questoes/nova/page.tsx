@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { exigirEquipe } from "@/lib/auth";
 import { FormularioQuestao } from "../formulario";
+import { CabecalhoPagina } from "@/components/sistema";
 
 export default async function NovaQuestao({ searchParams }: PageProps<"/admin/questoes/nova">) {
   const { disciplina } = await searchParams;
@@ -16,7 +17,7 @@ export default async function NovaQuestao({ searchParams }: PageProps<"/admin/qu
       <Link href="/admin/questoes" className="text-sm text-slate-600 hover:text-slate-900">
         ← Banco de questões
       </Link>
-      <h1 className="text-2xl font-bold text-tinta">Nova questão</h1>
+      <CabecalhoPagina tom="tinta" rotulo="Backoffice · Questões" titulo="Nova questão" />
       <FormularioQuestao
         disciplinas={disciplinas ?? []}
         disciplinaPadrao={typeof disciplina === "string" ? disciplina : undefined}

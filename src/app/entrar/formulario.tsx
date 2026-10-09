@@ -4,7 +4,7 @@ import { useActionState, useState } from "react";
 import { cadastrar, entrar, solicitarNovaSenha, type EstadoForm } from "./actions";
 
 const campo =
-  "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-violeta-600 focus:outline-none";
+  "w-full rounded-lg border-2 border-slate-200 bg-white px-3 py-2 text-slate-900 focus:border-tinta focus:outline-none";
 
 type Modo = "entrar" | "cadastrar" | "esqueci";
 
@@ -19,7 +19,7 @@ export function FormularioEntrar({ proximo, erroLink }: { proximo?: string; erro
   return (
     <div className="w-full max-w-sm space-y-6 rounded-2xl border-2 border-tinta bg-white p-6 shadow-[6px_6px_0_0_var(--color-tinta)]">
       {erroLink && (
-        <p className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+        <p className="rounded-2xl border-2 border-tinta bg-amber-50 p-3 text-sm text-amber-900">
           Esse link expirou ou já foi usado. Entre com sua senha ou peça um novo link.
         </p>
       )}
@@ -64,7 +64,7 @@ export function FormularioEntrar({ proximo, erroLink }: { proximo?: string; erro
 
         <button
           disabled={entrando || cadastrando || enviando}
-          className="w-full rounded-lg bg-violeta-700 py-2 font-medium text-white hover:bg-violeta-800 disabled:opacity-60"
+          className="w-full rounded-full bg-tinta py-2 font-bold text-white hover:bg-violeta disabled:opacity-60"
         >
           {{ entrar: "Entrar", cadastrar: "Criar conta", esqueci: "Enviar link" }[modo]}
         </button>

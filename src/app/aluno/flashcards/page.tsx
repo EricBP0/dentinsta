@@ -3,6 +3,7 @@ import { exigirLogin } from "@/lib/auth";
 import { carregarCatalogo } from "@/lib/catalogo";
 import { carregarResumo, carregarSessao } from "@/lib/flashcards/sessao";
 import { SessaoEstudo } from "./sessao-estudo";
+import { botaoMarca, CabecalhoPagina } from "@/components/sistema";
 
 export default async function RevisaoDoDia({ searchParams }: PageProps<"/aluno/flashcards">) {
   const { estudar } = await searchParams;
@@ -28,7 +29,7 @@ export default async function RevisaoDoDia({ searchParams }: PageProps<"/aluno/f
         <Link href="/aluno/flashcards" className="text-sm text-slate-600 hover:text-slate-900">
           ← Flashcards
         </Link>
-        <h1 className="text-2xl font-bold text-tinta">Revisão do dia</h1>
+        <CabecalhoPagina rotulo="Lab · Memória" titulo="Revisão do dia" />
         <SessaoEstudo cards={cards} nomesDecks={nomesDecks} />
       </div>
     );
@@ -36,21 +37,19 @@ export default async function RevisaoDoDia({ searchParams }: PageProps<"/aluno/f
 
   return (
     <div className="space-y-8">
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-tinta">Flashcards</h1>
-          <p className="text-sm text-slate-600">
-            Repetição espaçada: cada card volta no momento certo para você não esquecer.
-          </p>
-        </div>
+      <CabecalhoPagina
+        rotulo="Lab · Memória"
+        titulo="Flashcards"
+        descricao="Repetição espaçada: cada card volta no momento certo para você não esquecer."
+      >
         {vencidos + novos > 0 && (
-          <Link href="/aluno/flashcards?estudar=1" className="rounded-lg bg-violeta-700 px-5 py-3 font-medium text-white hover:bg-violeta-800">
+          <Link href="/aluno/flashcards?estudar=1" className={botaoMarca}>
             Revisar agora ({vencidos} para revisar{novos > 0 && `, ${novos} novos`})
           </Link>
         )}
-      </header>
+      </CabecalhoPagina>
 
-      <ul className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">
+      <ul className="divide-y divide-slate-100 rounded-2xl border-2 border-tinta bg-white">
         {decks.length === 0 && <li className="p-4 text-sm text-slate-600">Nenhum deck de flashcards liberado ainda.</li>}
         {decks.map((d) => (
           <li key={d.id}>

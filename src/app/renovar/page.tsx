@@ -26,7 +26,7 @@ export default async function Renovar({ searchParams }: PageProps<"/renovar">) {
         ← Voltar para os estudos
       </Link>
       <header className="space-y-2">
-        <h1 className="text-3xl font-bold text-slate-900">Renovar novidades e IA</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight text-tinta">Renovar novidades e IA</h1>
         <p className="text-slate-700">
           {vencido
             ? `Seu período de novidades terminou em ${formatarData(acesso.novidades_ate)}.`
@@ -46,7 +46,7 @@ export default async function Renovar({ searchParams }: PageProps<"/renovar">) {
           <OpcoesPagamento aVista={aVista} parcelado={parcelado} />
         </>
       ) : (
-        <p className="rounded-xl border border-slate-200 bg-white p-6 text-slate-700">
+        <p className="rounded-2xl border-2 border-tinta bg-white p-6 text-slate-700">
           A renovação estará disponível em breve.
         </p>
       )}

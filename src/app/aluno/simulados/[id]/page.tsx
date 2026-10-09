@@ -6,6 +6,7 @@ import { exigirLogin } from "@/lib/auth";
 import type { Alternativa } from "@/lib/questoes/questao";
 import { contestar, enviarSimulado, tentarCorrigirDeNovo } from "../actions";
 import { AtualizarEnquantoCorrige } from "./atualizar";
+import { CabecalhoPagina } from "@/components/sistema";
 
 type Simulado = {
   id: string;
@@ -73,13 +74,14 @@ async function Prova({ simulado }: { simulado: Simulado }) {
   return (
     <form action={enviarSimulado} className="space-y-6">
       <input type="hidden" name="simulado_id" value={simulado.id} />
-      <header>
-        <h1 className="text-2xl font-bold text-tinta">Simulado · {simulado.disciplinas.nome}</h1>
-        <p className="text-sm text-slate-600">{questoes.length} questões. Responda e envie no final.</p>
-      </header>
+      <CabecalhoPagina
+        rotulo="Lab · Simulado"
+        titulo={simulado.disciplinas.nome}
+        descricao={`${questoes.length} questões. Responda e envie no final.`}
+      />
 
       {questoes.map(({ ordem, questoes: q }) => (
-        <fieldset key={q.id} className="space-y-3 rounded-xl border border-slate-200 bg-white p-5">
+        <fieldset key={q.id} className="space-y-3 rounded-2xl border-2 border-tinta bg-white p-5">
           <legend className="sr-only">Questão {ordem}</legend>
           <p className="text-xs font-medium text-slate-500">
             Questão {ordem} · {q.tipo === "objetiva" ? "Objetiva" : "Discursiva"}
@@ -89,7 +91,7 @@ async function Prova({ simulado }: { simulado: Simulado }) {
           {q.tipo === "objetiva" ? (
             <div className="space-y-2">
               {q.alternativas.map((a) => (
-                <label key={a.letra} className="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-200 p-3 hover:bg-slate-50 has-[:checked]:border-violeta-600 has-[:checked]:bg-violeta-50">
+                <label key={a.letra} className="flex cursor-pointer items-start gap-3 rounded-lg border-2 border-slate-200 p-3 hover:border-tinta has-[:checked]:border-tinta has-[:checked]:bg-lima">
                   <input type="radio" name={`q_${q.id}`} value={a.letra} className="mt-1" />
                   <span className="text-sm text-slate-800">
                     <strong>{a.letra})</strong> {a.texto}
@@ -103,13 +105,13 @@ async function Prova({ simulado }: { simulado: Simulado }) {
               rows={6}
               maxLength={3000}
               placeholder="Escreva sua resposta (até 3.000 caracteres)"
-              className="w-full rounded-lg border border-slate-300 p-3 text-sm focus:border-violeta-600 focus:outline-none"
+              className="w-full rounded-lg border-2 border-slate-200 p-3 text-sm focus:border-tinta focus:outline-none"
             />
           )}
         </fieldset>
       ))}
 
-      <button className="w-full rounded-lg bg-violeta-700 py-3 font-medium text-white hover:bg-violeta-800 sm:w-auto sm:px-8">
+      <button className="w-full rounded-full bg-tinta py-3 font-bold text-white hover:bg-violeta sm:w-auto sm:px-8">
         Enviar respostas
       </button>
     </form>
@@ -128,16 +130,12 @@ async function Resultado({ simulado }: { simulado: Simulado }) {
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-tinta">Resultado · {simulado.disciplinas.nome}</h1>
-          {objetivas > 0 && (
-            <p className="text-sm text-slate-600">
-              Objetivas: {acertos} de {objetivas} corretas
-            </p>
-          )}
-        </div>
-        <div className="text-right">
+      <CabecalhoPagina
+        rotulo="Lab · Resultado"
+        titulo={simulado.disciplinas.nome}
+        descricao={objetivas > 0 ? `Objetivas: ${acertos} de ${objetivas} corretas` : undefined}
+      >
+        <div className="rounded-2xl border-2 border-tinta bg-white px-5 py-3 text-right text-tinta">
           {simulado.nota !== null ? (
             <div className="relative">
               {/* Comemoração para nota a partir de 7 */}
@@ -151,10 +149,10 @@ async function Resultado({ simulado }: { simulado: Simulado }) {
             <p className="text-sm text-slate-500">Nota final após a correção</p>
           )}
         </div>
-      </header>
+      </CabecalhoPagina>
 
       {corrigindo && (
-        <div className="rounded-xl border border-sky-200 bg-sky-50 p-4 text-sm text-sky-900">
+        <div className="rounded-2xl border-2 border-tinta bg-sky-50 p-4 text-sm text-sky-900">
           A IA está corrigindo suas respostas discursivas. Esta página atualiza sozinha.
           <AtualizarEnquantoCorrige
             seDemorar={
@@ -168,7 +166,7 @@ async function Resultado({ simulado }: { simulado: Simulado }) {
         </div>
       )}
       {comErro && !corrigindo && (
-        <form action={tentarCorrigirDeNovo} className="flex flex-wrap items-center gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900">
+        <form action={tentarCorrigirDeNovo} className="flex flex-wrap items-center gap-3 rounded-2xl border-2 border-tinta bg-red-50 p-4 text-sm text-red-900">
           <input type="hidden" name="simulado_id" value={simulado.id} />
           Não conseguimos corrigir alguma resposta agora.
           <button className="rounded-md border border-red-300 bg-white px-3 py-1">Tentar de novo</button>
@@ -176,7 +174,7 @@ async function Resultado({ simulado }: { simulado: Simulado }) {
       )}
 
       {linhas.map((l) => (
-        <article key={l.questao_id} className="space-y-3 rounded-xl border border-slate-200 bg-white p-5">
+        <article key={l.questao_id} className="space-y-3 rounded-2xl border-2 border-tinta bg-white p-5">
           <div className="flex items-start justify-between gap-3">
             <p className="text-xs font-medium text-slate-500">
               Questão {l.ordem} · {l.tipo === "objetiva" ? "Objetiva" : "Discursiva"}
@@ -286,7 +284,7 @@ function Discursiva({ linha, simuladoId }: { linha: LinhaResultado; simuladoId: 
               maxLength={2000}
               rows={3}
               placeholder="Explique por que a nota deveria ser diferente"
-              className="w-full rounded-lg border border-slate-300 p-2 focus:border-violeta-600 focus:outline-none"
+              className="w-full rounded-lg border-2 border-slate-200 p-2 focus:border-tinta focus:outline-none"
             />
             <button className="rounded-md border border-slate-300 px-3 py-1 hover:bg-slate-50">Enviar para o professor</button>
           </form>

@@ -82,7 +82,7 @@ export function FormularioGeracao({
   }
 
   return (
-    <form onSubmit={enviar} className="space-y-5 rounded-xl border border-slate-200 bg-white p-6">
+    <form onSubmit={enviar} className="space-y-5 rounded-2xl border-2 border-tinta bg-white p-6">
       <div className="grid gap-4 sm:grid-cols-2">
         {deck ? (
           <Rotulo texto="Deck">

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { exigirLogin } from "@/lib/auth";
 import { carregarCatalogo, formatarData } from "@/lib/catalogo";
 import { emitirCertificado } from "./actions";
+import { CabecalhoPagina } from "@/components/sistema";
 
 type Certificado = {
   id: string;
@@ -37,18 +38,17 @@ export default async function Certificados({ searchParams }: PageProps<"/aluno/c
 
   return (
     <div className="space-y-8">
-      <header>
-        <h1 className="text-2xl font-bold text-tinta">Certificados</h1>
-        <p className="text-sm text-slate-600">
-          Conclua todos os itens obrigatórios de uma disciplina para emitir o certificado.
-        </p>
-      </header>
+      <CabecalhoPagina
+        rotulo="Lab · Certificados"
+        titulo="Certificados"
+        descricao="Conclua todos os itens obrigatórios de uma disciplina para emitir o certificado."
+      />
 
       {typeof erro === "string" && (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">{erro}</p>
+        <p className="rounded-2xl border-2 border-tinta bg-red-50 p-3 text-sm text-red-800">{erro}</p>
       )}
       {emitido === "1" && (
-        <div className="relative rounded-xl border border-violeta-200 bg-violeta-50 p-4 text-sm text-violeta-900">
+        <div className="relative rounded-2xl border-2 border-tinta bg-violeta-50 p-4 text-sm text-violeta-900">
           <Confete />
           🎓 Certificado emitido! Baixe o PDF abaixo.
         </div>
@@ -56,12 +56,12 @@ export default async function Certificados({ searchParams }: PageProps<"/aluno/c
 
       {prontas.length > 0 && (
         <section className="space-y-3">
-          <h2 className="font-semibold text-slate-900">Prontos para emitir</h2>
+          <h2 className="font-extrabold tracking-tight text-tinta">Prontos para emitir</h2>
           {prontas.map((d) => (
             <form
               key={d.id}
               action={emitirCertificado}
-              className="flex flex-wrap items-end gap-3 rounded-2xl border-2 border-violeta-600 bg-white p-5"
+              className="flex flex-wrap items-end gap-3 rounded-2xl border-2 border-tinta bg-white p-5"
             >
               <input type="hidden" name="disciplina_id" value={d.id} />
               <div className="flex-1 space-y-1">
@@ -76,7 +76,7 @@ export default async function Certificados({ searchParams }: PageProps<"/aluno/c
                     required
                     minLength={5}
                     maxLength={120}
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 focus:border-violeta-600 focus:outline-none"
+                    className="w-full rounded-lg border-2 border-slate-200 px-3 py-2 text-slate-900 focus:border-tinta focus:outline-none"
                   />
                 </label>
               </div>
@@ -90,13 +90,13 @@ export default async function Certificados({ searchParams }: PageProps<"/aluno/c
       )}
 
       <section className="space-y-3">
-        <h2 className="font-semibold text-slate-900">Seus certificados</h2>
+        <h2 className="font-extrabold tracking-tight text-tinta">Seus certificados</h2>
         {certificados.length === 0 ? (
           <p className="rounded-xl bg-slate-50 p-6 text-center text-sm text-slate-500">Nenhum certificado emitido ainda.</p>
         ) : (
           <SurgirLista className="grid gap-3 sm:grid-cols-2">
             {certificados.map((c) => (
-              <SurgirItem key={c.id} className="space-y-3 rounded-2xl border border-slate-200 bg-white p-5">
+              <SurgirItem key={c.id} className="space-y-3 rounded-2xl border-2 border-tinta bg-white p-5">
                 <div className="flex items-start gap-3">
                   <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-violeta-50 text-violeta-700">
                     <GraduationCap className="size-5" />
@@ -130,8 +130,8 @@ export default async function Certificados({ searchParams }: PageProps<"/aluno/c
 
       {emAndamento.length > 0 && (
         <section className="space-y-3">
-          <h2 className="font-semibold text-slate-900">Em andamento</h2>
-          <ul className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5">
+          <h2 className="font-extrabold tracking-tight text-tinta">Em andamento</h2>
+          <ul className="space-y-4 rounded-2xl border-2 border-tinta bg-white p-5">
             {emAndamento.map((d) => (
               <li key={d.id}>
                 <Link href={`/aluno/disciplinas/${d.slug}`} className="block space-y-1.5">

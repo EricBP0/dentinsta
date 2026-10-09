@@ -8,6 +8,7 @@ import { limiteDiarioChat } from "@/lib/ia/chat";
 import { inicioDoDia } from "@/lib/ia/chat-cota";
 import { apagarConversa } from "./actions";
 import { Chat } from "./chat";
+import { botaoEscuro, CabecalhoPagina } from "@/components/sistema";
 
 type Conversa = { id: string; titulo: string; atualizado_em: string };
 type Mensagem = { id: string; papel: "user" | "assistant"; conteudo: string };
@@ -19,7 +20,7 @@ export default async function PaginaChat({ searchParams }: PageProps<"/aluno/cha
 
   if (!liberado) {
     return (
-      <div className="mx-auto max-w-xl space-y-4 rounded-2xl border border-slate-200 bg-white p-8 text-center">
+      <div className="mx-auto max-w-xl space-y-4 rounded-2xl border-2 border-tinta bg-white p-8 text-center">
         <div className="mx-auto grid size-12 place-items-center rounded-xl bg-violeta-50 text-violeta-700">
           <Sparkles className="size-6" />
         </div>
@@ -72,7 +73,7 @@ export default async function PaginaChat({ searchParams }: PageProps<"/aluno/cha
       <aside className="min-w-0 space-y-3">
         <Link
           href="/aluno/chat"
-          className="flex items-center justify-center gap-2 rounded-xl bg-violeta-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-violeta-800"
+          className={`${botaoEscuro} w-full`}
         >
           <Plus className="size-4" /> Nova conversa
         </Link>
@@ -83,7 +84,7 @@ export default async function PaginaChat({ searchParams }: PageProps<"/aluno/cha
                 key={x.id}
                 href={`/aluno/chat?c=${x.id}`}
                 className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm lg:shrink ${
-                  x.id === conversaId ? "bg-violeta-50 font-medium text-violeta-800" : "text-slate-600 hover:bg-slate-100"
+                  x.id === conversaId ? "bg-tinta font-semibold text-white" : "text-slate-700 hover:bg-white"
                 }`}
               >
                 <MessageCircle className="size-4 shrink-0" />
@@ -95,18 +96,16 @@ export default async function PaginaChat({ searchParams }: PageProps<"/aluno/cha
       </aside>
 
       <section className="min-w-0 space-y-3">
-        <header className="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <h1 className="text-2xl font-bold text-tinta">{atual?.titulo ?? "Chat de dúvidas"}</h1>
-            <p className="text-sm text-slate-600">Pergunte qualquer coisa de Odontologia.</p>
-          </div>
+        <CabecalhoPagina rotulo="Lab · Chat IA" titulo={atual?.titulo ?? "Chat de dúvidas"} descricao="Pergunte qualquer coisa de Odontologia.">
           {atual && (
             <form action={apagarConversa}>
               <input type="hidden" name="id" value={atual.id} />
-              <button className="text-xs text-slate-500 underline hover:text-red-700">Apagar conversa</button>
+              <button className="rounded-full border-2 border-white/60 px-3 py-1 text-xs font-semibold text-white hover:bg-white/10">
+                Apagar conversa
+              </button>
             </form>
           )}
-        </header>
+        </CabecalhoPagina>
         <Chat
           key={conversaId ?? "nova"}
           conversaId={conversaId}

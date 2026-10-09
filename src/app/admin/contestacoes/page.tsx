@@ -3,6 +3,7 @@ import { exigirEquipe } from "@/lib/auth";
 import { formatarData } from "@/lib/catalogo";
 import type { Feedback } from "@/lib/ia/rubrica";
 import { responderContestacao } from "./actions";
+import { CabecalhoPagina } from "@/components/sistema";
 
 type Contestacao = {
   id: string;
@@ -38,22 +39,21 @@ export default async function AdminContestacoes({ searchParams }: PageProps<"/ad
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-tinta">Contestações de correção</h1>
-          <p className="text-sm text-slate-600">
-            Alunos que discordaram da nota da IA. Use os casos para melhorar gabaritos e rubricas.
-          </p>
-        </div>
+      <CabecalhoPagina
+        tom="tinta"
+        rotulo="Backoffice · Correção"
+        titulo="Contestações de correção"
+        descricao="Alunos que discordaram da nota da IA. Use os casos para melhorar gabaritos e rubricas."
+      >
         <a href={filtro ? "?status=todas" : "?"} className={botaoSecundario + " px-3 py-2 text-sm"}>
           {filtro ? "Ver todas" : "Só abertas"}
         </a>
-      </header>
+      </CabecalhoPagina>
 
       {contestacoes.length === 0 && <p className="text-sm text-slate-600">Nenhuma contestação {filtro ? "aberta" : ""}.</p>}
 
       {contestacoes.map((c) => (
-        <article key={c.id} className="space-y-4 rounded-xl border border-slate-200 bg-white p-5">
+        <article key={c.id} className="space-y-4 rounded-2xl border-2 border-tinta bg-white p-5">
           <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
             <span className="text-slate-600">
               {c.perfis.nome || c.perfis.email} · {formatarData(c.criado_em)}
@@ -68,7 +68,7 @@ export default async function AdminContestacoes({ searchParams }: PageProps<"/ad
               Nota da IA: <strong>{c.respostas.nota ?? "—"}</strong>
               {c.respostas.feedback?.comentario_geral && ` — ${c.respostas.feedback.comentario_geral}`}
             </p>
-            <p className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-amber-900">
+            <p className="rounded-2xl border-2 border-tinta bg-amber-50 p-3 text-amber-900">
               <strong>Motivo do aluno:</strong> {c.motivo}
             </p>
             {c.resposta_equipe && (
