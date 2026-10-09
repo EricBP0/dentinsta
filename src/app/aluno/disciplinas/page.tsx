@@ -180,7 +180,9 @@ export default async function Catalogo({ searchParams }: PageProps<"/aluno/disci
           ))}
         </ul>
       ) : (
-        <SurgirLista className="space-y-10">
+        // A chave recria a lista a cada página ou filtro: a animação de entrada
+        // só roda uma vez por lista, e sem isso os cartões novos ficavam invisíveis.
+        <SurgirLista key={`${pagina.pagina}-${montarQuery(filtros)}`} className="space-y-10">
           {pagina.itens.map(({ disciplina: d, itens }) => {
             const arte = thumbDaDisciplina(d.slug);
             const pct = d.progresso.total ? Math.round((d.progresso.concluidos / d.progresso.total) * 100) : 0;
