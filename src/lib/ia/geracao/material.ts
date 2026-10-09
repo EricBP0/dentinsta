@@ -1,8 +1,8 @@
-// Converte o material enviado (PDF, Word, texto, imagens) em blocos de conteúdo
-// para a API da Anthropic. PDFs e imagens vão direto — o modelo lê o texto e as
-// figuras. Word (.docx) vira texto.
+// Converte o material enviado (PDF, Word, texto, imagens) nas partes que vão
+// para a IA (qualquer provedor). PDFs e imagens vão direto — o modelo lê o texto
+// e as figuras. Word (.docx) vira texto.
 
-import type Anthropic from "@anthropic-ai/sdk";
+import type { Parte } from "@/lib/ia/provedores/tipos";
 
 export type ArquivoMaterial = { nome: string; tipo: string; dados: Buffer };
 
@@ -71,45 +71,22 @@ async function textoDoDocx(dados: Buffer): Promise<string> {
   return value;
 }
 
-export async function montarBlocosMaterial(
-  arquivos: ArquivoMaterial[],
-  textoColado: string,
-): Promise<Anthropic.ContentBlockParam[]> {
-  const blocos: Anthropic.ContentBlockParam[] = [];
+export async function montarBlocosMaterial(arquivos: ArquivoMaterial[], textoColado: string): Promise<Parte[]> {
+  const partes: Parte[] = [];
 
   for (const arquivo of arquivos) {
     const tipo = tipoDoArquivo(arquivo.nome, arquivo.tipo);
     if (tipo === "pdf") {
-      blocos.push({
-        type: "document",
-        title: arquivo.nome,
-        source: { type: "base64", media_type: "application/pdf", data: arquivo.dados.toString("base64") },
-      });
+      partes.push({ tipo: "pdf", nome: arquivo.nome, dados: arquivo.dados });
     } else if (tipo === "imagem") {
       const mime = mimeDoArquivo(arquivo.nome, arquivo.tipo) as keyof typeof IMAGENS;
-      blocos.push({ type: "text", text: `Imagem do material: ${arquivo.nome}` });
-      blocos.push({
-        type: "image",
-        source: { type: "base64", media_type: IMAGENS[mime] ?? "image/jpeg", data: arquivo.dados.toString("base64") },
-      });
+      partes.push({ tipo: "imagem", nome: arquivo.nome, mime: IMAGENS[mime] ?? "image/jpeg", dados: arquivo.dados });
     } else if (tipo === "docx" || tipo === "texto") {
       const texto = tipo === "docx" ? await textoDoDocx(arquivo.dados) : arquivo.dados.toString("utf8");
-      if (texto.trim()) {
-        blocos.push({
-          type: "document",
-          title: arquivo.nome,
-          source: { type: "text", media_type: "text/plain", data: texto },
-        });
-      }
+      if (texto.trim()) partes.push({ tipo: "texto", titulo: arquivo.nome, texto });
     }
   }
 
-  if (textoColado.trim()) {
-    blocos.push({
-      type: "document",
-      title: "Texto enviado pelo professor",
-      source: { type: "text", media_type: "text/plain", data: textoColado },
-    });
-  }
-  return blocos;
+  if (textoColado.trim()) partes.push({ tipo: "texto", titulo: "Texto enviado pelo professor", texto: textoColado });
+  return partes;
 }

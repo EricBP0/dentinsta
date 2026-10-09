@@ -102,7 +102,8 @@ no `main` (enquanto isso, o `main` só tem o planejamento).
    | `NEXT_PUBLIC_SUPABASE_URL` | URL do projeto Supabase |
    | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Chave publishable |
    | `SUPABASE_SECRET_KEY` | Chave secret (marque como **Sensitive**) |
-   | `ANTHROPIC_API_KEY` | Chave da Anthropic (Sensitive) |
+   | `GEMINI_API_KEY` | Chave do Google AI Studio, com faturamento ativo (Sensitive) |
+   | `ANTHROPIC_API_KEY` | Chave da Anthropic, usada como reserva (Sensitive) |
    | `ASAAS_API_KEY` | Chave do **sandbox** do Asaas por enquanto (Sensitive) |
    | `ASAAS_AMBIENTE` | `sandbox` |
    | `ASAAS_WEBHOOK_TOKEN` | Uma senha longa e aleatória que você inventa (Sensitive) |
@@ -110,8 +111,9 @@ no `main` (enquanto isso, o `main` só tem o planejamento).
    | `CERTIFICADO_RESPONSAVEL` | Nome de quem assina (ex.: `Dr. Fulano de Tal`) |
    | `CERTIFICADO_RESPONSAVEL_CARGO` | Ex.: `CRO-SP 12345 · Coordenador pedagógico` |
 
-   Opcionais: `IA_MODELO`, `IA_EFFORT`, `IA_COTA_MENSAL`, `IA_MODELO_GERACAO`,
-   `IA_EFFORT_GERACAO`, `CERTIFICADO_PLATAFORMA`.
+   Opcionais: `IA_CORRECAO`, `IA_CHAT`, `IA_GERACAO` (ordem dos modelos de
+   cada uso), `IA_EFFORT`, `IA_EFFORT_GERACAO`, `IA_COTA_MENSAL`,
+   `CERTIFICADO_PLATAFORMA`.
 
 3. Clique em **Deploy**. As funções rodam na região de São Paulo (`gru1`),
    definida no `vercel.json`.

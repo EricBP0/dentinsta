@@ -85,11 +85,12 @@ corrigidas por função do banco e discursivas pelo servidor com a chave secreta
 3. Copie `.env.example` para `.env.local` e preencha:
    - URL e chave *publishable* do Supabase (**Project Settings → API Keys**);
    - chave *secret* do Supabase (só no servidor — grava as notas da IA);
-   - `ANTHROPIC_API_KEY` ([console.anthropic.com](https://console.anthropic.com)).
+   - IA: `GEMINI_API_KEY` ([aistudio.google.com](https://aistudio.google.com), conta paga)
+     e `ANTHROPIC_API_KEY` ([console.anthropic.com](https://console.anthropic.com)), de reserva.
    - Asaas: `ASAAS_API_KEY`, `ASAAS_AMBIENTE` (`sandbox` para testar,
      `producao` para cobrar), `ASAAS_WEBHOOK_TOKEN` e `NEXT_PUBLIC_SITE_URL`.
-   `IA_MODELO`, `IA_EFFORT`, `IA_COTA_MENSAL`, `IA_MODELO_GERACAO` e
-   `IA_EFFORT_GERACAO` são opcionais. No certificado, `CERTIFICADO_RESPONSAVEL`
+   `IA_CORRECAO`, `IA_CHAT`, `IA_GERACAO` (modelos de cada uso, em ordem),
+   `IA_EFFORT`, `IA_COTA_MENSAL` e `IA_EFFORT_GERACAO` são opcionais. No certificado, `CERTIFICADO_RESPONSAVEL`
    e `CERTIFICADO_RESPONSAVEL_CARGO` definem quem assina (ex.: nome e CRO do
    professor responsável).
 4. Instale e rode:
@@ -131,11 +132,14 @@ corrigidas por função do banco e discursivas pelo servidor com a chave secreta
 
 ## Correção por IA: calibrar antes de lançar
 
-O modelo e o esforço da correção são configuráveis (`IA_MODELO`, `IA_EFFORT`;
-padrão `claude-opus-5-5` com esforço `low`). Antes do lançamento, corrija ~50
-respostas reais com o professor, rode as mesmas com a IA e compare as notas
-(docs/PLANEJAMENTO.md, seção 6.3). Ajuste rubricas e configuração até as notas
-ficarem próximas. O consumo de tokens de cada correção fica na tabela `uso_ia`.
+Cada uso da IA (correção, chat, geração) tem uma lista de modelos em ordem
+(`IA_CORRECAO`, `IA_CHAT`, `IA_GERACAO`; padrão
+`gemini:gemini-3.6-flash,anthropic:claude-opus-5-5`): se o primeiro falhar ou
+recusar, o próximo assume. Os provedores ficam em `src/lib/ia/provedores/`
+(Gemini e Anthropic; outro provedor é mais um arquivo ali). Antes de trocar o
+modelo da correção, corrija ~50 respostas reais com o professor, rode as mesmas
+com a IA e compare as notas (docs/PLANEJAMENTO.md, seção 6.3). O uso e o custo
+estimado por modelo aparecem em **Backoffice → IA** (tabela `uso_ia`).
 
 ## Estrutura
 
