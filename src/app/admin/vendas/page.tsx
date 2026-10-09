@@ -4,6 +4,7 @@ import { formatarData } from "@/lib/catalogo";
 import { inicioDoMes } from "@/lib/ia/cota";
 import { formatarReais } from "@/lib/preco";
 import { liberarAcesso, revogarAcesso } from "./actions";
+import { CabecalhoPagina } from "@/components/sistema";
 
 type Compra = {
   id: string;
@@ -72,13 +73,15 @@ export default async function Vendas({ searchParams }: PageProps<"/admin/vendas"
 
   return (
     <div className="space-y-8">
-      <header>
-        <h1 className="text-2xl font-bold text-tinta">Vendas e acessos</h1>
-        <p className="text-sm text-slate-600">Pagamentos pelo Asaas. Estornos e chargebacks retiram o acesso automaticamente.</p>
-      </header>
+      <CabecalhoPagina
+        tom="tinta"
+        rotulo="Backoffice · Vendas"
+        titulo="Vendas e acessos"
+        descricao="Pagamentos pelo Asaas. Estornos e chargebacks retiram o acesso automaticamente."
+      />
 
       {typeof aviso === "string" && (
-        <p className="rounded-lg border border-sky-200 bg-sky-50 p-3 text-sm text-sky-900">{aviso}</p>
+        <p className="rounded-2xl border-2 border-tinta bg-sky-50 p-3 text-sm text-sky-900">{aviso}</p>
       )}
 
       <section className="grid gap-3 sm:grid-cols-3">
@@ -87,15 +90,15 @@ export default async function Vendas({ searchParams }: PageProps<"/admin/vendas"
           ["Alunos cadastrados", String(totalAlunos ?? 0)],
           ["Com acesso liberado", String(comAcesso ?? 0)],
         ].map(([titulo, valor]) => (
-          <div key={titulo} className="rounded-xl border border-slate-200 bg-white p-4">
+          <div key={titulo} className="rounded-2xl border-2 border-tinta bg-white p-4">
             <p className="text-xs text-slate-500">{titulo}</p>
             <p className="mt-1 text-lg font-semibold text-slate-900">{valor}</p>
           </div>
         ))}
       </section>
 
-      <section className="space-y-3 rounded-xl border border-slate-200 bg-white p-5">
-        <h2 className="font-semibold text-slate-900">Alunos</h2>
+      <section className="space-y-3 rounded-2xl border-2 border-tinta bg-white p-5">
+        <h2 className="font-extrabold tracking-tight text-tinta">Alunos</h2>
         <form className="flex gap-2">
           <input name="busca" defaultValue={termo} placeholder="Buscar por nome ou e-mail" className={campo} />
           <button className={`${botaoSecundario} px-4`}>Buscar</button>
@@ -145,7 +148,7 @@ export default async function Vendas({ searchParams }: PageProps<"/admin/vendas"
 
       <section className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="font-semibold text-slate-900">Pagamentos</h2>
+          <h2 className="font-extrabold tracking-tight text-tinta">Pagamentos</h2>
           <form className="flex gap-2">
             <select name="status" defaultValue={filtroStatus ?? ""} className={`${campo} w-auto`}>
               <option value="">Todos</option>
@@ -159,7 +162,7 @@ export default async function Vendas({ searchParams }: PageProps<"/admin/vendas"
             <button className={`${botaoSecundario} px-4`}>Filtrar</button>
           </form>
         </div>
-        <ul className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">
+        <ul className="divide-y divide-slate-100 rounded-2xl border-2 border-tinta bg-white">
           {(compras ?? []).length === 0 && <li className="p-4 text-sm text-slate-600">Nenhum pagamento.</li>}
           {(compras ?? []).map((c) => (
             <li key={c.id} className="flex flex-wrap items-center justify-between gap-2 p-4 text-sm">

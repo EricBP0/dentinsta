@@ -5,7 +5,7 @@ export function BotaoRenovar({ texto = "Renove para liberar" }: { texto?: string
   return (
     <Link
       href="/renovar"
-      className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-900 hover:bg-amber-200"
+      className="inline-flex items-center gap-1 rounded-full border-2 border-tinta bg-amber-200 px-3 py-1 text-xs font-bold text-tinta hover:bg-lima"
     >
       🔒 {texto}
     </Link>

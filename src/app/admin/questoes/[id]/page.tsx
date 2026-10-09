@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { exigirEquipe } from "@/lib/auth";
 import { FormularioQuestao, type QuestaoExistente } from "../formulario";
+import { CabecalhoPagina } from "@/components/sistema";
 
 export default async function EditarQuestao({ params }: PageProps<"/admin/questoes/[id]">) {
   const { id } = await params;
@@ -24,7 +25,7 @@ export default async function EditarQuestao({ params }: PageProps<"/admin/questo
       <Link href={`/admin/questoes?disciplina=${existente.disciplina_id}`} className="text-sm text-slate-600 hover:text-slate-900">
         ← Banco de questões
       </Link>
-      <h1 className="text-2xl font-bold text-tinta">Editar questão</h1>
+      <CabecalhoPagina tom="tinta" rotulo="Backoffice · Questões" titulo="Editar questão" />
       <FormularioQuestao disciplinas={disciplinas ?? []} questao={existente} />
     </div>
   );

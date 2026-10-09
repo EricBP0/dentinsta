@@ -5,6 +5,7 @@ import { CapaDisciplina } from "@/components/capa-disciplina";
 import { exigirLogin } from "@/lib/auth";
 import { carregarCatalogo } from "@/lib/catalogo";
 import { NOME_TIPO_ITEM } from "@/lib/tipos";
+import { CabecalhoPagina } from "@/components/sistema";
 
 export default async function PaginaDisciplina({ params }: PageProps<"/aluno/disciplinas/[slug]">) {
   const { slug } = await params;
@@ -18,10 +19,9 @@ export default async function PaginaDisciplina({ params }: PageProps<"/aluno/dis
       <Link href="/aluno/disciplinas" className="text-sm text-slate-600 hover:text-slate-900">
         ← Disciplinas
       </Link>
-      <header className="space-y-3">
-        {disciplina.capa_url && <CapaDisciplina src={disciplina.capa_url} nome={disciplina.nome} className="max-w-xl" />}
-        <h1 className="text-2xl font-bold text-tinta">{disciplina.nome}</h1>
-        {disciplina.descricao && <p className="text-slate-600">{disciplina.descricao}</p>}
+      <CabecalhoPagina rotulo="Lab · Disciplina" titulo={disciplina.nome} descricao={disciplina.descricao || undefined} />
+      <header className="grid items-center gap-4 sm:grid-cols-[minmax(0,320px)_1fr]">
+        {disciplina.capa_url && <CapaDisciplina src={disciplina.capa_url} nome={disciplina.nome} className="border-2 border-tinta" />}
         <div className="max-w-sm">
           <BarraProgresso feitos={disciplina.progresso.concluidos} total={disciplina.progresso.total} />
           {disciplina.progresso.completo && (
@@ -36,8 +36,8 @@ export default async function PaginaDisciplina({ params }: PageProps<"/aluno/dis
       </header>
 
       {disciplina.modulos.map((modulo) => (
-        <section key={modulo.id} className="rounded-xl border border-slate-200 bg-white">
-          <h2 className="border-b border-slate-100 px-4 py-3 font-semibold text-slate-900">{modulo.titulo}</h2>
+        <section key={modulo.id} className="rounded-2xl border-2 border-tinta bg-white">
+          <h2 className="border-b border-slate-100 px-4 py-3 font-extrabold tracking-tight text-tinta">{modulo.titulo}</h2>
           <ul className="divide-y divide-slate-100">
             {modulo.itens.map((item) => (
               <li key={item.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">

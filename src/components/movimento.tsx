@@ -88,9 +88,9 @@ export function NumeroAnimado({ valor, casas = 1, className }: { valor: number; 
 /** Barra de progresso que preenche com animação. */
 export function BarraAnimada({ porcentagem, className }: { porcentagem: number; className?: string }) {
   return (
-    <div className={`h-2 overflow-hidden rounded-full bg-slate-200 ${className ?? ""}`}>
+    <div className={`h-3 overflow-hidden rounded-full border-2 border-tinta bg-white ${className ?? ""}`}>
       <motion.div
-        className="h-full rounded-full bg-primary"
+        className="h-full bg-violeta"
         initial={{ width: 0 }}
         whileInView={{ width: `${Math.min(Math.max(porcentagem, 0), 100)}%` }}
         viewport={{ once: true }}

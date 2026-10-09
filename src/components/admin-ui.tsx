@@ -1,18 +1,19 @@
 import type { ReactNode } from "react";
+import { CabecalhoPagina } from "@/components/sistema";
 
 // Estilos do backoffice, nos tokens da marca OdontoLab (docs/MARCA.md).
 export const campo =
-  "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-xs transition-colors focus:border-primary focus:outline-none focus:ring-3 focus:ring-primary/15";
+  "w-full rounded-lg border-2 border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 transition-colors focus:border-tinta focus:outline-none";
 export const botaoPrimario =
-  "inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-violeta-800";
+  "inline-flex items-center justify-center gap-1.5 rounded-full bg-tinta px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-violeta disabled:opacity-60";
 export const botaoSecundario =
-  "inline-flex items-center justify-center gap-1 rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-xs text-slate-700 transition-colors hover:border-slate-400 hover:bg-slate-50";
-export const botaoPerigo = "rounded-lg px-2 py-1 text-xs text-red-700 transition-colors hover:bg-red-50";
+  "inline-flex items-center justify-center gap-1 rounded-full border-2 border-tinta bg-white px-3 py-1 text-xs font-semibold text-tinta transition-colors hover:bg-lima";
+export const botaoPerigo = "rounded-full px-2.5 py-1 text-xs font-semibold text-red-700 transition-colors hover:bg-red-50";
 
 export function Rotulo({ texto, children, dica }: { texto: string; children: ReactNode; dica?: string }) {
   return (
     <label className="block space-y-1">
-      <span className="text-sm font-medium text-slate-700">{texto}</span>
+      <span className="rotulo text-[10px] font-semibold text-slate-600">{texto}</span>
       {children}
       {dica && <span className="block text-xs text-slate-500">{dica}</span>}
     </label>
@@ -36,15 +37,11 @@ export function Selo({ status, texto }: { status: string; texto?: string }) {
   );
 }
 
-/** Título padrão das páginas do backoffice. */
+/** Título padrão das páginas do backoffice: a faixa preta quadriculada. */
 export function TituloPagina({ titulo, descricao, children }: { titulo: string; descricao?: string; children?: ReactNode }) {
   return (
-    <header className="flex flex-wrap items-end justify-between gap-4">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-bold text-tinta">{titulo}</h1>
-        {descricao && <p className="text-sm text-slate-600">{descricao}</p>}
-      </div>
-      {children && <div className="flex flex-wrap gap-2">{children}</div>}
-    </header>
+    <CabecalhoPagina tom="tinta" rotulo="Backoffice" titulo={titulo} descricao={descricao}>
+      {children}
+    </CabecalhoPagina>
   );
 }

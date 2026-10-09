@@ -10,7 +10,9 @@ export default async function LayoutAluno({ children }: LayoutProps<"/aluno">) {
       <Cabecalho perfil={perfil} area="aluno" />
       <RegistroTempo />
       <Movimento>
-        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">{children}</main>
+        <div className="fundo-marca flex flex-1 flex-col">
+          <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">{children}</main>
+        </div>
       </Movimento>
     </>
   );

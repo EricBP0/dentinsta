@@ -7,6 +7,7 @@ import { iaAtiva } from "@/lib/acesso";
 import { exigirLogin } from "@/lib/auth";
 import { carregarCatalogo, formatarData } from "@/lib/catalogo";
 import { thumbDaDisciplina } from "@/lib/thumbs";
+import { CabecalhoPagina } from "@/components/sistema";
 
 export default async function Catalogo() {
   const { supabase, perfil } = await exigirLogin();
@@ -21,10 +22,10 @@ export default async function Catalogo() {
   return (
     <div className="space-y-8">
       <section className="space-y-3">
-        <h1 className="text-2xl font-bold text-tinta">Disciplinas</h1>
+        <CabecalhoPagina rotulo="Lab · Estudo" titulo="Disciplinas" descricao="Cada disciplina numa linha, com todos os conteúdos dela." />
 
         {!acesso && !equipe && (
-          <div className="rounded-xl border border-violeta-200 bg-violeta-50 p-4 text-sm text-violeta-900">
+          <div className="rounded-2xl border-2 border-tinta bg-violeta-50 p-4 text-sm text-violeta-900">
             Você ainda não tem acesso ao conteúdo. <Link href="/assinar" className="font-medium underline">Liberar acesso</Link>
           </div>
         )}
@@ -32,7 +33,7 @@ export default async function Catalogo() {
         {acesso && (
           <div className="flex flex-wrap gap-3 text-sm">
             {iaAtiva(acesso) ? (
-              <span className="rounded-full bg-violeta-50 px-3 py-1 text-violeta-800">
+              <span className="rounded-full border-2 border-tinta bg-lima px-3 py-1 font-semibold text-tinta">
                 Novidades e IA liberadas até {formatarData(acesso.novidadesAte)}
               </span>
             ) : (
@@ -42,7 +43,7 @@ export default async function Catalogo() {
         )}
 
         {itensBloqueados > 0 && (
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-tinta bg-amber-50 p-4 text-sm text-amber-900">
             <span>
               {itensBloqueados} {itensBloqueados === 1 ? "novo conteúdo" : "novos conteúdos"}
               {disciplinasBloqueadas > 0 && ` e ${disciplinasBloqueadas} ${disciplinasBloqueadas === 1 ? "disciplina" : "disciplinas"}`} desde o seu acesso.

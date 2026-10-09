@@ -9,8 +9,8 @@ import {
   inicioConsulta,
   partesBrasilia,
   reaisParaCentavos,
-} from "@/lib/clinica/clinica";
-import { exigirClinica } from "./acesso";
+} from "@/lib/consultorio/consultorio";
+import { exigirConsultorio } from "./acesso";
 
 export type EstadoForm = { erro?: string; ok?: number };
 
@@ -19,7 +19,7 @@ function texto(formData: FormData, campo: string, limite = 4000) {
 }
 
 function revalidar() {
-  revalidatePath("/aluno/clinica", "layout");
+  revalidatePath("/aluno/consultorio", "layout");
 }
 
 // ---------------------------------------------------------------------------
@@ -27,7 +27,7 @@ function revalidar() {
 // ---------------------------------------------------------------------------
 
 export async function salvarPaciente(_: EstadoForm, formData: FormData): Promise<EstadoForm> {
-  const { supabase } = await exigirClinica();
+  const { supabase } = await exigirConsultorio();
   const id = texto(formData, "id");
   const nascimento = texto(formData, "nascimento");
   const dados = {
@@ -44,15 +44,15 @@ export async function salvarPaciente(_: EstadoForm, formData: FormData): Promise
     : await supabase.from("clinica_pacientes").insert(dados);
   if (error) return { erro: "Não foi possível salvar o paciente." };
   revalidar();
-  if (id) redirect("/aluno/clinica/pacientes");
+  if (id) redirect("/aluno/consultorio/pacientes");
   return { ok: Date.now() };
 }
 
 export async function excluirPaciente(formData: FormData) {
-  const { supabase } = await exigirClinica();
+  const { supabase } = await exigirConsultorio();
   await supabase.from("clinica_pacientes").delete().eq("id", texto(formData, "id"));
   revalidar();
-  redirect("/aluno/clinica/pacientes");
+  redirect("/aluno/consultorio/pacientes");
 }
 
 // ---------------------------------------------------------------------------
@@ -60,7 +60,7 @@ export async function excluirPaciente(formData: FormData) {
 // ---------------------------------------------------------------------------
 
 export async function agendarConsulta(_: EstadoForm, formData: FormData): Promise<EstadoForm> {
-  const { supabase } = await exigirClinica();
+  const { supabase } = await exigirConsultorio();
   const tipo = texto(formData, "tipo");
   const inicio = inicioConsulta(texto(formData, "dia"), texto(formData, "hora"));
   const duracao = Number(texto(formData, "duracao") || 60);
@@ -83,11 +83,11 @@ export async function agendarConsulta(_: EstadoForm, formData: FormData): Promis
   });
   if (error) return { erro: "Não foi possível agendar." };
   revalidar();
-  redirect(`/aluno/clinica/calendario?dia=${partesBrasilia(inicio).dia}`);
+  redirect(`/aluno/consultorio/agenda?dia=${partesBrasilia(inicio).dia}`);
 }
 
 export async function mudarStatusConsulta(formData: FormData) {
-  const { supabase } = await exigirClinica();
+  const { supabase } = await exigirConsultorio();
   const status = texto(formData, "status");
   if (!ehStatusConsulta(status)) return;
   await supabase.from("clinica_consultas").update({ status }).eq("id", texto(formData, "id"));
@@ -95,7 +95,7 @@ export async function mudarStatusConsulta(formData: FormData) {
 }
 
 export async function excluirConsulta(formData: FormData) {
-  const { supabase } = await exigirClinica();
+  const { supabase } = await exigirConsultorio();
   await supabase.from("clinica_consultas").delete().eq("id", texto(formData, "id"));
   revalidar();
 }
@@ -105,7 +105,7 @@ export async function excluirConsulta(formData: FormData) {
 // ---------------------------------------------------------------------------
 
 export async function adicionarLancamento(_: EstadoForm, formData: FormData): Promise<EstadoForm> {
-  const { supabase } = await exigirClinica();
+  const { supabase } = await exigirConsultorio();
   const tipo = texto(formData, "tipo");
   const descricao = texto(formData, "descricao", 200);
   const valor = reaisParaCentavos(texto(formData, "valor"));
@@ -124,7 +124,7 @@ export async function adicionarLancamento(_: EstadoForm, formData: FormData): Pr
 }
 
 export async function excluirLancamento(formData: FormData) {
-  const { supabase } = await exigirClinica();
+  const { supabase } = await exigirConsultorio();
   await supabase.from("clinica_lancamentos").delete().eq("id", texto(formData, "id"));
   revalidar();
 }
@@ -134,7 +134,7 @@ export async function excluirLancamento(formData: FormData) {
 // ---------------------------------------------------------------------------
 
 export async function salvarProva(_: EstadoForm, formData: FormData): Promise<EstadoForm> {
-  const { supabase } = await exigirClinica();
+  const { supabase } = await exigirConsultorio();
   const materia = texto(formData, "materia", 200);
   const data = texto(formData, "data");
   const horario = texto(formData, "horario");
@@ -158,11 +158,11 @@ export async function salvarProva(_: EstadoForm, formData: FormData): Promise<Es
   });
   if (error) return { erro: "Não foi possível salvar a prova." };
   revalidar();
-  redirect(`/aluno/clinica/provas?mes=${data.slice(0, 7)}`);
+  redirect("/aluno/consultorio/provas");
 }
 
 export async function excluirProva(formData: FormData) {
-  const { supabase } = await exigirClinica();
+  const { supabase } = await exigirConsultorio();
   await supabase.from("clinica_provas").delete().eq("id", texto(formData, "id"));
   revalidar();
 }

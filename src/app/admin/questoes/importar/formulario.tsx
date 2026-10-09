@@ -15,7 +15,7 @@ export function FormularioImportacao({
   const [estado, acao, enviando] = useActionState<EstadoImportacao, FormData>(importarQuestoes, {});
 
   return (
-    <form action={acao} className="space-y-4 rounded-xl border border-slate-200 bg-white p-6">
+    <form action={acao} className="space-y-4 rounded-2xl border-2 border-tinta bg-white p-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <Rotulo texto="Disciplina">
           <select name="disciplina_id" defaultValue={disciplinaPadrao ?? ""} required className={campo}>
@@ -38,7 +38,7 @@ export function FormularioImportacao({
 
       {estado.erro && <p className="text-sm text-red-600">{estado.erro}</p>}
       {estado.erros && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+        <div className="rounded-2xl border-2 border-tinta bg-red-50 p-3 text-sm text-red-800">
           <p className="font-medium">Nada foi importado. Corrija estas linhas e envie de novo:</p>
           <ul className="mt-2 list-disc space-y-1 pl-5">
             {estado.erros.slice(0, 50).map((e) => (

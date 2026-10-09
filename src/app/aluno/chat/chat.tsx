@@ -89,7 +89,7 @@ export function Chat({
   }
 
   return (
-    <div className="flex min-h-[60vh] flex-col rounded-2xl border border-slate-200 bg-white">
+    <div className="flex min-h-[60vh] flex-col rounded-2xl border-2 border-tinta bg-white">
       <div className="flex-1 space-y-4 p-4 sm:p-6">
         {mensagens.length === 0 && (
           <div className="space-y-4 py-6 text-center">
@@ -104,7 +104,7 @@ export function Chat({
                   type="button"
                   onClick={() => enviar(s)}
                   disabled={enviando || restantes <= 0}
-                  className="rounded-xl border border-slate-200 px-3 py-2 text-left text-sm text-slate-700 hover:border-violeta-300 hover:bg-violeta-50 disabled:opacity-50"
+                  className="rounded-2xl border-2 border-tinta px-3 py-2 text-left text-sm text-slate-700 hover:border-violeta-300 hover:bg-violeta-50 disabled:opacity-50"
                 >
                   {s}
                 </button>
@@ -163,12 +163,12 @@ export function Chat({
             maxLength={4000}
             disabled={restantes <= 0}
             placeholder={restantes > 0 ? "Escreva sua dúvida…" : "Você já usou as perguntas de hoje. Volte amanhã!"}
-            className="min-h-11 flex-1 resize-none rounded-xl border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-violeta-400 focus:ring-2 focus:ring-violeta-100 disabled:bg-slate-50"
+            className="min-h-11 flex-1 resize-none rounded-2xl border-2 border-tinta px-3 py-2.5 text-sm outline-none focus:border-violeta-400 focus:ring-2 focus:ring-violeta-100 disabled:bg-slate-50"
           />
           <button
             disabled={enviando || !texto.trim() || restantes <= 0}
             aria-label="Enviar"
-            className="grid size-11 shrink-0 place-items-center rounded-xl bg-violeta-700 text-white hover:bg-violeta-800 disabled:opacity-40"
+            className="grid size-11 shrink-0 place-items-center rounded-full bg-tinta text-white hover:bg-violeta disabled:opacity-40"
           >
             <ArrowUp className="size-5" />
           </button>

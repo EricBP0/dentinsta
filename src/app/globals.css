@@ -177,6 +177,15 @@
   background-size: 48px 48px;
 }
 
+/* Mesma grade sobre o Preto da marca (faixa de topo do backoffice). */
+.grade-tinta {
+  background-color: var(--color-tinta);
+  background-image:
+    linear-gradient(rgb(255 255 255 / 7%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 7%) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
 /* Rótulo da marca: JetBrains Mono em caixa alta e espaçado ("LAB 01 · FIG. 01"). */
 .rotulo {
   font-family: var(--font-mono);

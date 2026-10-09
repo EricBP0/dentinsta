@@ -1,13 +1,13 @@
-// Regras do ClinicaON que não dependem do banco: valores, datas e rótulos.
+// Regras do Consultório que não dependem do banco: valores, datas e rótulos.
 // Tudo no horário de Brasília (UTC-3, sem horário de verão desde 2019).
 
 export const TIPOS_CONSULTA = {
-  avaliacao: { nome: "Avaliação", emoji: "🩺" },
-  retorno: { nome: "Retorno", emoji: "🔄" },
-  cirurgia: { nome: "Cirurgia", emoji: "🔪" },
-  reuniao: { nome: "Reunião", emoji: "👥" },
-  compromisso: { nome: "Compromisso", emoji: "📅" },
-  especial: { nome: "Especial", emoji: "⭐" },
+  consulta: { nome: "Consulta", cor: "bg-violeta-100 text-violeta-900 border-violeta-300" },
+  retorno: { nome: "Retorno", cor: "bg-sky-100 text-sky-900 border-sky-300" },
+  procedimento: { nome: "Procedimento", cor: "bg-amber-100 text-amber-900 border-amber-300" },
+  urgencia: { nome: "Urgência", cor: "bg-red-100 text-red-900 border-red-300" },
+  clinica_escola: { nome: "Clínica da faculdade", cor: "bg-lime-100 text-lime-900 border-lime-300" },
+  pessoal: { nome: "Pessoal", cor: "bg-slate-100 text-slate-800 border-slate-300" },
 } as const;
 export type TipoConsulta = keyof typeof TIPOS_CONSULTA;
 
@@ -86,16 +86,6 @@ export function limitesDoMes(mes: string): { inicio: string; fim: string } {
   return { inicio: `${mes}-01`, fim: somarDias(`${somarMeses(mes, 1)}-01`, -1) };
 }
 
-/** Semanas (domingo a sábado) para o calendário do mês; dias de fora vêm como null. */
-export function gradeDoMes(mes: string): (string | null)[][] {
-  const { inicio, fim } = limitesDoMes(mes);
-  const vazios = new Date(`${inicio}T00:00:00Z`).getUTCDay();
-  const dias: (string | null)[] = Array(vazios).fill(null);
-  for (let d = inicio; d <= fim; d = somarDias(d, 1)) dias.push(d);
-  while (dias.length % 7) dias.push(null);
-  return Array.from({ length: dias.length / 7 }, (_, i) => dias.slice(i * 7, i * 7 + 7));
-}
-
 /** Data e hora de Brasília → ISO em UTC. */
 export function inicioConsulta(dia: string, hora: string): string | null {
   if (!diaValido(dia) || !/^\d{2}:\d{2}$/.test(hora)) return null;
@@ -137,4 +127,9 @@ export function diaDaSemana(dia: string): string {
 export function diaCurto(dia: string): string {
   const [, m, d] = dia.split("-");
   return `${d}/${m}`;
+}
+
+/** Dias de `de` até `ate` (AAAA-MM-DD); negativo se já passou. */
+export function diasAte(de: string, ate: string): number {
+  return Math.round((Date.parse(`${ate}T00:00:00Z`) - Date.parse(`${de}T00:00:00Z`)) / 864e5);
 }

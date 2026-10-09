@@ -16,7 +16,7 @@ export function AvisoCheckout({ erro, cancelado, expirado }: { erro?: string; ca
         ? "O tempo para pagar expirou. Gere um novo pagamento."
         : null;
   if (!texto) return null;
-  return <p className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">{texto}</p>;
+  return <p className="rounded-2xl border-2 border-tinta bg-amber-50 p-3 text-sm text-amber-900">{texto}</p>;
 }
 
 /** Os dois botões de pagamento (à vista e parcelado) de uma compra ou renovação. */
@@ -24,7 +24,7 @@ export function OpcoesPagamento({ aVista, parcelado }: { aVista: Oferta; parcela
   const desconto = Math.round((1 - aVista.valorCentavos / parcelado.valorCentavos) * 100);
   return (
     <div className="grid gap-4 sm:grid-cols-2">
-      <form action={iniciarCheckout} className="flex flex-col gap-3 rounded-2xl border-2 border-violeta-600 bg-white p-6">
+      <form action={iniciarCheckout} className="flex flex-col gap-3 rounded-2xl border-2 border-tinta bg-white p-6">
         <input type="hidden" name="tipo" value={aVista.tipo} />
         <input type="hidden" name="modalidade" value="a_vista" />
         <div className="flex items-center justify-between">
@@ -37,12 +37,12 @@ export function OpcoesPagamento({ aVista, parcelado }: { aVista: Oferta; parcela
         </div>
         <p className="text-3xl font-bold text-slate-900">{formatarReais(aVista.valorCentavos)}</p>
         <p className="text-sm text-slate-600">Pix ou cartão de crédito em 1x. Pix libera o acesso na hora.</p>
-        <button className="mt-auto rounded-lg bg-violeta-700 py-3 font-medium text-white hover:bg-violeta-800">
+        <button className="mt-auto rounded-full bg-tinta py-3 font-bold text-white hover:bg-violeta">
           Pagar à vista
         </button>
       </form>
 
-      <form action={iniciarCheckout} className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-6">
+      <form action={iniciarCheckout} className="flex flex-col gap-3 rounded-2xl border-2 border-tinta bg-white p-6">
         <input type="hidden" name="tipo" value={parcelado.tipo} />
         <input type="hidden" name="modalidade" value="parcelado" />
         <p className="font-medium text-slate-900">Parcelado</p>
@@ -52,7 +52,7 @@ export function OpcoesPagamento({ aVista, parcelado }: { aVista: Oferta; parcela
         <p className="text-sm text-slate-600">
           Sem juros no cartão de crédito (total {formatarReais(parcelado.valorCentavos)}).
         </p>
-        <button className="mt-auto rounded-lg border border-violeta-700 py-3 font-medium text-violeta-800 hover:bg-violeta-50">
+        <button className="mt-auto rounded-full border-2 border-tinta py-3 font-bold text-tinta hover:bg-lima">
           Pagar parcelado
         </button>
       </form>

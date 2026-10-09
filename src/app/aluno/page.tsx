@@ -19,6 +19,7 @@ import {
   type DesempenhoTema,
 } from "@/lib/painel";
 import { NOME_TIPO_ITEM } from "@/lib/tipos";
+import { CabecalhoPagina } from "@/components/sistema";
 
 type SimuladoFeito = { id: string; nota: number; finalizado_em: string; disciplinas: { nome: string } };
 
@@ -58,7 +59,7 @@ function Variacao({ valor, sufixo, periodo }: { valor: number | null; sufixo?: s
 
 function Indicador({ rotulo, children, rodape }: { rotulo: string; children: React.ReactNode; rodape?: React.ReactNode }) {
   return (
-    <SurgirItem className="rounded-xl border border-slate-200 bg-white p-4">
+    <SurgirItem className="rounded-2xl border-2 border-tinta bg-white p-4">
       <p className="text-xs text-slate-500">{rotulo}</p>
       <div className="mt-1 text-2xl font-semibold text-slate-900">{children}</div>
       <div className="mt-1 min-h-4">{rodape}</div>
@@ -140,25 +141,23 @@ export default async function Painel() {
 
   return (
     <div className="space-y-8">
-      <header className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-tinta">Olá{perfil.nome ? `, ${perfil.nome.split(" ")[0]}` : ""}!</h1>
-          <p className="text-sm text-slate-600">
-            {sequencia > 1 ? `Você estudou ${sequencia} dias seguidos. Continue assim!` : "Bora estudar hoje?"}
-          </p>
-        </div>
+      <CabecalhoPagina
+        rotulo="Lab · Painel"
+        titulo={`Olá${perfil.nome ? `, ${perfil.nome.split(" ")[0]}` : ""}!`}
+        descricao={sequencia > 1 ? `Você estudou ${sequencia} dias seguidos. Continue assim!` : "Bora estudar hoje?"}
+      >
         {acesso &&
           (iaAtiva(acesso) ? (
-            <span className="rounded-full bg-violeta-50 px-3 py-1 text-xs text-violeta-800">
+            <span className="rounded-full bg-tinta px-3 py-1 text-xs font-semibold text-lima">
               Novidades e IA até {formatarData(acesso.novidadesAte)}
             </span>
           ) : (
             <BotaoRenovar texto="Renove para usar a IA" />
           ))}
-      </header>
+      </CabecalhoPagina>
 
       {!acesso && !equipe && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-violeta-200 bg-violeta-50 p-4 text-sm text-violeta-900">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-tinta bg-violeta-50 p-4 text-sm text-violeta-900">
           Você ainda não tem acesso ao conteúdo.
           <Button asChild>
             <Link href="/assinar">Liberar acesso</Link>
@@ -184,7 +183,7 @@ export default async function Painel() {
             </span>
           </Link>
         ) : (
-          <Link href="/aluno/disciplinas" className="rounded-2xl border border-slate-200 bg-white p-5 md:col-span-2">
+          <Link href="/aluno/disciplinas" className="rounded-2xl border-2 border-tinta bg-white p-5 md:col-span-2">
             <p className="text-lg font-semibold text-slate-900">Escolha uma disciplina para começar</p>
             <p className="text-sm text-slate-600">Vídeos, resumos, mapas mentais e flashcards organizados por período.</p>
           </Link>
@@ -192,7 +191,7 @@ export default async function Painel() {
         <div className="grid gap-3">
           <Link
             href={flashcardsHoje > 0 ? "/aluno/flashcards?estudar=1" : "/aluno/flashcards"}
-            className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 hover:shadow-md"
+            className="flex items-center gap-3 rounded-2xl border-2 border-tinta bg-white p-4 hover:shadow-md"
           >
             <span className="flex size-9 items-center justify-center rounded-xl bg-sky-50 text-sky-700">
               <Layers className="size-4" />
@@ -204,7 +203,7 @@ export default async function Painel() {
               <span className="text-slate-500">{flashcardsHoje > 0 ? "Revisar agora" : "Ver decks"}</span>
             </span>
           </Link>
-          <Link href="/aluno/simulados" className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 hover:shadow-md">
+          <Link href="/aluno/simulados" className="flex items-center gap-3 rounded-2xl border-2 border-tinta bg-white p-4 hover:shadow-md">
             <span className="flex size-9 items-center justify-center rounded-xl bg-violeta-50 text-violeta-700">
               <Sparkles className="size-4" />
             </span>
@@ -266,8 +265,8 @@ export default async function Painel() {
 
       {/* Gráficos */}
       <section className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-2xl border border-slate-200 bg-white p-5">
-          <h2 className="font-semibold text-slate-900">Notas nos simulados</h2>
+        <div className="rounded-2xl border-2 border-tinta bg-white p-5">
+          <h2 className="font-extrabold tracking-tight text-tinta">Notas nos simulados</h2>
           <p className="mb-3 text-xs text-slate-500">Últimos 30 dias · uma nota por simulado</p>
           {ultimos30.length >= 2 ? (
             <GraficoLinha
@@ -287,8 +286,8 @@ export default async function Painel() {
             </p>
           )}
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-5">
-          <h2 className="font-semibold text-slate-900">Tempo de estudo por dia</h2>
+        <div className="rounded-2xl border-2 border-tinta bg-white p-5">
+          <h2 className="font-extrabold tracking-tight text-tinta">Tempo de estudo por dia</h2>
           <p className="mb-3 text-xs text-slate-500">Últimos 14 dias · minutos ativos em aulas, simulados e flashcards</p>
           {tempoSemana + tempoSemanaAnterior > 0 ? (
             <GraficoColunas
@@ -311,8 +310,8 @@ export default async function Painel() {
 
       <section className="grid gap-4 lg:grid-cols-2">
         {/* Onde reforçar */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-5">
-          <h2 className="font-semibold text-slate-900">Onde reforçar</h2>
+        <div className="rounded-2xl border-2 border-tinta bg-white p-5">
+          <h2 className="font-extrabold tracking-tight text-tinta">Onde reforçar</h2>
           <p className="mb-4 text-xs text-slate-500">Temas com menor média nos últimos 90 dias (mínimo de 3 questões)</p>
           {reforcar.length ? (
             <ul className="space-y-4">
@@ -346,8 +345,8 @@ export default async function Painel() {
         </div>
 
         {/* Progresso e certificados */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-5">
-          <h2 className="font-semibold text-slate-900">Progresso e certificados</h2>
+        <div className="rounded-2xl border-2 border-tinta bg-white p-5">
+          <h2 className="font-extrabold tracking-tight text-tinta">Progresso e certificados</h2>
           <p className="mb-4 text-xs text-slate-500">Conclua os itens obrigatórios para ganhar o certificado</p>
           {liberadas.length ? (
             <ul className="space-y-4">
@@ -379,7 +378,7 @@ export default async function Painel() {
       </section>
 
       {itensBloqueados > 0 && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-tinta bg-amber-50 p-4 text-sm text-amber-900">
           <span>
             {itensBloqueados} {itensBloqueados === 1 ? "novo conteúdo publicado" : "novos conteúdos publicados"} depois do
             seu período de novidades.

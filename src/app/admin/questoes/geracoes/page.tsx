@@ -4,6 +4,7 @@ import { AtualizarPeriodicamente } from "@/components/atualizar-periodicamente";
 import { exigirEquipe } from "@/lib/auth";
 import { formatarData } from "@/lib/catalogo";
 import { aprovarTodasDaGeracao, verificarGeracoes } from "../gerar/actions";
+import { botaoMarca, CabecalhoPagina } from "@/components/sistema";
 
 type LinhaGeracao = {
   id: string;
@@ -64,25 +65,20 @@ export default async function Geracoes() {
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <Link href="/admin/questoes" className="text-sm text-slate-600 hover:text-slate-900">
-            ← Banco de questões
-          </Link>
-          <h1 className="text-2xl font-bold text-tinta">Gerações por IA</h1>
-        </div>
-        <div className="flex gap-2">
-          <form action={verificarGeracoes}>
-            <button className={botaoSecundario + " px-4 py-2 text-sm"}>Verificar agora</button>
-          </form>
-          <Link href="/admin/questoes/gerar" className={botaoPrimario}>
-            Nova geração
-          </Link>
-        </div>
-      </header>
+      <Link href="/admin/questoes" className="text-sm font-semibold text-slate-600 hover:text-tinta">
+        ← Banco de questões
+      </Link>
+      <CabecalhoPagina tom="tinta" rotulo="Backoffice · IA" titulo="Gerações por IA">
+        <form action={verificarGeracoes}>
+          <button className={botaoSecundario + " px-4 py-2 text-sm"}>Verificar agora</button>
+        </form>
+        <Link href="/admin/questoes/gerar" className={botaoMarca}>
+          Nova geração
+        </Link>
+      </CabecalhoPagina>
 
       {emAndamento && (
-        <p className="rounded-xl border border-sky-200 bg-sky-50 p-4 text-sm text-sky-900">
+        <p className="rounded-2xl border-2 border-tinta bg-sky-50 p-4 text-sm text-sky-900">
           Há gerações em andamento. Esta página confere a cada 30 segundos — pode fechar e voltar depois.
           <AtualizarPeriodicamente segundos={30} acao={verificarGeracoes} />
         </p>
@@ -95,7 +91,7 @@ export default async function Geracoes() {
           const flashcards = g.alvo === "flashcards";
           const unidade = flashcards ? "cards" : "questões";
           return (
-            <li key={g.id} className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
+            <li key={g.id} className="space-y-3 rounded-2xl border-2 border-tinta bg-white p-4">
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
                   <p className="font-medium text-slate-900">

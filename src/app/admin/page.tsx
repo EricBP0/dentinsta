@@ -3,6 +3,7 @@ import { botaoPrimario, campo, Selo } from "@/components/admin-ui";
 import { exigirEquipe } from "@/lib/auth";
 import { NOME_STATUS_DISCIPLINA, type Disciplina } from "@/lib/tipos";
 import { criarDisciplina } from "./actions";
+import { CabecalhoPagina } from "@/components/sistema";
 
 export default async function AdminDisciplinas() {
   const { supabase } = await exigirEquipe();
@@ -14,19 +15,19 @@ export default async function AdminDisciplinas() {
 
   return (
     <div className="space-y-8">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-bold text-tinta">Disciplinas</h1>
-        <p className="text-sm text-slate-600">
-          Crie a disciplina, organize módulos e itens e publique quando estiver pronta.
-        </p>
-      </header>
+      <CabecalhoPagina
+        tom="tinta"
+        rotulo="Backoffice · Conteúdo"
+        titulo="Disciplinas"
+        descricao="Crie a disciplina, organize módulos e itens e publique quando estiver pronta."
+      />
 
       <form action={criarDisciplina} className="flex flex-col gap-3 sm:flex-row">
         <input name="nome" placeholder="Nome da nova disciplina (ex.: Endodontia)" required className={campo} />
         <button className={`${botaoPrimario} shrink-0`}>Criar disciplina</button>
       </form>
 
-      <ul className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">
+      <ul className="divide-y divide-slate-100 rounded-2xl border-2 border-tinta bg-white">
         {(disciplinas ?? []).length === 0 && (
           <li className="p-4 text-sm text-slate-600">Nenhuma disciplina cadastrada.</li>
         )}

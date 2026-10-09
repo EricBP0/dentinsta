@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { exigirEquipe } from "@/lib/auth";
 import { FormularioGeracao } from "./formulario";
+import { CabecalhoPagina } from "@/components/sistema";
 
 export default async function GerarQuestoes({ searchParams }: PageProps<"/admin/questoes/gerar">) {
   const { disciplina } = await searchParams;
@@ -16,13 +17,20 @@ export default async function GerarQuestoes({ searchParams }: PageProps<"/admin/
       <Link href="/admin/questoes" className="text-sm text-slate-600 hover:text-slate-900">
         ← Banco de questões
       </Link>
-      <header className="space-y-1">
-        <h1 className="text-2xl font-bold text-tinta">Gerar questões com IA</h1>
-        <p className="text-sm text-slate-600">
-          Envie o material da aula e a IA cria questões objetivas e discursivas (com gabarito, explicação e rubrica)
-          baseadas nele. <Link href="/admin/questoes/geracoes" className="underline">Ver gerações anteriores</Link>
-        </p>
-      </header>
+      <CabecalhoPagina
+        tom="tinta"
+        rotulo="Backoffice · IA"
+        titulo="Gerar questões com IA"
+        descricao={
+          <>
+            Envie o material da aula e a IA cria questões objetivas e discursivas (com gabarito, explicação e rubrica)
+            baseadas nele.{" "}
+            <Link href="/admin/questoes/geracoes" className="font-semibold text-lima underline">
+              Ver gerações anteriores
+            </Link>
+          </>
+        }
+      />
       <FormularioGeracao
         disciplinas={disciplinas ?? []}
         disciplinaPadrao={typeof disciplina === "string" ? disciplina : undefined}

@@ -5,6 +5,7 @@ import { exigirLogin } from "@/lib/auth";
 import { carregarCatalogo, formatarData } from "@/lib/catalogo";
 import { cotaMensal, inicioDoMes } from "@/lib/ia/cota";
 import { NovoSimulado } from "./novo-simulado";
+import { CabecalhoPagina } from "@/components/sistema";
 
 type LinhaSimulado = {
   id: string;
@@ -48,22 +49,22 @@ export default async function Simulados() {
 
   return (
     <div className="space-y-8">
-      <header className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-tinta">Simulados</h1>
-          <p className="text-sm text-slate-600">Monte um simulado com questões do banco da sua disciplina.</p>
-        </div>
+      <CabecalhoPagina
+        rotulo="Lab · Treino"
+        titulo="Simulados"
+        descricao="Monte um simulado com questões do banco da sua disciplina."
+      >
         {comIa ? (
-          <span className="rounded-full bg-violeta-50 px-3 py-1 text-xs text-violeta-800">
+          <span className="rounded-full bg-tinta px-3 py-1 text-xs font-semibold text-lima">
             Correções por IA este mês: {usadas ?? 0} de {cota}
           </span>
         ) : (
           <BotaoRenovar texto="Renove para usar a IA" />
         )}
-      </header>
+      </CabecalhoPagina>
 
       {!acesso && !equipe ? (
-        <p className="rounded-xl border border-violeta-200 bg-violeta-50 p-4 text-sm text-violeta-900">
+        <p className="rounded-2xl border-2 border-tinta bg-violeta-50 p-4 text-sm text-violeta-900">
           Você ainda não tem acesso. <Link href="/assinar" className="font-medium underline">Liberar acesso</Link>
         </p>
       ) : (
@@ -71,8 +72,8 @@ export default async function Simulados() {
       )}
 
       <section>
-        <h2 className="mb-3 text-lg font-semibold text-slate-900">Seus simulados</h2>
-        <ul className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">
+        <h2 className="mb-3 text-lg font-extrabold tracking-tight text-tinta">Seus simulados</h2>
+        <ul className="divide-y divide-slate-100 rounded-2xl border-2 border-tinta bg-white">
           {(simulados ?? []).length === 0 && <li className="p-4 text-sm text-slate-600">Nenhum simulado ainda.</li>}
           {(simulados ?? []).map((s) => (
             <li key={s.id}>

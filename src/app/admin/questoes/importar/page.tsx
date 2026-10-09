@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { exigirEquipe } from "@/lib/auth";
 import { FormularioImportacao } from "./formulario";
+import { CabecalhoPagina } from "@/components/sistema";
 
 export default async function ImportarQuestoes({ searchParams }: PageProps<"/admin/questoes/importar">) {
   const { disciplina } = await searchParams;
@@ -16,17 +17,21 @@ export default async function ImportarQuestoes({ searchParams }: PageProps<"/adm
       <Link href="/admin/questoes" className="text-sm text-slate-600 hover:text-slate-900">
         ← Banco de questões
       </Link>
-      <header className="space-y-2">
-        <h1 className="text-2xl font-bold text-tinta">Importar questões por planilha</h1>
-        <p className="text-sm text-slate-600">
-          Monte a planilha no Excel ou Google Sheets e salve como CSV.{" "}
-          <a href="/modelo-questoes.csv" download className="font-medium text-violeta-700 underline">
-            Baixar planilha modelo
-          </a>
-        </p>
-      </header>
+      <CabecalhoPagina
+        tom="tinta"
+        rotulo="Backoffice · Questões"
+        titulo="Importar questões por planilha"
+        descricao={
+          <>
+            Monte a planilha no Excel ou Google Sheets e salve como CSV.{" "}
+            <a href="/modelo-questoes.csv" download className="font-semibold text-lima underline">
+              Baixar planilha modelo
+            </a>
+          </>
+        }
+      />
 
-      <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-700">
+      <div className="rounded-2xl border-2 border-tinta bg-white p-4 text-sm text-slate-700">
         <p className="mb-2 font-medium">Colunas</p>
         <ul className="list-disc space-y-1 pl-5">
           <li><strong>tipo</strong>: objetiva ou discursiva</li>

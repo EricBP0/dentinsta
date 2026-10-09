@@ -67,7 +67,7 @@ export function SessaoEstudo({ cards, nomesDecks }: { cards: CardSessao[]; nomes
       <motion.div
         initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="relative space-y-3 rounded-xl border border-violeta-200 bg-violeta-50 p-8 text-center"
+        className="relative space-y-3 rounded-2xl border-2 border-tinta bg-violeta-50 p-8 text-center"
       >
         {revisados > 0 && <Confete />}
         <p className="text-2xl">🎉</p>
@@ -115,7 +115,7 @@ export function SessaoEstudo({ cards, nomesDecks }: { cards: CardSessao[]; nomes
             >
               {/* frente */}
               <div
-                className="flex min-h-64 items-center justify-center rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-10"
+                className="flex min-h-64 items-center justify-center rounded-2xl border-2 border-tinta bg-white p-6 shadow-sm sm:p-10"
                 style={{ backfaceVisibility: "hidden" }}
               >
                 <p className="whitespace-pre-wrap text-center text-lg font-medium text-slate-900">{atual.frente}</p>
@@ -154,7 +154,7 @@ export function SessaoEstudo({ cards, nomesDecks }: { cards: CardSessao[]; nomes
       ) : (
         <button
           onClick={() => setMostrandoVerso(true)}
-          className="w-full rounded-lg bg-violeta-700 py-3 font-medium text-white hover:bg-violeta-800"
+          className="w-full rounded-full bg-tinta py-3 font-bold text-white hover:bg-violeta"
         >
           Mostrar resposta
         </button>
