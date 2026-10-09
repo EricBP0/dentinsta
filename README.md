@@ -14,10 +14,11 @@ Plataforma de estudos para graduação em Odontologia. Planejamento completo em
   `src/app/globals.css`, e animações com Motion (`src/components/movimento.tsx`),
   que respeitam a opção "reduzir movimento" do sistema. Componentes do
   [21st.dev](https://21st.dev) podem ser adicionados com o CLI do shadcn.
-- **Pagamento pelo Asaas** (`/assinar`, `/renovar`): à vista (Pix ou cartão 1x) ou
-  parcelado em até 12x no cartão, pelo checkout hospedado do Asaas. O webhook
-  libera o acesso ao confirmar, soma 12 meses na renovação e desfaz em estorno ou
-  chargeback. Renovação fica desligada até o preço ser configurado.
+- **Assinaturas pelo Asaas** (`/assinar`): planos Essencial (Disciplinas + módulos
+  avulsos), Completo e Duplo (duas pessoas), com upsell para o Completo. Mensal é
+  recorrente no cartão; anual é pagamento único (Pix, cartão 1x ou até 12x). Cada
+  pagamento confirmado estende o acesso; estorno e chargeback cortam. Preços em
+  `src/lib/planos.ts`; o aluno gerencia em **Minha assinatura**.
 - **Login e cadastro** (Supabase Auth, e-mail e senha), com confirmação de e-mail
   (`/auth/confirmar`) e "esqueci minha senha" (`/redefinir-senha`).
 - **Backoffice** (`/admin`, só `professor` e `admin`):
@@ -112,7 +113,8 @@ corrigidas por função do banco e discursivas pelo servidor com a chave secreta
    - Token de autenticação: o mesmo valor de `ASAAS_WEBHOOK_TOKEN`
    - Eventos: `CHECKOUT_PAID`, `CHECKOUT_CANCELED`, `CHECKOUT_EXPIRED`,
      `PAYMENT_CONFIRMED`, `PAYMENT_RECEIVED`, `PAYMENT_REFUNDED`,
-     `PAYMENT_CHARGEBACK_REQUESTED`
+     `PAYMENT_CHARGEBACK_REQUESTED`, `SUBSCRIPTION_DELETED`,
+     `SUBSCRIPTION_INACTIVATED`
 
    Para emitir nota fiscal automaticamente, configure a NFS-e no painel do Asaas.
    Em desenvolvimento, dá para liberar acesso de teste em **Backoffice → Vendas**.

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BarraProgresso, BotaoRenovar } from "@/components/cadeado";
+import { BarraProgresso, BotaoPlano } from "@/components/cadeado";
+import { moduloDoItem } from "@/lib/acesso";
 import { CapaDisciplina } from "@/components/capa-disciplina";
 import { exigirLogin } from "@/lib/auth";
 import { carregarCatalogo } from "@/lib/catalogo";
@@ -57,7 +58,8 @@ export default async function PaginaDisciplina({ params }: PageProps<"/aluno/dis
                     </p>
                   </div>
                 </div>
-                {item.situacao === "renove" && <BotaoRenovar />}
+                {item.situacao === "bloqueado" && <BotaoPlano modulo={moduloDoItem(item.tipo)} />}
+                {item.situacao === "sem_acesso" && <BotaoPlano texto="Assinar para liberar" />}
               </li>
             ))}
           </ul>

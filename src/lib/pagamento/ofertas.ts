@@ -1,87 +1,69 @@
-// Ofertas de compra e renovação e o corpo do checkout do Asaas.
+// Corpo do checkout do Asaas para cada assinatura.
+//
+// Mensal: checkout recorrente (o Asaas só aceita cartão de crédito), cobrado
+// todo mês até o aluno cancelar.
+// Anual: pagamento único que libera 12 meses — à vista (Pix ou cartão 1x) ou
+// parcelado no cartão em até 12x.
 
-import { PRECO, totalParcelado } from "@/lib/preco";
+import { nomeDaEscolha, MODULOS, PLANOS, type Escolha } from "@/lib/planos";
 import { IMAGEM_PRODUTO_BASE64 } from "./imagem-produto";
 
-export type TipoCompra = "compra" | "renovacao";
-export type Modalidade = "a_vista" | "parcelado";
+export type ModalidadeAnual = "a_vista" | "parcelado";
+export const PARCELAS_ANUAL = 12;
 
-export type Oferta = {
-  tipo: TipoCompra;
-  modalidade: Modalidade;
-  valorCentavos: number;
-  parcelas: number;
-  nome: string;
-  descricao: string;
-};
-
-function inteiroPositivo(valor: string | undefined): number | null {
-  const n = Number(valor);
-  return Number.isInteger(n) && n > 0 ? n : null;
+/** "2026-10-09 14:30:00" no horário de Brasília (formato que o Asaas espera). */
+export function dataAsaas(data: Date): string {
+  const brasilia = new Date(data.getTime() - 3 * 60 * 60 * 1000);
+  return brasilia.toISOString().slice(0, 19).replace("T", " ");
 }
 
-/** Preço da renovação ainda não foi definido: fica desligado até configurar as variáveis. */
-export function precoRenovacao(): { aVistaCentavos: number; parceladoCentavos: number } | null {
-  const aVista = inteiroPositivo(process.env.PRECO_RENOVACAO_A_VISTA_CENTAVOS);
-  const parcelado = inteiroPositivo(process.env.PRECO_RENOVACAO_PARCELADO_CENTAVOS);
-  return aVista && parcelado ? { aVistaCentavos: aVista, parceladoCentavos: parcelado } : null;
+function descricao(escolha: Escolha): string {
+  if (escolha.plano !== "essencial") return `${PLANOS[escolha.plano].resumo}.`;
+  return escolha.modulos.map((m) => MODULOS[m].nome).join(", ");
 }
 
-export function obterOferta(tipo: TipoCompra, modalidade: Modalidade): Oferta | null {
-  if (tipo === "compra") {
-    return modalidade === "a_vista"
-      ? {
-          tipo,
-          modalidade,
-          valorCentavos: PRECO.aVistaCentavos,
-          parcelas: 1,
-          nome: "Acesso completo",
-          descricao: "Acesso vitalício ao conteúdo + novidades e IA por 12 meses",
-        }
-      : {
-          tipo,
-          modalidade,
-          valorCentavos: totalParcelado(),
-          parcelas: PRECO.parcelas,
-          nome: "Acesso completo",
-          descricao: "Acesso vitalício ao conteúdo + novidades e IA por 12 meses",
-        };
-  }
+/** Corpo do POST /v3/checkouts. externalReference = id da assinatura no nosso banco. */
+export function montarCheckoutAssinatura(params: {
+  escolha: Escolha;
+  assinaturaId: string;
+  urlBase: string;
+  modalidadeAnual?: ModalidadeAnual;
+  agora?: Date;
+}) {
+  const { escolha, assinaturaId, urlBase, agora = new Date() } = params;
+  const mensal = escolha.ciclo === "mensal";
+  const parcelado = !mensal && params.modalidadeAnual === "parcelado";
 
-  const renovacao = precoRenovacao();
-  if (!renovacao) return null;
+  const cobranca = mensal
+    ? {
+        billingTypes: ["CREDIT_CARD"],
+        chargeTypes: ["RECURRENT"],
+        // Primeira cobrança agora; as seguintes no mesmo dia dos próximos meses.
+        subscription: {
+          cycle: "MONTHLY",
+          nextDueDate: dataAsaas(agora),
+          endDate: dataAsaas(new Date(agora.getTime() + 10 * 365 * 24 * 60 * 60 * 1000)),
+        },
+      }
+    : parcelado
+      ? { billingTypes: ["CREDIT_CARD"], chargeTypes: ["INSTALLMENT"], installment: { maxInstallmentCount: PARCELAS_ANUAL } }
+      : { billingTypes: ["PIX", "CREDIT_CARD"], chargeTypes: ["DETACHED"] };
+
   return {
-    tipo,
-    modalidade,
-    valorCentavos: modalidade === "a_vista" ? renovacao.aVistaCentavos : renovacao.parceladoCentavos,
-    parcelas: modalidade === "a_vista" ? 1 : PRECO.parcelas,
-    nome: "Renovação",
-    descricao: "Novidades e IA por mais 12 meses",
-  };
-}
-
-/** Corpo do POST /v3/checkouts. externalReference = id da compra no nosso banco. */
-export function montarCheckout(params: { oferta: Oferta; compraId: string; urlBase: string }) {
-  const { oferta, compraId, urlBase } = params;
-  const parcelado = oferta.modalidade === "parcelado";
-  return {
-    // À vista: Pix ou cartão em 1x. Parcelado: só cartão, até 12x.
-    billingTypes: parcelado ? ["CREDIT_CARD"] : ["PIX", "CREDIT_CARD"],
-    chargeTypes: [parcelado ? "INSTALLMENT" : "DETACHED"],
-    ...(parcelado && { installment: { maxInstallmentCount: oferta.parcelas } }),
+    ...cobranca,
     minutesToExpire: 60,
-    externalReference: compraId,
+    externalReference: assinaturaId,
     callback: {
-      successUrl: `${urlBase}/pagamento/concluido?compra=${compraId}`,
-      cancelUrl: `${urlBase}/${oferta.tipo === "renovacao" ? "renovar" : "assinar"}?cancelado=1`,
-      expiredUrl: `${urlBase}/${oferta.tipo === "renovacao" ? "renovar" : "assinar"}?expirado=1`,
+      successUrl: `${urlBase}/pagamento/concluido?assinatura=${assinaturaId}`,
+      cancelUrl: `${urlBase}/assinar?cancelado=1`,
+      expiredUrl: `${urlBase}/assinar?expirado=1`,
     },
     items: [
       {
-        name: oferta.nome.slice(0, 30),
-        description: oferta.descricao.slice(0, 150),
+        name: `OdontoLab ${nomeDaEscolha(escolha)}`.slice(0, 30),
+        description: (mensal ? `Assinatura mensal: ${descricao(escolha)}` : `12 meses: ${descricao(escolha)}`).slice(0, 150),
         quantity: 1,
-        value: oferta.valorCentavos / 100,
+        value: escolha.valorCentavos / 100,
         imageBase64: IMAGEM_PRODUTO_BASE64,
       },
     ],

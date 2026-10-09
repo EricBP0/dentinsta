@@ -1,5 +1,5 @@
 import { carregarAcesso } from "@/lib/catalogo";
-import { podeCorrigirComIa } from "@/lib/acesso";
+import { temModulo } from "@/lib/acesso";
 import { obterSessao } from "@/lib/auth";
 import {
   MENSAGENS_DE_CONTEXTO,
@@ -27,8 +27,8 @@ export async function POST(request: Request) {
   if (!perfil) return erro(401, "Entre na sua conta para usar o chat.");
 
   const acesso = await carregarAcesso(supabase, perfil);
-  if (!podeCorrigirComIa(acesso, perfil.papel !== "aluno")) {
-    return erro(403, "O chat com IA está disponível para quem está com a IA ativa. Renove para usar.");
+  if (!temModulo(acesso, "chat", perfil.papel !== "aluno")) {
+    return erro(403, "O Chat IA não faz parte do seu plano. Veja os planos para liberar.");
   }
 
   const corpo = (await request.json().catch(() => null)) as { conversaId?: unknown; mensagem?: unknown } | null;

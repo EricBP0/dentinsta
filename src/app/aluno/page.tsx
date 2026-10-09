@@ -1,10 +1,12 @@
 import { ArrowDownRight, ArrowRight, ArrowUpRight, Flame, GraduationCap, Layers, Sparkles, TriangleAlert } from "lucide-react";
 import Link from "next/link";
-import { BarraProgresso, BotaoRenovar } from "@/components/cadeado";
+import { BarraProgresso, SeloPlano } from "@/components/cadeado";
 import { GraficoColunas, GraficoLinha } from "@/components/graficos";
 import { BarraAnimada, NumeroAnimado, SurgirItem, SurgirLista } from "@/components/movimento";
 import { Button } from "@/components/ui/button";
-import { iaAtiva } from "@/lib/acesso";
+import { temModulo } from "@/lib/acesso";
+import { formatarReais } from "@/lib/preco";
+import { MODULOS, PRECO_MENSAL, TODOS_MODULOS } from "@/lib/planos";
 import { exigirLogin } from "@/lib/auth";
 import { carregarCatalogo, formatarData, type DisciplinaCatalogo } from "@/lib/catalogo";
 import { carregarResumo } from "@/lib/flashcards/sessao";
@@ -139,8 +141,9 @@ export default async function Painel() {
   const liberadas = disciplinas.filter((d) => d.situacao === "liberada");
   const concluidas = liberadas.filter((d) => d.progresso.completo);
   const continuar = continuarDeOndeParou(disciplinas, ultimoProgresso?.item_id ?? null);
-  const itensBloqueados = disciplinas.flatMap((d) => d.modulos.flatMap((m) => m.itens)).filter((i) => i.situacao === "renove").length;
-  const comIa = equipe || iaAtiva(acesso);
+  const comIa = temModulo(acesso, "simulados", equipe);
+  // Essencial sem tudo: mostra o que falta e o Completo como a saída mais em conta.
+  const faltando = acesso && !equipe ? TODOS_MODULOS.filter((m) => !acesso.modulos.includes(m)) : [];
 
   return (
     <div className="space-y-8">
@@ -149,21 +152,14 @@ export default async function Painel() {
         titulo={`Olá${perfil.nome ? `, ${perfil.nome.split(" ")[0]}` : ""}!`}
         descricao={sequencia > 1 ? `Você estudou ${sequencia} dias seguidos. Continue assim!` : "Bora estudar hoje?"}
       >
-        {acesso &&
-          (iaAtiva(acesso) ? (
-            <span className="rounded-full bg-tinta px-3 py-1 text-xs font-semibold text-lima">
-              Novidades e IA até {formatarData(acesso.novidadesAte)}
-            </span>
-          ) : (
-            <BotaoRenovar texto="Renove para usar a IA" />
-          ))}
+        {acesso && <SeloPlano acesso={acesso} />}
       </CabecalhoPagina>
 
       {!acesso && !equipe && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-tinta bg-violeta-50 p-4 text-sm text-violeta-900">
           Você ainda não tem acesso ao conteúdo.
           <Button asChild>
-            <Link href="/assinar">Liberar acesso</Link>
+            <Link href="/assinar">Ver planos</Link>
           </Button>
         </div>
       )}
@@ -213,7 +209,7 @@ export default async function Painel() {
             <span className="text-sm">
               <strong className="block text-slate-900">Fazer um simulado</strong>
               <span className="text-slate-500">
-                {comIa ? `Correções por IA: ${correcoesNoMes ?? 0} de ${cotaMensal()} no mês` : "Questões objetivas"}
+                {comIa ? `Correções por IA: ${correcoesNoMes ?? 0} de ${cotaMensal()} no mês` : "Disponível com o módulo Simulados"}
               </span>
             </span>
           </Link>
@@ -380,13 +376,15 @@ export default async function Painel() {
         </div>
       </section>
 
-      {itensBloqueados > 0 && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-tinta bg-amber-50 p-4 text-sm text-amber-900">
+      {faltando.length > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-tinta bg-lima/40 p-4 text-sm text-tinta">
           <span>
-            {itensBloqueados} {itensBloqueados === 1 ? "novo conteúdo publicado" : "novos conteúdos publicados"} depois do
-            seu período de novidades.
+            Seu plano ainda não tem {faltando.map((m) => MODULOS[m].nome).join(", ")}. No <strong>Completo</strong> você
+            leva tudo por {formatarReais(PRECO_MENSAL.completo)}/mês.
           </span>
-          <BotaoRenovar />
+          <Button asChild>
+            <Link href="/assinar/escolher?plano=completo">Quero o Completo</Link>
+          </Button>
         </div>
       )}
     </div>

@@ -1,57 +1,82 @@
-// Regras de acesso do aluno (docs/PLANEJAMENTO.md, seção 4.1.1).
-// A mesma regra é aplicada no banco em pode_acessar_item() — manter as duas iguais.
+// Regras de acesso do aluno: assinatura ativa + módulos do plano.
+// A mesma regra é aplicada no banco (meus_modulos, modulo_do_item e
+// pode_acessar_item, migration 0014) — manter as duas iguais.
 
-export const MESES_DE_NOVIDADES = 12;
+import { TODOS_MODULOS, type Ciclo, type Modulo, type Plano } from "@/lib/planos";
+import type { TipoItem } from "@/lib/tipos";
 
 export type Acesso = {
-  novidadesAte: Date;
-  iaAte: Date;
+  assinaturaId: string;
+  plano: Plano;
+  ciclo: Ciclo;
+  modulos: Modulo[];
+  /** ativa: renova sozinha; cancelada: vale até ativaAte e não renova. */
+  status: "ativa" | "cancelada";
+  /** Fim do período pago (sem a tolerância). */
+  periodoAte: Date | null;
+  ativaAte: Date;
+  /** false: é o convidado de um plano Duplo. */
+  titular: boolean;
+  origem: "asaas" | "manual";
 };
 
-export type DatasPublicacao = {
-  item: Date | null;
-  modulo: Date | null;
-  disciplina: Date | null;
-};
+/** "liberado": pode abrir. "bloqueado": o plano não inclui. "sem_acesso": sem assinatura. */
+export type SituacaoItem = "liberado" | "bloqueado" | "sem_acesso";
 
-/** "liberado": pode abrir. "renove": publicado depois da janela. "sem_acesso": não comprou. */
-export type SituacaoItem = "liberado" | "renove" | "sem_acesso";
-
-/** O item só "existe" para o aluno quando item, módulo e disciplina já foram publicados. */
-export function dataEfetivaPublicacao(datas: DatasPublicacao): Date | null {
-  const conhecidas = [datas.item, datas.modulo, datas.disciplina].filter(
-    (d): d is Date => d !== null,
-  );
-  if (conhecidas.length === 0) return null;
-  return new Date(Math.max(...conhecidas.map((d) => d.getTime())));
+/** Módulo que libera cada tipo de item (igual a modulo_do_item no banco). */
+export function moduloDoItem(tipo: TipoItem): Modulo {
+  return tipo === "flashcards" ? "flashcards" : "disciplinas";
 }
 
-export function situacaoItem(params: {
-  acesso: Acesso | null;
-  datas: DatasPublicacao;
-  equipe?: boolean;
-}): SituacaoItem {
+/** A equipe usa tudo (para testar); o aluno, o que o plano dele tem. */
+export function temModulo(acesso: Acesso | null, modulo: Modulo, equipe = false, agora: Date = new Date()): boolean {
+  if (equipe) return true;
+  return acesso !== null && agora.getTime() <= acesso.ativaAte.getTime() && acesso.modulos.includes(modulo);
+}
+
+export function situacaoItem(params: { acesso: Acesso | null; tipo: TipoItem; equipe?: boolean }): SituacaoItem {
   if (params.equipe) return "liberado";
   if (!params.acesso) return "sem_acesso";
-  const publicacao = dataEfetivaPublicacao(params.datas);
-  if (!publicacao) return "renove";
-  return publicacao.getTime() <= params.acesso.novidadesAte.getTime() ? "liberado" : "renove";
+  return temModulo(params.acesso, moduloDoItem(params.tipo)) ? "liberado" : "bloqueado";
 }
 
-export function iaAtiva(acesso: Acesso | null, agora: Date = new Date()): boolean {
-  return acesso !== null && agora.getTime() <= acesso.iaAte.getTime();
-}
+/** Linha de assinaturas como vem do banco. */
+export type AssinaturaRow = {
+  id: string;
+  usuario_id: string;
+  plano: Plano;
+  ciclo: Ciclo;
+  modulos: string[];
+  status: string;
+  periodo_ate: string | null;
+  ativa_ate: string | null;
+  origem: "asaas" | "manual";
+};
 
-/** Correção por IA: aluno com a IA na janela, ou equipe (que testa sem ter comprado). */
-export function podeCorrigirComIa(acesso: Acesso | null, equipe: boolean, agora: Date = new Date()): boolean {
-  return equipe || iaAtiva(acesso, agora);
-}
+export const COLUNAS_ASSINATURA = "id, usuario_id, plano, ciclo, modulos, status, periodo_ate, ativa_ate, origem";
 
-/** Nova compra ou renovação: janela de 12 meses a partir da data informada. */
-export function calcularJanela(inicio: Date): Acesso {
-  const fim = new Date(inicio);
-  fim.setUTCMonth(fim.getUTCMonth() + MESES_DE_NOVIDADES);
-  return { novidadesAte: fim, iaAte: fim };
+/**
+ * Junta as assinaturas válidas do usuário (normalmente uma) num acesso só:
+ * a de prazo mais longo manda, e os módulos de todas se somam.
+ */
+export function acessoDasAssinaturas(linhas: AssinaturaRow[], usuarioId: string, agora: Date = new Date()): Acesso | null {
+  const validas = linhas
+    .filter((l) => (l.status === "ativa" || l.status === "cancelada") && l.ativa_ate && new Date(l.ativa_ate) >= agora)
+    .sort((a, b) => new Date(b.ativa_ate!).getTime() - new Date(a.ativa_ate!).getTime());
+  if (!validas.length) return null;
+  const principal = validas.find((l) => l.usuario_id === usuarioId) ?? validas[0];
+  const modulos = TODOS_MODULOS.filter((m) => validas.some((l) => l.modulos.includes(m)));
+  return {
+    assinaturaId: principal.id,
+    plano: principal.plano,
+    ciclo: principal.ciclo,
+    modulos,
+    status: principal.status as Acesso["status"],
+    periodoAte: paraData(principal.periodo_ate),
+    ativaAte: new Date(principal.ativa_ate!),
+    titular: principal.usuario_id === usuarioId,
+    origem: principal.origem,
+  };
 }
 
 export function paraData(valor: string | null): Date | null {

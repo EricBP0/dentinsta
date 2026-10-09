@@ -1,10 +1,12 @@
 import { CalendarPlus, UserPlus } from "lucide-react";
 import Link from "next/link";
-import { exigirConsultorio } from "./acesso";
+import { AreaBloqueada } from "@/components/cadeado";
+import { podeUsarConsultorio } from "./acesso";
 import { MenuConsultorio } from "./menu";
 
 export default async function LayoutConsultorio({ children }: LayoutProps<"/aluno/consultorio">) {
-  await exigirConsultorio();
+  const { liberado, temAssinatura } = await podeUsarConsultorio();
+  if (!liberado) return <AreaBloqueada modulo="consultorio" temAssinatura={temAssinatura} />;
   return (
     <div className="space-y-6">
       <header className="grade-violeta relative overflow-hidden rounded-3xl border-2 border-tinta p-6 text-white sm:p-8">

@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { AreaBloqueada } from "@/components/cadeado";
+import { temModulo } from "@/lib/acesso";
 import { exigirLogin } from "@/lib/auth";
 import { carregarCatalogo } from "@/lib/catalogo";
 import { carregarResumo, carregarSessao, type ResumoDeck } from "@/lib/flashcards/sessao";
@@ -29,7 +31,10 @@ export default async function RevisaoDoDia({ searchParams }: PageProps<"/aluno/f
   const disciplina = textoParam(params.disciplina);
   const situacao = textoParam(params.situacao);
   const { supabase, perfil } = await exigirLogin();
-  const [{ disciplinas }, resumo] = await Promise.all([carregarCatalogo(supabase, perfil), carregarResumo(supabase)]);
+  const [{ acesso, disciplinas }, resumo] = await Promise.all([carregarCatalogo(supabase, perfil), carregarResumo(supabase)]);
+  if (!temModulo(acesso, "flashcards", perfil.papel !== "aluno")) {
+    return <AreaBloqueada modulo="flashcards" temAssinatura={Boolean(acesso)} />;
+  }
 
   // Decks liberados, com nome da disciplina, na ordem do catálogo.
   const decks = disciplinas.flatMap((d) =>

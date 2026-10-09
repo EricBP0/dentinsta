@@ -11,7 +11,7 @@ const LINKS = [
   { href: "#recursos", texto: "Recursos" },
   { href: "#novidades", texto: "Novidades" },
   { href: "#como-funciona", texto: "Como funciona" },
-  { href: "#preco", texto: "Preço" },
+  { href: "#preco", texto: "Planos" },
   { href: "#duvidas", texto: "Dúvidas" },
 ];
 

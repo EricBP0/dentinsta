@@ -64,13 +64,6 @@ export type ConfigItem = {
   nota_minima?: number;
 };
 
-export type AcessoRow = {
-  usuario_id: string;
-  compra_em: string;
-  novidades_ate: string;
-  ia_ate: string;
-};
-
 export const COLUNAS_ITEM =
   "id, modulo_id, tipo, titulo, ordem, obrigatorio, status, publicar_em, primeira_publicacao_em";
 

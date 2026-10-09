@@ -98,14 +98,16 @@ function Conta({ perfil, escuro, iniciais }: { perfil: Perfil; escuro: boolean; 
           <alternar.Icone className="size-4" />
         </Link>
       )}
-      <span
-        title={perfil.nome || perfil.email}
+      <Link
+        href="/aluno/assinatura"
+        title={`${perfil.nome || perfil.email} · Minha assinatura`}
+        aria-label="Minha assinatura"
         className={`flex size-8 items-center justify-center rounded-full text-xs font-bold ${
           escuro ? "border-2 border-lima bg-tinta text-lima" : "border-2 border-tinta bg-lima text-tinta"
         }`}
       >
         {iniciais}
-      </span>
+      </Link>
       <form action={sair}>
         <button
           aria-label="Sair"

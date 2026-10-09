@@ -5,6 +5,7 @@ import { BarraBusca, FiltroSelect, Paginacao, ResumoLista } from "@/components/l
 import { formatarData } from "@/lib/catalogo";
 import { inicioDoMes } from "@/lib/ia/cota";
 import { formatarReais } from "@/lib/preco";
+import { PLANOS, type Ciclo, type Plano } from "@/lib/planos";
 import { liberarAcesso, revogarAcesso } from "./actions";
 import { CabecalhoPagina } from "@/components/sistema";
 
@@ -17,16 +18,22 @@ type Compra = {
   status: string;
   criado_em: string;
   pago_em: string | null;
+  plano: Plano | null;
+  ciclo: Ciclo | null;
   perfis: { nome: string; email: string };
 };
 
+type AssinaturaResumo = { plano: Plano; ciclo: Ciclo; status: string; ativa_ate: string | null; origem: string; valor_centavos: number };
 type Aluno = {
   id: string;
   nome: string;
   email: string;
   criado_em: string;
-  acessos: { novidades_ate: string; origem: string } | null;
+  assinaturas: AssinaturaResumo[];
 };
+
+const valida = (a: AssinaturaResumo, agora: Date) =>
+  (a.status === "ativa" || a.status === "cancelada") && a.ativa_ate !== null && new Date(a.ativa_ate) >= agora;
 
 const SELO_STATUS: Record<string, string> = {
   pago: "publicada",
@@ -66,7 +73,7 @@ export default async function Vendas({ searchParams }: PageProps<"/admin/vendas"
   let consulta = supabase
     .from("compras")
     .select(
-      `id, tipo, modalidade, parcelas, valor_total_centavos, status, criado_em, pago_em, perfis${termoPagamento ? "!inner" : ""}(nome, email)`,
+      `id, tipo, modalidade, parcelas, valor_total_centavos, status, criado_em, pago_em, plano, ciclo, perfis${termoPagamento ? "!inner" : ""}(nome, email)`,
       { count: "exact" },
     )
     .order("criado_em", { ascending: false })
@@ -83,7 +90,7 @@ export default async function Vendas({ searchParams }: PageProps<"/admin/vendas"
     { data: compras, count: totalCompras },
     { data: pagasMes },
     { count: totalAlunos },
-    { count: comAcesso },
+    { data: vigentes },
     { data: alunos, count: alunosEncontrados },
   ] =
     await Promise.all([
@@ -95,11 +102,19 @@ export default async function Vendas({ searchParams }: PageProps<"/admin/vendas"
         .gte("pago_em", inicioDoMes().toISOString())
         .overrideTypes<{ valor_total_centavos: number }[], { merge: false }>(),
       supabase.from("perfis").select("id", { count: "exact", head: true }).eq("papel", "aluno"),
-      supabase.from("acessos").select("usuario_id", { count: "exact", head: true }),
+      supabase
+        .from("assinaturas")
+        .select("plano, ciclo, status, ativa_ate, origem, valor_centavos")
+        .in("status", ["ativa", "cancelada"])
+        .gte("ativa_ate", new Date().toISOString())
+        .overrideTypes<AssinaturaResumo[], { merge: false }>(),
       termo
         ? supabase
             .from("perfis")
-            .select("id, nome, email, criado_em, acessos(novidades_ate, origem)", { count: "exact" })
+            .select(
+              "id, nome, email, criado_em, assinaturas!assinaturas_usuario_id_fkey(plano, ciclo, status, ativa_ate, origem, valor_centavos)",
+              { count: "exact" },
+            )
             .or(`email.ilike.%${termo}%,nome.ilike.%${termo}%`)
             .order("nome")
             .range(...faixa(paginaAlunos, ALUNOS_POR_PAGINA))
@@ -108,13 +123,22 @@ export default async function Vendas({ searchParams }: PageProps<"/admin/vendas"
     ]);
 
   const receitaMes = (pagasMes ?? []).reduce((soma, c) => soma + c.valor_total_centavos, 0);
+  const agora = new Date();
+  // Receita recorrente por mês: mensais que vão renovar + anuais divididos por 12.
+  // Assinantes: mensais que vão renovar e anuais no período pago.
+  const pagantes = (vigentes ?? []).filter((a) => a.origem === "asaas" && (a.status === "ativa" || a.ciclo === "anual"));
+  const canceladas = (vigentes ?? []).filter((a) => a.origem === "asaas" && a.status === "cancelada" && a.ciclo === "mensal").length;
+  const mrr = pagantes.reduce((soma, a) => soma + (a.ciclo === "anual" ? Math.round(a.valor_centavos / 12) : a.valor_centavos), 0);
+  const porPlano = (Object.keys(PLANOS) as Plano[])
+    .map((p) => `${PLANOS[p].nome} ${pagantes.filter((a) => a.plano === p).length}`)
+    .join(" · ");
 
   return (
     <div className="space-y-8">
       <CabecalhoPagina
         tom="tinta"
         rotulo="Backoffice · Vendas"
-        titulo="Vendas e acessos"
+        titulo="Vendas e assinaturas"
         descricao="Pagamentos pelo Asaas. Estornos e chargebacks retiram o acesso automaticamente."
       />
 
@@ -125,8 +149,16 @@ export default async function Vendas({ searchParams }: PageProps<"/admin/vendas"
       <section className="grid gap-3 sm:grid-cols-3">
         {[
           ["Vendas no mês", `${formatarReais(receitaMes)} · ${pagasMes?.length ?? 0} pagamentos`],
-          ["Alunos cadastrados", String(totalAlunos ?? 0)],
-          ["Com acesso liberado", String(comAcesso ?? 0)],
+          [
+            "Receita recorrente (por mês)",
+            `${formatarReais(mrr)} · ${pagantes.length} ${pagantes.length === 1 ? "assinante" : "assinantes"} (${porPlano})${
+              canceladas ? ` · ${canceladas} não ${canceladas === 1 ? "renova" : "renovam"}` : ""
+            }`,
+          ],
+          [
+            "Alunos cadastrados",
+            `${totalAlunos ?? 0} · ${(vigentes ?? []).filter((a) => a.origem === "manual").length} com cortesia`,
+          ],
         ].map(([titulo, valor]) => (
           <div key={titulo} className="rounded-2xl border-2 border-tinta bg-white p-4">
             <p className="text-xs text-slate-500">{titulo}</p>
@@ -158,18 +190,26 @@ export default async function Vendas({ searchParams }: PageProps<"/admin/vendas"
                   {a.email} · cadastro em {formatarData(a.criado_em)}
                 </p>
               </div>
-              {a.acessos ? (
+              {a.assinaturas.some((x) => valida(x, agora)) ? (
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-slate-600">
-                    Novidades até {formatarData(a.acessos.novidades_ate)} ({a.acessos.origem})
+                    {a.assinaturas
+                      .filter((x) => valida(x, agora))
+                      .map(
+                        (x) =>
+                          `${PLANOS[x.plano].nome} ${x.ciclo}${x.origem === "manual" ? " (cortesia)" : x.status === "cancelada" ? " (não renova)" : ""} até ${formatarData(x.ativa_ate!)}`,
+                      )
+                      .join(" · ")}
                   </span>
                   <form action={revogarAcesso}>
                     <input type="hidden" name="usuario_id" value={a.id} />
-                    <button className={botaoPerigo}>Revogar</button>
+                    <button className={botaoPerigo} title="Corta o acesso na hora. Cancele também a cobrança no Asaas, se houver.">
+                      Revogar
+                    </button>
                   </form>
                 </div>
               ) : (
-                <span className="text-xs text-slate-500">Sem acesso</span>
+                <span className="text-xs text-slate-500">Sem assinatura</span>
               )}
             </li>
           ))}
@@ -185,9 +225,16 @@ export default async function Vendas({ searchParams }: PageProps<"/admin/vendas"
 
         <form action={liberarAcesso} className="flex flex-wrap items-end gap-2 border-t border-slate-100 pt-4">
           <label className="flex-1 space-y-1">
-            <span className="text-sm font-medium text-slate-700">Liberar acesso manual (cortesia, parceria)</span>
+            <span className="text-sm font-medium text-slate-700">Liberar plano manual (cortesia, parceria)</span>
             <input name="email" type="email" required placeholder="E-mail da conta do aluno" className={campo} />
           </label>
+          <select name="plano" defaultValue="completo" className={`${campo} w-auto`}>
+            {(Object.keys(PLANOS) as Plano[]).map((p) => (
+              <option key={p} value={p}>
+                {PLANOS[p].nome}
+              </option>
+            ))}
+          </select>
           <select name="meses" defaultValue="12" className={`${campo} w-auto`}>
             {[1, 3, 6, 12, 24].map((m) => (
               <option key={m} value={m}>
@@ -213,9 +260,9 @@ export default async function Vendas({ searchParams }: PageProps<"/admin/vendas"
             nome="tipo"
             valor={filtroTipo}
             rotulo="Tipo"
-            todos="Compras e renovações"
+            todos="Todos os pagamentos"
             opcoes={[
-              ["compra", "Compras"],
+              ["compra", "Primeiros pagamentos"],
               ["renovacao", "Renovações"],
             ]}
           />
@@ -228,7 +275,8 @@ export default async function Vendas({ searchParams }: PageProps<"/admin/vendas"
               <div>
                 <p className="font-medium text-slate-900">{c.perfis.nome || c.perfis.email}</p>
                 <p className="text-xs text-slate-500">
-                  {c.tipo === "renovacao" ? "Renovação" : "Compra"} ·{" "}
+                  {c.plano ? `${PLANOS[c.plano].nome} ${c.ciclo ?? ""} · ` : ""}
+                  {c.tipo === "renovacao" ? "Renovação" : "1º pagamento"} ·{" "}
                   {c.modalidade === "parcelado" ? `parcelado em até ${c.parcelas}x` : "à vista"} ·{" "}
                   {formatarData(c.pago_em ?? c.criado_em)}
                 </p>

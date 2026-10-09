@@ -108,7 +108,7 @@ export default async function Certificados({ searchParams }: PageProps<"/aluno/c
         {certificados.length === 0 ? (
           <p className="rounded-xl bg-slate-50 p-6 text-center text-sm text-slate-500">Nenhum certificado emitido ainda.</p>
         ) : (
-          <SurgirLista className="grid gap-3 sm:grid-cols-2">
+          <SurgirLista key={certificados.length} className="grid gap-3 sm:grid-cols-2">
             {certificados.map((c) => (
               <SurgirItem key={c.id} className="space-y-3 rounded-2xl border-2 border-tinta bg-white p-5">
                 <div className="flex items-start gap-3">
