@@ -5,6 +5,7 @@ import { Confete, SurgirItem, SurgirLista } from "@/components/movimento";
 import { Button } from "@/components/ui/button";
 import { exigirLogin } from "@/lib/auth";
 import { carregarCatalogo, formatarData } from "@/lib/catalogo";
+import { carregarResumo } from "@/lib/flashcards/sessao";
 import { emitirCertificado } from "./actions";
 import { CabecalhoPagina } from "@/components/sistema";
 
@@ -21,7 +22,7 @@ export default async function Certificados({ searchParams }: PageProps<"/aluno/c
   const { erro, emitido } = await searchParams;
   const { supabase, perfil } = await exigirLogin();
 
-  const [{ disciplinas }, { data }] = await Promise.all([
+  const [{ disciplinas }, { data }, { data: progresso }, resumoFlashcards] = await Promise.all([
     carregarCatalogo(supabase, perfil),
     supabase
       .from("certificados")
@@ -29,12 +30,25 @@ export default async function Certificados({ searchParams }: PageProps<"/aluno/c
       .eq("usuario_id", perfil.id)
       .order("emitido_em", { ascending: false })
       .overrideTypes<Certificado[], { merge: false }>(),
+    supabase
+      .from("progresso_item")
+      .select("item_id")
+      .eq("usuario_id", perfil.id)
+      .overrideTypes<{ item_id: string }[], { merge: false }>(),
+    carregarResumo(supabase),
   ]);
   const certificados = data ?? [];
   const jaEmitidas = new Set(certificados.map((c) => c.disciplina_id));
   const liberadas = disciplinas.filter((d) => d.situacao === "liberada" && !jaEmitidas.has(d.id));
   const prontas = liberadas.filter((d) => d.progresso.completo);
-  const emAndamento = liberadas.filter((d) => !d.progresso.completo && d.progresso.total > 0);
+  // Só o que o aluno já começou: algum item com progresso ou algum flashcard revisado.
+  const iniciados = new Set([
+    ...(progresso ?? []).map((p) => p.item_id),
+    ...resumoFlashcards.filter((r) => r.vistos > 0).map((r) => r.item_id),
+  ]);
+  const emAndamento = liberadas.filter(
+    (d) => !d.progresso.completo && d.progresso.total > 0 && d.modulos.some((m) => m.itens.some((i) => iniciados.has(i.id))),
+  );
 
   return (
     <div className="space-y-8">
