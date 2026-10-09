@@ -26,7 +26,7 @@ import { Movimento, Surgir, SurgirItem, SurgirLista } from "@/components/movimen
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { formatarReais } from "@/lib/preco";
-import { MODULOS, PRECO_ANUAL, PRECO_MENSAL, somaAvulsos, TODOS_MODULOS } from "@/lib/planos";
+import { economiaAnual, MODULOS, PARCELA_ANUAL, PRECO_ANUAL, PRECO_MENSAL, somaAvulsos, TODOS_MODULOS } from "@/lib/planos";
 
 const RECURSOS = [
   {
@@ -79,7 +79,7 @@ const NOVIDADES = [
 ];
 
 const PASSOS = [
-  { icone: PenLine, titulo: "Escolha seu plano", texto: "Mensal no cartão ou anual no Pix ou em até 12x. O acesso é liberado assim que o pagamento é confirmado." },
+  { icone: PenLine, titulo: "Escolha seu plano", texto: "Anual em até 12x sem juros ou no Pix, ou mensal no cartão. O acesso é liberado assim que o pagamento é confirmado." },
   { icone: Brain, titulo: "Estude por disciplina", texto: "Vídeos, resumos, mapas mentais e flashcards organizados por período e matéria." },
   { icone: ChartColumn, titulo: "Treine e acompanhe", texto: "Faça simulados, receba a correção comentada e reforce onde você errou." },
 ];
@@ -87,11 +87,11 @@ const PASSOS = [
 const DUVIDAS = [
   {
     pergunta: "Como funciona a assinatura?",
-    resposta: `É mensal e sem fidelidade. O Essencial (${formatarReais(MODULOS.disciplinas.precoCentavos)}/mês) libera as disciplinas, e você pode somar Simulados, Flashcards, Chat IA e Consultório. O Completo (${formatarReais(PRECO_MENSAL.completo)}/mês) tem tudo. Cancele quando quiser e use até o fim do período pago. Tudo o que for publicado enquanto você assina fica disponível para você.`,
+    resposta: `É uma assinatura anual (em até 12x sem juros) ou mensal, sem fidelidade. O Essencial (12x ${formatarReais(PARCELA_ANUAL.essencial)} no anual ou ${formatarReais(PRECO_MENSAL.essencial)}/mês) libera as disciplinas; no mensal, você pode somar Simulados, Flashcards, Chat IA e Consultório. O Completo (12x ${formatarReais(PARCELA_ANUAL.completo)} no anual ou ${formatarReais(PRECO_MENSAL.completo)}/mês) tem tudo. Cancele quando quiser e use até o fim do período pago. Tudo o que for publicado enquanto você assina fica disponível para você.`,
   },
   {
     pergunta: "Posso dividir com um colega?",
-    resposta: `Sim, no plano Duplo (${formatarReais(PRECO_MENSAL.duplo)}/mês): é o Completo para duas pessoas, cada uma com a própria conta e o próprio progresso. Sai ${formatarReais(PRECO_MENSAL.duplo / 2)} para cada.`,
+    resposta: `Sim, no plano Duplo (12x ${formatarReais(PARCELA_ANUAL.duplo)} no anual ou ${formatarReais(PRECO_MENSAL.duplo)}/mês): é o Completo para duas pessoas, cada uma com a própria conta e o próprio progresso. No anual, sai 12x ${formatarReais(PARCELA_ANUAL.duplo / 2)} para cada.`,
   },
   {
     pergunta: "Como funciona a correção por IA?",
@@ -110,7 +110,7 @@ const DUVIDAS = [
   },
   {
     pergunta: "Quais as formas de pagamento?",
-    resposta: `Mensal: no cartão de crédito, cobrado todo mês. Anual (Completo ou Duplo): à vista no Pix ou no cartão, ou em até 12x no cartão, e sai 2 meses mais barato (Completo por ${formatarReais(PRECO_ANUAL.completo)}/ano). O pagamento é processado pelo Asaas.`,
+    resposta: `Anual: em até 12x sem juros no cartão, ou à vista no Pix pelo mesmo total (Completo por 12x ${formatarReais(PARCELA_ANUAL.completo)}, ${formatarReais(PRECO_ANUAL.completo)} no total: ${formatarReais(economiaAnual("completo"))} a menos que 12 mensalidades). Mensal: no cartão de crédito, cobrado todo mês. O pagamento é processado pelo Asaas.`,
   },
   {
     pergunta: "O certificado vale como hora complementar?",
@@ -326,10 +326,10 @@ export default function Inicio() {
             <div className="mx-auto max-w-6xl space-y-10 px-4">
               <Surgir className="mx-auto max-w-2xl space-y-3 text-center">
                 <Rotulo className="text-violeta">Fig. 04 · Planos</Rotulo>
-                <h2 className="text-4xl font-extrabold tracking-tight text-tinta sm:text-5xl">Tudo da plataforma por menos de R$ 1,20 por dia</h2>
+                <h2 className="text-4xl font-extrabold tracking-tight text-tinta sm:text-5xl">Tudo da plataforma por menos de R$ 1,20 por dia no anual</h2>
                 <p className="text-lg text-slate-600">
-                  Separado, tudo sairia {formatarReais(somaAvulsos())}/mês. No Completo, {formatarReais(PRECO_MENSAL.completo)}. Sem
-                  fidelidade: cancele quando quiser.
+                  Separado, tudo sairia {formatarReais(somaAvulsos())}/mês. No Completo anual, 12x {formatarReais(PARCELA_ANUAL.completo)} sem
+                  juros. Prefere mensal? {formatarReais(PRECO_MENSAL.completo)}/mês, sem fidelidade.
                 </p>
               </Surgir>
               <SurgirLista className="grid items-start gap-6 lg:grid-cols-3">
@@ -337,10 +337,11 @@ export default function Inicio() {
                   <div className="flex h-full flex-col rounded-3xl border-2 border-tinta bg-white p-7">
                     <Rotulo className="text-violeta">Essencial</Rotulo>
                     <p className="mt-2 font-heading text-4xl font-extrabold tracking-tight text-tinta">
-                      {formatarReais(MODULOS.disciplinas.precoCentavos)}
-                      <span className="text-base font-semibold text-slate-500">/mês</span>
+                      <span className="text-base font-semibold text-slate-500">12x </span>
+                      {formatarReais(PARCELA_ANUAL.essencial)}
                     </p>
-                    <p className="text-sm text-slate-600">As disciplinas, e você soma o que quiser.</p>
+                    <p className="text-xs text-slate-500">sem juros · ou {formatarReais(PRECO_MENSAL.essencial)}/mês no mensal</p>
+                    <p className="mt-1 text-sm text-slate-600">As disciplinas; no mensal, você soma o que quiser.</p>
                     <ul className="mt-6 space-y-2.5 text-sm text-slate-700">
                       <li className="flex gap-2">
                         <Check className="size-5 shrink-0 text-violeta" /> {MODULOS.disciplinas.descricao}
@@ -365,10 +366,12 @@ export default function Inicio() {
                     <Rotulo className="text-lima">Completo</Rotulo>
                     <p className="mt-2 text-sm text-white/60 line-through">{formatarReais(somaAvulsos())}/mês</p>
                     <p className="font-heading text-5xl font-extrabold tracking-tight">
-                      {formatarReais(PRECO_MENSAL.completo)}
-                      <span className="text-base font-semibold text-white/70">/mês</span>
+                      <span className="text-base font-semibold text-white/70">12x </span>
+                      {formatarReais(PARCELA_ANUAL.completo)}
                     </p>
-                    <p className="text-sm text-white/80">ou {formatarReais(PRECO_ANUAL.completo)} no anual (2 meses grátis)</p>
+                    <p className="text-sm text-white/80">
+                      sem juros no anual · ou {formatarReais(PRECO_MENSAL.completo)}/mês no mensal
+                    </p>
                     <ul className="mt-6 space-y-2.5 text-sm">
                       {TODOS_MODULOS.map((m) => (
                         <li key={m} className="flex gap-2">
@@ -378,7 +381,7 @@ export default function Inicio() {
                       ))}
                     </ul>
                     <Button size="lg" className="mt-8 h-12 w-full rounded-full bg-lima text-base text-tinta hover:bg-lima/90" asChild>
-                      <Link href="/assinar/escolher?plano=completo&ciclo=mensal">
+                      <Link href="/assinar/escolher?plano=completo&ciclo=anual">
                         Quero o Completo <ArrowRight data-icon="inline-end" />
                       </Link>
                     </Button>
@@ -388,11 +391,12 @@ export default function Inicio() {
                   <div className="flex h-full flex-col rounded-3xl border-2 border-tinta bg-white p-7">
                     <Rotulo className="text-violeta">Duplo</Rotulo>
                     <p className="mt-2 font-heading text-4xl font-extrabold tracking-tight text-tinta">
-                      {formatarReais(PRECO_MENSAL.duplo)}
-                      <span className="text-base font-semibold text-slate-500">/mês</span>
+                      <span className="text-base font-semibold text-slate-500">12x </span>
+                      {formatarReais(PARCELA_ANUAL.duplo)}
                     </p>
-                    <p className="text-sm text-slate-600">
-                      O Completo para você e um colega: {formatarReais(PRECO_MENSAL.duplo / 2)} para cada.
+                    <p className="text-xs text-slate-500">sem juros · ou {formatarReais(PRECO_MENSAL.duplo)}/mês no mensal</p>
+                    <p className="mt-1 text-sm text-slate-600">
+                      O Completo para você e um colega: 12x {formatarReais(PARCELA_ANUAL.duplo / 2)} para cada.
                     </p>
                     <ul className="mt-6 space-y-2.5 text-sm text-slate-700">
                       {["Tudo do Completo, para duas contas", "Cada um com o próprio progresso", "Convite pelo e-mail, depois de assinar"].map(
@@ -404,13 +408,13 @@ export default function Inicio() {
                       )}
                     </ul>
                     <Button variant="outline" size="lg" className="mt-8 h-12 w-full rounded-full text-base" asChild>
-                      <Link href="/assinar/escolher?plano=duplo&ciclo=mensal">Assinar o Duplo</Link>
+                      <Link href="/assinar/escolher?plano=duplo&ciclo=anual">Assinar o Duplo</Link>
                     </Button>
                   </div>
                 </SurgirItem>
               </SurgirLista>
               <p className="flex items-center justify-center gap-1.5 text-center text-xs text-slate-500">
-                <ShieldCheck className="size-4 shrink-0" /> Pagamento seguro pelo Asaas · mensal no cartão · anual no Pix ou em até 12x · 7 dias
+                <ShieldCheck className="size-4 shrink-0" /> Pagamento seguro pelo Asaas · anual em até 12x sem juros ou no Pix · mensal no cartão · 7 dias
                 para desistir
               </p>
             </div>

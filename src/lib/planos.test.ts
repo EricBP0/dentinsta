@@ -1,9 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { ehUpgrade, montarEscolha, nomeDaEscolha, somaAvulsos, upsellParaCompleto } from "./planos";
+import { economiaAnual, ehUpgrade, montarEscolha, nomeDaEscolha, somaAvulsos, upsellParaCompleto } from "./planos";
 
 describe("preços", () => {
   it("a soma dos módulos avulsos é a âncora do Completo", () => {
-    expect(somaAvulsos()).toBe(6750);
+    expect(somaAvulsos()).toBe(10250);
+  });
+  it("anual em 12x sem juros: total = 12 parcelas, mais barato que 12 mensalidades", () => {
+    expect(montarEscolha("essencial", "anual")?.valorCentavos).toBe(12 * 1490);
+    expect(montarEscolha("completo", "anual")?.valorCentavos).toBe(12 * 3490);
+    expect(montarEscolha("duplo", "anual")?.valorCentavos).toBe(12 * 5990);
+    expect([economiaAnual("essencial"), economiaAnual("completo"), economiaAnual("duplo")]).toEqual([9600, 18000, 24000]);
   });
 });
 
@@ -13,7 +19,7 @@ describe("montarEscolha", () => {
       plano: "essencial",
       ciclo: "mensal",
       modulos: ["disciplinas", "simulados", "chat"],
-      valorCentavos: 1490 + 1490 + 1790,
+      valorCentavos: 2290 + 2290 + 2690,
     });
   });
   it("ignora módulos desconhecidos e repetidos", () => {
@@ -22,14 +28,13 @@ describe("montarEscolha", () => {
   it("Essencial com todos os avulsos vira Completo", () => {
     expect(montarEscolha("essencial", "mensal", ["simulados", "flashcards", "chat", "consultorio"])).toMatchObject({
       plano: "completo",
-      valorCentavos: 3490,
+      valorCentavos: 4990,
     });
   });
-  it("anual só no Completo e no Duplo", () => {
-    expect(montarEscolha("essencial", "anual")).toBeNull();
-    expect(montarEscolha("completo", "anual")?.valorCentavos).toBe(34900);
-    expect(montarEscolha("duplo", "anual")?.valorCentavos).toBe(59900);
-    expect(montarEscolha("duplo", "mensal")?.valorCentavos).toBe(5990);
+  it("Essencial anual é só com as Disciplinas; avulsos só no mensal", () => {
+    expect(montarEscolha("essencial", "anual")).toEqual({ plano: "essencial", ciclo: "anual", modulos: ["disciplinas"], valorCentavos: 17880 });
+    expect(montarEscolha("essencial", "anual", ["chat"])).toBeNull();
+    expect(montarEscolha("duplo", "mensal")?.valorCentavos).toBe(7990);
   });
   it("recusa plano inválido", () => {
     expect(montarEscolha("vip", "mensal")).toBeNull();
@@ -39,10 +44,16 @@ describe("montarEscolha", () => {
 describe("upsellParaCompleto", () => {
   it("mostra quanto falta para levar tudo", () => {
     const escolha = montarEscolha("essencial", "mensal", ["simulados", "chat"])!;
-    expect(upsellParaCompleto(escolha)).toEqual({ diferencaCentavos: 3490 - 4770, modulosGanhos: ["flashcards", "consultorio"] });
+    expect(upsellParaCompleto(escolha)).toMatchObject({ diferencaCentavos: 4990 - 7270, modulosGanhos: ["flashcards", "consultorio"] });
   });
   it("também oferece para o Essencial puro, mas não para quem já leva tudo", () => {
-    expect(upsellParaCompleto(montarEscolha("essencial", "mensal")!)?.diferencaCentavos).toBe(2000);
+    expect(upsellParaCompleto(montarEscolha("essencial", "mensal")!)?.diferencaCentavos).toBe(2700);
+    expect(upsellParaCompleto(montarEscolha("completo", "mensal")!)).toBeNull();
+  });
+  it("no anual, compara com o Completo anual, por parcela", () => {
+    const upsell = upsellParaCompleto(montarEscolha("essencial", "anual")!)!;
+    expect(upsell.completo).toMatchObject({ plano: "completo", ciclo: "anual", valorCentavos: 41880 });
+    expect(upsell.diferencaCentavos).toBe(2000);
     expect(upsellParaCompleto(montarEscolha("completo", "mensal")!)).toBeNull();
   });
 });

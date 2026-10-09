@@ -4,7 +4,7 @@ import { BarraAnimada } from "@/components/movimento";
 import type { Acesso } from "@/lib/acesso";
 import { formatarData } from "@/lib/catalogo";
 import { formatarReais } from "@/lib/preco";
-import { MODULOS, PLANOS, PRECO_MENSAL, somaAvulsos, type Modulo } from "@/lib/planos";
+import { MODULOS, PARCELA_ANUAL, PLANOS, PRECO_MENSAL, somaAvulsos, type Modulo } from "@/lib/planos";
 
 /** Link para os planos, já com o módulo que falta marcado. */
 export function hrefDoPlano(modulo?: Modulo) {
@@ -40,13 +40,13 @@ export function AreaBloqueada({ modulo, temAssinatura }: { modulo: Modulo; temAs
       </div>
       <p className="text-sm text-slate-600">
         {temAssinatura ? "Seu plano ainda não inclui esta área. " : ""}
-        Some ao Essencial por <strong>{formatarReais(info.precoCentavos)}/mês</strong>, ou leve{" "}
-        <strong>tudo</strong> no Completo por {formatarReais(PRECO_MENSAL.completo)}/mês{" "}
-        <span className="text-slate-500">(separado sairia {formatarReais(somaAvulsos())})</span>.
+        Some ao Essencial mensal por <strong>{formatarReais(info.precoCentavos)}/mês</strong>, ou leve{" "}
+        <strong>tudo</strong> no Completo por 12x {formatarReais(PARCELA_ANUAL.completo)} no anual ou{" "}
+        {formatarReais(PRECO_MENSAL.completo)}/mês <span className="text-slate-500">(separado sairia {formatarReais(somaAvulsos())}/mês)</span>.
       </p>
       <div className="flex flex-wrap justify-center gap-2">
         <Link
-          href={`/assinar/escolher?plano=completo`}
+          href={`/assinar/escolher?plano=completo&ciclo=anual`}
           className="rounded-full border-2 border-tinta bg-lima px-4 py-2 text-sm font-bold text-tinta transition hover:-translate-y-0.5"
         >
           Quero o Completo

@@ -6,7 +6,7 @@ import { exigirLogin } from "@/lib/auth";
 import { carregarAcesso, formatarData } from "@/lib/catalogo";
 import { textoParam } from "@/lib/listagem";
 import { formatarReais } from "@/lib/preco";
-import { ehModulo, MODULOS, PLANOS, PRECO_ANUAL, PRECO_MENSAL, somaAvulsos, TODOS_MODULOS } from "@/lib/planos";
+import { economiaAnual, ehModulo, MODULOS, PARCELA_ANUAL, PLANOS, PRECO_ANUAL, PRECO_MENSAL, somaAvulsos, TODOS_MODULOS } from "@/lib/planos";
 import { CartaoEssencial } from "./essencial";
 
 export default async function Planos({ searchParams }: PageProps<"/assinar">) {
@@ -24,8 +24,8 @@ export default async function Planos({ searchParams }: PageProps<"/assinar">) {
       <header className="max-w-2xl space-y-2">
         <h1 className="text-3xl font-extrabold tracking-tight text-tinta sm:text-4xl">Escolha seu plano</h1>
         <p className="text-slate-600">
-          Assinatura mensal, sem fidelidade: cancele quando quiser. Separado, tudo sairia{" "}
-          <strong>{formatarReais(ancora)}/mês</strong>. No Completo, sai por {formatarReais(PRECO_MENSAL.completo)}.
+          Separado, tudo sairia <strong>{formatarReais(ancora)}/mês</strong>. No Completo anual, sai por 12x{" "}
+          {formatarReais(PARCELA_ANUAL.completo)} sem juros. No mensal, sem fidelidade: cancele quando quiser.
         </p>
       </header>
 
@@ -46,7 +46,7 @@ export default async function Planos({ searchParams }: PageProps<"/assinar">) {
       )}
 
       <div className="grid items-start gap-5 lg:grid-cols-3">
-        <CartaoEssencial inicial={ehModulo(modulo) && modulo !== "disciplinas" ? [modulo] : []} />
+        <CartaoEssencial inicial={ehModulo(modulo) && modulo !== "disciplinas" ? [modulo] : []} cicloInicial={ehModulo(modulo) ? "mensal" : "anual"} />
 
         {/* Completo: o destaque da página */}
         <section className="relative flex flex-col gap-4 rounded-3xl border-2 border-tinta bg-tinta p-6 text-white shadow-[6px_6px_0_0_var(--color-lima)] lg:-mt-3">
@@ -56,11 +56,8 @@ export default async function Planos({ searchParams }: PageProps<"/assinar">) {
           <div>
             <p className="rotulo text-[11px] font-semibold text-lima">Completo</p>
             <p className="text-sm text-white/60 line-through">{formatarReais(ancora)}/mês</p>
-            <p className="text-4xl font-extrabold tracking-tight">
-              {formatarReais(PRECO_MENSAL.completo)}
-              <span className="text-base font-semibold text-white/70">/mês</span>
-            </p>
-            <p className="text-sm text-white/80">Tudo da plataforma por quase metade do preço.</p>
+            <Parcela plano="completo" claro />
+            <p className="text-sm text-white/80">Tudo da plataforma por um terço do preço.</p>
           </div>
           <ListaModulos claro />
           <BotoesCiclo plano="completo" claro />
@@ -71,12 +68,9 @@ export default async function Planos({ searchParams }: PageProps<"/assinar">) {
             <p className="rotulo flex items-center gap-1 text-[11px] font-semibold text-violeta-700">
               <Users className="size-3.5" /> Duplo
             </p>
-            <p className="mt-1 text-4xl font-extrabold tracking-tight text-tinta">
-              {formatarReais(PRECO_MENSAL.duplo)}
-              <span className="text-base font-semibold text-slate-500">/mês</span>
-            </p>
+            <Parcela plano="duplo" />
             <p className="text-sm text-slate-600">
-              O Completo para você e mais uma pessoa: {formatarReais(PRECO_MENSAL.duplo / 2)} para cada.
+              O Completo para você e mais uma pessoa: 12x {formatarReais(PARCELA_ANUAL.duplo / 2)} para cada.
             </p>
           </div>
           <ListaModulos />
@@ -90,7 +84,7 @@ export default async function Planos({ searchParams }: PageProps<"/assinar">) {
       <section className="grid gap-4 text-sm text-slate-700 sm:grid-cols-3">
         <div className="rounded-2xl border-2 border-tinta bg-white p-4">
           <p className="font-bold text-tinta">Como é a cobrança?</p>
-          <p>Mensal: no cartão de crédito, todo mês. Anual: Pix ou cartão à vista, ou em até 12x no cartão.</p>
+          <p>Anual: em até 12x sem juros no cartão, ou à vista no Pix pelo mesmo total. Mensal: no cartão, todo mês.</p>
         </div>
         <div className="rounded-2xl border-2 border-tinta bg-white p-4">
           <p className="font-bold text-tinta">Posso cancelar?</p>
@@ -128,25 +122,39 @@ function ListaModulos({ claro = false }: { claro?: boolean }) {
   );
 }
 
+/** Preço em destaque: a parcela do anual, com o total e o mensal embaixo. */
+function Parcela({ plano, claro = false }: { plano: "completo" | "duplo"; claro?: boolean }) {
+  return (
+    <div className="mt-1">
+      <p className={`text-4xl font-extrabold tracking-tight ${claro ? "" : "text-tinta"}`}>
+        <span className={`text-base font-semibold ${claro ? "text-white/70" : "text-slate-500"}`}>12x </span>
+        {formatarReais(PARCELA_ANUAL[plano])}
+      </p>
+      <p className={`text-xs ${claro ? "text-white/70" : "text-slate-500"}`}>
+        sem juros no anual (total {formatarReais(PRECO_ANUAL[plano])}) · ou {formatarReais(PRECO_MENSAL[plano])}/mês no mensal
+      </p>
+    </div>
+  );
+}
+
 function BotoesCiclo({ plano, claro = false }: { plano: "completo" | "duplo"; claro?: boolean }) {
-  const economia = PRECO_MENSAL[plano] * 12 - PRECO_ANUAL[plano];
   return (
     <div className="mt-auto space-y-2">
       <Link
-        href={`/assinar/escolher?plano=${plano}&ciclo=mensal`}
+        href={`/assinar/escolher?plano=${plano}&ciclo=anual`}
         className={`block rounded-full py-3 text-center font-bold transition hover:-translate-y-0.5 ${
           claro ? "bg-lima text-tinta" : "bg-tinta text-white hover:bg-violeta"
         }`}
       >
-        Assinar mensal
+        Assinar anual · economize {formatarReais(economiaAnual(plano))}
       </Link>
       <Link
-        href={`/assinar/escolher?plano=${plano}&ciclo=anual`}
+        href={`/assinar/escolher?plano=${plano}&ciclo=mensal`}
         className={`block rounded-full border-2 py-2.5 text-center text-sm font-bold transition ${
           claro ? "border-lima text-lima hover:bg-lima hover:text-tinta" : "border-tinta text-tinta hover:bg-lima"
         }`}
       >
-        Anual: {formatarReais(PRECO_ANUAL[plano])} (economize {formatarReais(economia)})
+        Mensal: {formatarReais(PRECO_MENSAL[plano])}/mês
       </Link>
     </div>
   );
