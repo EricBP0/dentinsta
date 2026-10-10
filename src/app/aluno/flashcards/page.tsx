@@ -8,6 +8,8 @@ import { correspondeBusca, lerPagina, paginar, textoParam } from "@/lib/listagem
 import { SessaoEstudo } from "./sessao-estudo";
 import { BarraBusca, FiltroSelect, Paginacao, ResumoLista } from "@/components/listagem";
 import { botaoMarca, CabecalhoPagina } from "@/components/sistema";
+import { formatarReais } from "@/lib/preco";
+import { MODULOS, PARCELA_ANUAL } from "@/lib/planos";
 
 const SITUACOES = {
   revisar: "Com cards para revisar",
@@ -31,9 +33,29 @@ export default async function RevisaoDoDia({ searchParams }: PageProps<"/aluno/f
   const disciplina = textoParam(params.disciplina);
   const situacao = textoParam(params.situacao);
   const { supabase, perfil } = await exigirLogin();
-  const [{ acesso, disciplinas }, resumo] = await Promise.all([carregarCatalogo(supabase, perfil), carregarResumo(supabase)]);
+  const [{ acesso, disciplinas }, resumo, { count: naAmostra }] = await Promise.all([
+    carregarCatalogo(supabase, perfil),
+    carregarResumo(supabase),
+    supabase.from("flashcards_amostra").select("flashcard_id", { count: "exact", head: true }).eq("usuario_id", perfil.id),
+  ]);
   if (!temModulo(acesso, "flashcards", perfil.papel !== "aluno")) {
-    return <AreaBloqueada modulo="flashcards" temAssinatura={Boolean(acesso)} />;
+    if (!acesso || !naAmostra) return <AreaBloqueada modulo="flashcards" temAssinatura={Boolean(acesso)} />;
+    // Amostra (prêmio do formulário): só os cards liberados, sem a lista de decks.
+    const nomes = Object.fromEntries(
+      disciplinas.flatMap((d) => d.modulos.flatMap((m) => m.itens.map((i) => [i.id, `${d.nome} · ${i.titulo}`]))),
+    );
+    if (estudar === "1") {
+      return (
+        <div className="mx-auto max-w-2xl space-y-6">
+          <Link href="/aluno/flashcards" className="text-sm text-slate-600 hover:text-slate-900">
+            ← Flashcards
+          </Link>
+          <CabecalhoPagina rotulo="Lab · Memória" titulo="Sua amostra de flashcards" />
+          <SessaoEstudo cards={await carregarSessao(supabase, perfil.id, null)} nomesDecks={nomes} />
+        </div>
+      );
+    }
+    return <Amostra total={naAmostra} resumo={resumo} />;
   }
 
   // Decks liberados, com nome da disciplina, na ordem do catálogo.
@@ -142,6 +164,45 @@ export default async function RevisaoDoDia({ searchParams }: PageProps<"/aluno/f
       </ul>
 
       <Paginacao acao="/aluno/flashcards" pagina={pagina.pagina} totalPaginas={pagina.totalPaginas} params={filtros} />
+    </div>
+  );
+}
+
+function Amostra({ total, resumo }: { total: number; resumo: ResumoDeck[] }) {
+  const vistos = resumo.reduce((soma, r) => soma + r.vistos, 0);
+  const paraHoje = resumo.reduce((soma, r) => soma + r.vencidos + (r.total - r.vistos), 0);
+  return (
+    <div className="space-y-6">
+      <CabecalhoPagina
+        rotulo="Lab · Memória"
+        titulo="Flashcards"
+        descricao={`Sua amostra: ${total} flashcards, começando pelas disciplinas que você marcou. Repetição espaçada: cada card volta no momento certo.`}
+      >
+        {paraHoje > 0 && (
+          <Link href="/aluno/flashcards?estudar=1" className={botaoMarca}>
+            Revisar agora
+          </Link>
+        )}
+      </CabecalhoPagina>
+      <div className="rounded-2xl border-2 border-tinta bg-white p-5">
+        <p className="text-sm text-slate-600">Cards vistos</p>
+        <p className="text-3xl font-extrabold text-tinta">
+          {vistos} <span className="text-base font-semibold text-slate-500">de {total}</span>
+        </p>
+        <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
+          <div className="h-full rounded-full bg-violeta" style={{ width: `${Math.min(100, (vistos / total) * 100)}%` }} />
+        </div>
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-tinta bg-lima/40 p-4 text-sm text-tinta">
+        <span>
+          <strong className="block">Gostou? Libere todos os flashcards</strong>
+          Some Flashcards ao seu plano por {formatarReais(MODULOS.flashcards.precoCentavos)}/mês, ou leve tudo no Completo por 12x{" "}
+          {formatarReais(PARCELA_ANUAL.completo)}.
+        </span>
+        <Link href="/aluno/assinatura" className={botaoMarca}>
+          Ver opções
+        </Link>
+      </div>
     </div>
   );
 }

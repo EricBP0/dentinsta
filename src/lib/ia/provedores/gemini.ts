@@ -116,6 +116,13 @@ function textoDasPartes(resposta: GenerateContentResponse | undefined): string {
     .join("");
 }
 
+/** Mensagem do erro do Google com os detalhes (campo recusado), quando vierem. */
+function mensagemDeErro(erro: { message?: string; details?: unknown[] } | undefined): string | undefined {
+  if (!erro?.message) return undefined;
+  const detalhes = erro.details?.length ? JSON.stringify(erro.details).slice(0, 500) : "";
+  return detalhes ? `${erro.message} ${detalhes}` : erro.message;
+}
+
 export const provedorGemini: Provedor = {
   nome: "gemini",
   disponivel: () => Boolean(process.env.GEMINI_API_KEY),
@@ -194,7 +201,11 @@ export const provedorGemini: Provedor = {
     const lote = await gemini().batches.get({ name: idLote });
     if (lote.state === JobState.JOB_STATE_SUCCEEDED) {
       const item = lote.dest?.inlinedResponses?.[0];
-      if (!item?.response) return { terminado: true, erro: item?.error?.message ?? "Resultado do lote vazio." };
+      if (!item?.response) {
+        // Os detalhes dizem qual campo o Google recusou ("invalid argument" sozinho não diz).
+        if (item?.error) console.error("Gemini: item do lote com erro", { lote: idLote, erro: JSON.stringify(item.error) });
+        return { terminado: true, erro: mensagemDeErro(item?.error) ?? "Resultado do lote vazio." };
+      }
       const modelo = item.response.modelVersion ?? lote.model ?? "gemini";
       const uso = usoDa(item.response);
       try {
@@ -213,7 +224,9 @@ export const provedorGemini: Provedor = {
       lote.state === JobState.JOB_STATE_CANCELLED ||
       lote.state === JobState.JOB_STATE_EXPIRED
     ) {
-      return { terminado: true, erro: `A IA não concluiu a geração (${lote.state}). Tente novamente.` };
+      if (lote.error) console.error("Gemini: lote com erro", { lote: idLote, erro: JSON.stringify(lote.error) });
+      const motivo = mensagemDeErro(lote.error);
+      return { terminado: true, erro: `A IA não concluiu a geração (${lote.state}${motivo ? `: ${motivo}` : ""}). Tente novamente.` };
     }
     return { terminado: false };
   },

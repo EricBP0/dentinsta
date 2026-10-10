@@ -52,7 +52,15 @@ function servidorGemini(req: http.IncomingMessage, res: http.ServerResponse, cor
         name: "batches/lote2",
         metadata: {
           state: "BATCH_STATE_SUCCEEDED",
-          output: { inlinedResponses: { inlinedResponses: [{ error: { code: 400, message: "Request contains an invalid argument." } }] } },
+          output: { inlinedResponses: { inlinedResponses: [
+            {
+              error: {
+                code: 400,
+                message: "Request contains an invalid argument.",
+                details: [{ "@type": "type.googleapis.com/google.rpc.BadRequest", fieldViolations: [{ field: "campo.x" }] }],
+              },
+            },
+          ] } },
         },
       }),
     );
@@ -200,7 +208,11 @@ describe("Claude de reserva", () => {
     const pedido = { sistema: "Gere", partes: [{ tipo: "texto" as const, texto: "FALHAR_NO_LOTE" }], schema, maxTokens: 32000 };
     const enviado = await ia.enviarLote("geracao", pedido, "g2");
     expect(enviado.idLote).toBe("gemini:batches/lote2");
-    expect(await ia.consultarLote(enviado.idLote, "g2")).toEqual({ terminado: true, erro: "Request contains an invalid argument." });
+    // O erro guarda os detalhes do Google (qual campo foi recusado).
+    expect(await ia.consultarLote(enviado.idLote, "g2")).toEqual({
+      terminado: true,
+      erro: expect.stringMatching(/^Request contains an invalid argument\. .*campo\.x/),
+    });
 
     const antes = chamadas.length;
     const reserva = await ia.enviarLote("geracao", pedido, "g2", { depoisDe: enviado.modelo });
