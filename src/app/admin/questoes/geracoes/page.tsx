@@ -16,6 +16,8 @@ type LinhaGeracao = {
   config: { objetivas: number; discursivas: number; cards?: number; tema: string };
   erro: string | null;
   observacoes: string | null;
+  /** "provedor:modelo" do lote atual (registros antigos: só o modelo). */
+  modelo: string | null;
   questoes_geradas: number;
   questoes_descartadas: number;
   criado_em: string;
@@ -34,7 +36,7 @@ export default async function Geracoes() {
   const { data } = await supabase
     .from("geracoes_questoes")
     .select(
-      "id, alvo, item_id, status, tipo_material, arquivos, config, erro, observacoes, questoes_geradas, questoes_descartadas, criado_em, disciplinas(nome)",
+      "id, alvo, item_id, status, tipo_material, arquivos, config, erro, observacoes, modelo, questoes_geradas, questoes_descartadas, criado_em, disciplinas(nome)",
     )
     .order("criado_em", { ascending: false })
     .limit(50)
@@ -112,6 +114,12 @@ export default async function Geracoes() {
                 <Selo status={STATUS[g.status].selo} texto={STATUS[g.status].texto} />
               </div>
 
+              {(g.status === "processando" || g.status === "importando") && g.modelo && (
+                <p className="text-xs text-slate-500">
+                  Com {g.modelo.replace(/^[a-z]+:/, "")}
+                  {g.modelo.startsWith("gemini:") && " · o lote do Gemini pode levar algumas horas; se falhar, vai sozinho para o Claude"}
+                </p>
+              )}
               {g.status === "erro" && g.erro && <p className="text-sm text-red-700">{g.erro}</p>}
 
               {g.status === "concluida" && (
