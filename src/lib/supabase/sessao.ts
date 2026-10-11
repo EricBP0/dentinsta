@@ -1,7 +1,9 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const ROTAS_PROTEGIDAS = ["/aluno", "/admin", "/assinar", "/renovar", "/pagamento"];
+// /assinar e /pagamento abrem sem login: os dados de contato são pedidos na
+// hora de pagar e a conta é criada nesse momento.
+const ROTAS_PROTEGIDAS = ["/aluno", "/admin", "/renovar"];
 
 // Renova a sessão do Supabase a cada navegação e protege as áreas logadas.
 export async function atualizarSessao(request: NextRequest) {

@@ -5,6 +5,7 @@
 // Anual: pagamento único que libera 12 meses — à vista (Pix ou cartão 1x) ou
 // parcelado no cartão em até 12x.
 
+import type { Contato } from "@/lib/cadastro";
 import { nomeDaEscolha, MODULOS, PLANOS, type Escolha } from "@/lib/planos";
 import { IMAGEM_PRODUTO_BASE64 } from "./imagem-produto";
 
@@ -28,6 +29,8 @@ export function montarCheckoutAssinatura(params: {
   assinaturaId: string;
   urlBase: string;
   modalidadeAnual?: ModalidadeAnual;
+  /** Dados já informados no site: o Asaas preenche e o aluno só completa o resto (CPF). */
+  cliente?: Contato;
   agora?: Date;
 }) {
   const { escolha, assinaturaId, urlBase, agora = new Date() } = params;
@@ -51,6 +54,9 @@ export function montarCheckoutAssinatura(params: {
 
   return {
     ...cobranca,
+    ...(params.cliente && {
+      customerData: { name: params.cliente.nome, email: params.cliente.email, phone: params.cliente.telefone },
+    }),
     minutesToExpire: 60,
     externalReference: assinaturaId,
     callback: {

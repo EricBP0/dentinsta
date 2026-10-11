@@ -160,8 +160,8 @@ export default function Inicio() {
               </div>
               <div className="entrar flex flex-wrap gap-3 [animation-delay:150ms]">
                 <Button variant="destaque" size="lg" className="h-12 rounded-full px-6 text-base" asChild>
-                  <Link href="/assinar">
-                    Começar agora <ArrowRight data-icon="inline-end" />
+                  <Link href="/conhecer">
+                    Quero conhecer <ArrowRight data-icon="inline-end" />
                   </Link>
                 </Button>
                 <Button
@@ -458,8 +458,8 @@ export default function Inicio() {
                     Estude com método, treine com simulados e chegue na prova sabendo onde você precisa melhorar.
                   </p>
                   <Button size="lg" className="h-12 rounded-full bg-tinta px-6 text-base text-white hover:bg-tinta/85" asChild>
-                    <Link href="/assinar">
-                      Começar agora <ArrowRight data-icon="inline-end" />
+                    <Link href="/conhecer">
+                      Quero conhecer <ArrowRight data-icon="inline-end" />
                     </Link>
                   </Button>
                 </div>

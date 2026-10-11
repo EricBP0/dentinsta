@@ -23,7 +23,7 @@ campo **Message body** (aba *Source*). Depois clique em **Save**.
 | Modelo no painel | Subject | Arquivo |
 |---|---|---|
 | Confirm signup | `Confirme seu e-mail na OdontoLab` | `confirmar-cadastro.html` |
-| Reset password | `Crie uma nova senha na OdontoLab` | `redefinir-senha.html` |
+| Reset password | `Crie sua senha na OdontoLab` | `redefinir-senha.html` |
 | Invite user | `Você foi convidado para a OdontoLab` | `convite.html` |
 | Change email address | `Confirme seu novo e-mail na OdontoLab` | `alterar-email.html` |
 | Magic link | `Seu link de acesso à OdontoLab` | `link-magico.html` |

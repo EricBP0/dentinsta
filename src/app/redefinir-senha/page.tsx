@@ -3,7 +3,7 @@ import { Logo } from "@/components/marca/logo";
 import { obterSessao } from "@/lib/auth";
 import { FormularioNovaSenha } from "./formulario";
 
-/** Aberta pelo link de "esqueci minha senha" (que já deixa o aluno logado). */
+/** Aberta pelo link de "crie sua senha" ou "esqueci minha senha" (que já deixa o aluno logado). */
 export default async function RedefinirSenha() {
   const { perfil } = await obterSessao();
   return (

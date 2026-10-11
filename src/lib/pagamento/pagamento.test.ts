@@ -20,6 +20,18 @@ describe("montarCheckoutAssinatura", () => {
     expect(corpo.items[0].description).toBe("Assinatura mensal: Disciplinas, Chat IA");
     expect(corpo.externalReference).toBe("a1");
     expect(corpo.callback.successUrl).toBe("https://site.com/pagamento/concluido?assinatura=a1");
+    expect(corpo).not.toHaveProperty("customerData");
+  });
+
+  it("pagar sem conta: nome, e-mail e WhatsApp já vão preenchidos", () => {
+    const corpo = montarCheckoutAssinatura({
+      escolha: montarEscolha("completo", "mensal")!,
+      assinaturaId: "a3",
+      urlBase: "https://site.com",
+      cliente: { nome: "Ana Souza", email: "ana@email.com", telefone: "11987654321" },
+      agora,
+    });
+    expect(corpo).toMatchObject({ customerData: { name: "Ana Souza", email: "ana@email.com", phone: "11987654321" } });
   });
 
   it("anual à vista: Pix ou cartão, pagamento único", () => {
