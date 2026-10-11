@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { botaoPerigo, botaoPrimario, campo, Selo } from "@/components/admin-ui";
 import { exigirAdmin } from "@/lib/auth";
 import { faixa, lerPagina, termoIlike, textoParam, totalDePaginas } from "@/lib/listagem";
@@ -140,7 +141,14 @@ export default async function Vendas({ searchParams }: PageProps<"/admin/vendas"
         rotulo="Backoffice · Vendas"
         titulo="Vendas e assinaturas"
         descricao="Pagamentos pelo Asaas. Estornos e chargebacks retiram o acesso automaticamente."
-      />
+      >
+        <Link
+          href="/admin/vendas/leads"
+          className="inline-flex items-center rounded-full border-2 border-lima px-4 py-2 text-sm font-bold text-lima hover:bg-lima hover:text-tinta"
+        >
+          Leads e carrinhos abandonados
+        </Link>
+      </CabecalhoPagina>
 
       {typeof aviso === "string" && (
         <p className="rounded-2xl border-2 border-tinta bg-sky-50 p-3 text-sm text-sky-900">{aviso}</p>

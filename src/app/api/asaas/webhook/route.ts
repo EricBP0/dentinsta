@@ -1,3 +1,4 @@
+import { enviarConviteDeSenha } from "@/lib/conta";
 import { cancelarAssinaturaAsaas } from "@/lib/pagamento/asaas";
 import { processarEvento, tokenValido, type AssinaturaRef, type EventoAsaas } from "@/lib/pagamento/webhook";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
@@ -92,6 +93,14 @@ export async function POST(request: Request) {
     await admin
       .from("webhook_eventos")
       .upsert({ id: evento.id, gateway: "asaas", evento: evento.event, payload: evento }, { ignoreDuplicates: true });
+
+    // Conta criada no pagamento: o 1º pagamento confirmado manda o e-mail "crie
+    // sua senha" (uma vez só). Falha aqui não pode fazer o Asaas reenviar o evento.
+    if (resultado.acao === "confirmada" && resultado.assinaturaId) {
+      await enviarConviteDeSenha(resultado.assinaturaId).catch((erro) =>
+        console.error("Falha ao enviar o convite de senha", { assinaturaId: resultado.assinaturaId, erro }),
+      );
+    }
 
     return Response.json({ ok: true, ...resultado });
   } catch (erro) {

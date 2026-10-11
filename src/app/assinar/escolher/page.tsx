@@ -2,7 +2,6 @@ import { ArrowLeft, Check, CreditCard, QrCode, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Logo } from "@/components/marca/logo";
-import { exigirLogin } from "@/lib/auth";
 import { textoParam } from "@/lib/listagem";
 import { PARCELAS_ANUAL } from "@/lib/pagamento/ofertas";
 import { formatarReais } from "@/lib/preco";
@@ -25,7 +24,6 @@ import { iniciarAssinatura } from "../actions";
  */
 export default async function Escolher({ searchParams }: PageProps<"/assinar/escolher">) {
   const params = await searchParams;
-  await exigirLogin();
   const modulos = ([] as string[]).concat(params.modulos ?? []).flatMap((m) => m.split(","));
   const escolha = montarEscolha(textoParam(params.plano), textoParam(params.ciclo), modulos);
   if (!escolha) redirect("/assinar");

@@ -86,7 +86,7 @@ export default async function Painel() {
     { data: temas },
     { count: correcoesNoMes },
     { data: ultimoProgresso },
-    { data: perfilCliente },
+    { data: perfilCliente, error: erroPerfilCliente },
   ] = await Promise.all([
     carregarCatalogo(supabase, perfil),
     carregarResumo(supabase),
@@ -126,7 +126,8 @@ export default async function Painel() {
       .maybeSingle<PerfilCliente>(),
   ]);
   // Primeiro acesso de quem assina: o formulário "Personalize sua OdontoLab".
-  if (!equipe && acesso && !perfilCliente) redirect("/aluno/personalizar");
+  // Se a consulta falhar (ex.: migration 0016 ainda não aplicada), não redireciona.
+  if (!equipe && acesso && !perfilCliente && !erroPerfilCliente) redirect("/aluno/personalizar");
 
   // Notas
   const notas = (simulados ?? []).map((s) => ({ ...s, nota: Number(s.nota) }));

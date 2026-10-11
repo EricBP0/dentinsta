@@ -2,7 +2,7 @@ import { Check, Users } from "lucide-react";
 import Link from "next/link";
 import { Logo } from "@/components/marca/logo";
 import { AvisoCheckout } from "@/components/ofertas";
-import { exigirLogin } from "@/lib/auth";
+import { obterSessao } from "@/lib/auth";
 import { carregarAcesso, formatarData } from "@/lib/catalogo";
 import { textoParam } from "@/lib/listagem";
 import { formatarReais } from "@/lib/preco";
@@ -12,15 +12,23 @@ import { CartaoEssencial } from "./essencial";
 export default async function Planos({ searchParams }: PageProps<"/assinar">) {
   const params = await searchParams;
   const modulo = textoParam(params.modulo);
-  const { supabase, perfil } = await exigirLogin();
-  const acesso = await carregarAcesso(supabase, perfil);
+  // Aberta sem login: os dados de contato são pedidos só na hora de pagar.
+  const { supabase, perfil } = await obterSessao();
+  const acesso = perfil ? await carregarAcesso(supabase, perfil) : null;
   const ancora = somaAvulsos();
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 space-y-8 px-4 py-12">
-      <Link href={acesso ? "/aluno" : "/"} aria-label="OdontoLab — início" className="inline-block">
-        <Logo />
-      </Link>
+      <div className="flex items-center justify-between gap-4">
+        <Link href={acesso ? "/aluno" : "/"} aria-label="OdontoLab — início" className="inline-block">
+          <Logo />
+        </Link>
+        {!perfil && (
+          <Link href="/entrar?proximo=/assinar" className="text-sm font-semibold text-slate-600 hover:text-tinta">
+            Já tem conta? Entrar
+          </Link>
+        )}
+      </div>
       <header className="max-w-2xl space-y-2">
         <h1 className="text-3xl font-extrabold tracking-tight text-tinta sm:text-4xl">Escolha seu plano</h1>
         <p className="text-slate-600">

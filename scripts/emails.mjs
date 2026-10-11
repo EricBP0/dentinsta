@@ -151,19 +151,23 @@ export const modelos = [
   {
     arquivo: "redefinir-senha.html",
     painel: "Reset password",
-    assunto: "Crie uma nova senha na OdontoLab",
+    // Serve para trocar a senha e também para criar a primeira (conta criada no pagamento).
+    assunto: "Crie sua senha na OdontoLab",
     variaveis: ["{{ .TokenHash }}", "type=recovery"],
     html: layout({
-      assunto: "Crie uma nova senha na OdontoLab",
-      preheader: "Use o link para criar uma nova senha.",
-      titulo: "Crie uma nova senha",
+      assunto: "Crie sua senha na OdontoLab",
+      preheader: "Use o link para criar sua senha de acesso.",
+      titulo: "Crie sua senha",
       corpo: [
         paragrafo(SAUDACAO),
-        paragrafo("Recebemos um pedido para trocar a senha da sua conta. Clique no botão para escolher uma nova."),
-        botao("Criar nova senha", linkConfirmacao("recovery", "/redefinir-senha")),
+        paragrafo(
+          "Clique no botão para criar sua senha da OdontoLab. Com ela, você entra no celular, no computador ou em qualquer outro aparelho.",
+        ),
+        botao("Criar minha senha", linkConfirmacao("recovery", "/redefinir-senha")),
         linkReserva(linkConfirmacao("recovery", "/redefinir-senha")),
       ].join("\n"),
-      aviso: "O link vale por 1 hora. Se você não pediu a troca, ignore este e-mail: sua senha continua a mesma.",
+      aviso:
+        "O link vale por tempo limitado. Se expirar, use “Esqueci minha senha” na página de entrar. Se você não pediu este e-mail, ignore: nada muda na sua conta.",
     }),
   },
   {
