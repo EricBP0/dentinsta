@@ -115,7 +115,12 @@ corrigidas por função do banco e discursivas pelo servidor com a chave secreta
    - Eventos: `CHECKOUT_PAID`, `CHECKOUT_CANCELED`, `CHECKOUT_EXPIRED`,
      `PAYMENT_CONFIRMED`, `PAYMENT_RECEIVED`, `PAYMENT_REFUNDED`,
      `PAYMENT_CHARGEBACK_REQUESTED`, `SUBSCRIPTION_DELETED`,
-     `SUBSCRIPTION_INACTIVATED`
+     `SUBSCRIPTION_INACTIVATED`, `TRANSFER_DONE`, `TRANSFER_FAILED`,
+     `TRANSFER_CANCELLED` (os três últimos são do Pix dos afiliados)
+   - Afiliados: o saque aprovado no backoffice vira um Pix pela API do Asaas
+     (`POST /transfers`). Libere transferências por API na conta do Asaas e
+     mantenha saldo para os pagamentos. Se o Asaas pedir autorização da
+     transferência (SMS/app), ela fica "Pix em andamento" até ser autorizada.
 
    Para emitir nota fiscal automaticamente, configure a NFS-e no painel do Asaas.
    Em desenvolvimento, dá para liberar acesso de teste em **Backoffice → Vendas**.

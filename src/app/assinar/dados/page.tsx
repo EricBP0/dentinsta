@@ -1,7 +1,10 @@
 import { ArrowLeft, Lock } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { FaixaCupom } from "@/components/cupom";
 import { FormularioContato } from "@/components/formulario-contato";
+import { afiliadoDaVisita } from "@/lib/afiliado-visita";
+import { descontoCentavos } from "@/lib/afiliados";
 import { Logo } from "@/components/marca/logo";
 import { obterSessao } from "@/lib/auth";
 import { contatoDoLead } from "@/lib/lead";
@@ -27,13 +30,20 @@ export default async function DadosParaPagar({ searchParams }: PageProps<"/assin
   const { perfil } = await obterSessao();
   if (perfil) redirect(voltar);
 
-  const lead = await contatoDoLead();
+  const [lead, visita] = await Promise.all([contatoDoLead(), afiliadoDaVisita()]);
+  // Cupom: desconto só na primeira cobrança.
+  const desconto = visita?.cupom ? descontoCentavos(escolha.valorCentavos, visita.descontoPct) : 0;
+  const primeira = escolha.valorCentavos - desconto;
   const preco =
     escolha.ciclo === "mensal"
-      ? `${formatarReais(escolha.valorCentavos)}/mês no cartão`
+      ? desconto
+        ? `${formatarReais(primeira)} no 1º mês e ${formatarReais(escolha.valorCentavos)}/mês depois, no cartão`
+        : `${formatarReais(escolha.valorCentavos)}/mês no cartão`
       : modalidade === "parcelado"
-        ? `${PARCELAS_ANUAL}x ${formatarReais(Math.ceil(escolha.valorCentavos / PARCELAS_ANUAL))} sem juros no cartão`
-        : `${formatarReais(escolha.valorCentavos)} à vista (Pix ou cartão)`;
+        ? `${PARCELAS_ANUAL}x ${formatarReais(Math.ceil(primeira / PARCELAS_ANUAL))} sem juros no cartão`
+        : `${formatarReais(primeira)} à vista (Pix ou cartão)`;
+  const aqui = new URLSearchParams({ plano: escolha.plano, ciclo: escolha.ciclo, modalidade });
+  modulos.forEach((m) => aqui.append("modulos", m));
 
   return (
     <main className="mx-auto w-full max-w-md flex-1 space-y-6 px-4 py-12">
@@ -54,6 +64,7 @@ export default async function DadosParaPagar({ searchParams }: PageProps<"/assin
             {preco}. Depois do pagamento você já entra na plataforma e recebe um e-mail para criar sua senha.
           </p>
         </div>
+        <FaixaCupom voltar={`/assinar/dados?${aqui}`} escolha={escolha} />
         <FormularioContato
           acao={pagarSemConta}
           ocultos={{ plano: escolha.plano, ciclo: escolha.ciclo, modalidade, modulos }}

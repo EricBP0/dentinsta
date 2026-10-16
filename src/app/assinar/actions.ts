@@ -1,6 +1,9 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { afiliadoDaVisita, afiliadoPorCupom, opcoesCookieAfiliado } from "@/lib/afiliado-visita";
+import { COOKIE_CUPOM, descontoCentavos, normalizarCupom } from "@/lib/afiliados";
 import { obterSessao } from "@/lib/auth";
 import { contatoDoFormulario, validarContato, type Contato, type EstadoContato } from "@/lib/cadastro";
 import { contaParaPagamento, entrarSemSenha } from "@/lib/conta";
@@ -8,7 +11,7 @@ import { criarCheckout } from "@/lib/pagamento/asaas";
 import { montarCheckoutAssinatura, type ModalidadeAnual } from "@/lib/pagamento/ofertas";
 import { montarEscolha, type Escolha } from "@/lib/planos";
 import { criarClienteAdmin } from "@/lib/supabase/admin";
-import { urlDoSite } from "@/lib/url";
+import { destinoSeguro, urlDoSite } from "@/lib/url";
 
 function lerEscolha(formData: FormData) {
   const escolha = montarEscolha(
@@ -40,6 +43,10 @@ async function temAssinaturaRecorrente(usuarioId: string) {
  */
 async function abrirCheckout(usuarioId: string, escolha: Escolha, modalidadeAnual: ModalidadeAnual, cliente?: Contato) {
   const admin = criarClienteAdmin();
+  // Afiliado do link ou do cupom. O afiliado não usa o próprio cupom nem indica a si mesmo.
+  const visita = await afiliadoDaVisita();
+  const afiliado = visita && visita.usuarioId !== usuarioId ? visita : null;
+  const desconto = afiliado?.cupom ? descontoCentavos(escolha.valorCentavos, afiliado.descontoPct) : 0;
   const { data: assinatura, error } = await admin
     .from("assinaturas")
     .insert({
@@ -49,12 +56,21 @@ async function abrirCheckout(usuarioId: string, escolha: Escolha, modalidadeAnua
       ciclo: escolha.ciclo,
       valor_centavos: escolha.valorCentavos,
       status: "pendente",
+      afiliado_id: afiliado?.id ?? null,
+      cupom: desconto > 0 ? afiliado!.cupom : null,
+      desconto_centavos: desconto,
     })
     .select("id")
     .single<{ id: string }>();
   if (error || !assinatura) return null;
 
-  const corpo = { escolha, assinaturaId: assinatura.id, urlBase: await urlDoSite(), modalidadeAnual };
+  const corpo = {
+    escolha,
+    assinaturaId: assinatura.id,
+    urlBase: await urlDoSite(),
+    modalidadeAnual,
+    ...(desconto > 0 && { cupom: { codigo: afiliado!.cupom!, descontoCentavos: desconto } }),
+  };
   try {
     let checkout;
     try {
@@ -65,7 +81,9 @@ async function abrirCheckout(usuarioId: string, escolha: Escolha, modalidadeAnua
       console.warn("Checkout recusou os dados do cliente; tentando sem", { assinaturaId: assinatura.id, erro });
       checkout = await criarCheckout(montarCheckoutAssinatura(corpo));
     }
-    await admin.from("assinaturas").update({ checkout_id: checkout.id }).eq("id", assinatura.id);
+    const { error: erroCheckout } = await admin.from("assinaturas").update({ checkout_id: checkout.id }).eq("id", assinatura.id);
+    // Sem o checkout_id o webhook ainda acha a assinatura pela externalReference do pagamento.
+    if (erroCheckout) console.error("Falha ao gravar o checkout da assinatura", { assinaturaId: assinatura.id, erroCheckout });
     return checkout.link;
   } catch (erro) {
     console.error("Falha ao criar checkout no Asaas", { assinaturaId: assinatura.id, erro });
@@ -130,4 +148,18 @@ export async function pagarSemConta(_: EstadoContato, formData: FormData): Promi
   const link = await abrirCheckout(conta.usuarioId, escolha, modalidade, contato);
   if (!link) return { erro: "Não foi possível abrir o pagamento. Tente de novo em instantes.", valores };
   redirect(link);
+}
+
+/** "Tem um cupom?": guarda o cupom (se for de um afiliado ativo) e volta para a página. */
+export async function aplicarCupom(_: { erro?: string }, formData: FormData): Promise<{ erro?: string }> {
+  const cupom = normalizarCupom(String(formData.get("cupom") ?? ""));
+  const afiliado = cupom ? await afiliadoPorCupom(cupom) : null;
+  if (!afiliado) return { erro: "Cupom inválido ou expirado." };
+  (await cookies()).set(COOKIE_CUPOM, afiliado.cupom!, opcoesCookieAfiliado);
+  redirect(destinoSeguro(formData.get("voltar"), "/assinar"));
+}
+
+export async function removerCupom(formData: FormData) {
+  (await cookies()).delete(COOKIE_CUPOM);
+  redirect(destinoSeguro(formData.get("voltar"), "/assinar"));
 }

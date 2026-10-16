@@ -8,7 +8,16 @@ const campo =
 
 type Modo = "entrar" | "cadastrar" | "esqueci";
 
-export function FormularioEntrar({ proximo, erroLink }: { proximo?: string; erroLink?: boolean }) {
+export function FormularioEntrar({
+  proximo,
+  erroLink,
+  semCadastro = false,
+}: {
+  proximo?: string;
+  erroLink?: boolean;
+  /** Área de parceiros: só entrar (a conta é criada pelo backoffice). */
+  semCadastro?: boolean;
+}) {
   const [modo, setModo] = useState<Modo>("entrar");
   const [estadoEntrar, acaoEntrar, entrando] = useActionState<EstadoForm, FormData>(entrar, {});
   const [estadoCadastro, acaoCadastrar, cadastrando] = useActionState<EstadoForm, FormData>(cadastrar, {});
@@ -29,6 +38,8 @@ export function FormularioEntrar({ proximo, erroLink }: { proximo?: string; erro
           <h1 className="text-lg font-semibold text-slate-900">Esqueci minha senha</h1>
           <p className="text-sm text-slate-600">Enviamos um link para você criar uma nova senha.</p>
         </div>
+      ) : semCadastro ? (
+        <h1 className="text-lg font-semibold text-slate-900">Entrar na área de parceiros</h1>
       ) : (
         <div className="flex rounded-lg bg-slate-100 p-1 text-sm">
           {(["entrar", "cadastrar"] as const).map((m) => (

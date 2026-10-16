@@ -31,6 +31,8 @@ export function montarCheckoutAssinatura(params: {
   modalidadeAnual?: ModalidadeAnual;
   /** Dados já informados no site: o Asaas preenche e o aluno só completa o resto (CPF). */
   cliente?: Contato;
+  /** Cupom de afiliado: desconto só na 1ª cobrança (no mensal, o webhook volta ao preço cheio). */
+  cupom?: { codigo: string; descontoCentavos: number };
   agora?: Date;
 }) {
   const { escolha, assinaturaId, urlBase, agora = new Date() } = params;
@@ -67,9 +69,12 @@ export function montarCheckoutAssinatura(params: {
     items: [
       {
         name: `OdontoLab ${nomeDaEscolha(escolha)}`.slice(0, 30),
-        description: (mensal ? `Assinatura mensal: ${descricao(escolha)}` : `12 meses: ${descricao(escolha)}`).slice(0, 150),
+        description: (
+          (mensal ? `Assinatura mensal: ${descricao(escolha)}` : `12 meses: ${descricao(escolha)}`) +
+          (params.cupom ? ` · cupom ${params.cupom.codigo}${mensal ? " (1º mês)" : ""}` : "")
+        ).slice(0, 150),
         quantity: 1,
-        value: escolha.valorCentavos / 100,
+        value: (escolha.valorCentavos - (params.cupom?.descontoCentavos ?? 0)) / 100,
         imageBase64: IMAGEM_PRODUTO_BASE64,
       },
     ],

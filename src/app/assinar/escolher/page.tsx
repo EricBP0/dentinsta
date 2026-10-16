@@ -1,6 +1,7 @@
 import { ArrowLeft, Check, CreditCard, QrCode, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { FaixaCupom } from "@/components/cupom";
 import { Logo } from "@/components/marca/logo";
 import { textoParam } from "@/lib/listagem";
 import { PARCELAS_ANUAL } from "@/lib/pagamento/ofertas";
@@ -28,6 +29,8 @@ export default async function Escolher({ searchParams }: PageProps<"/assinar/esc
   const escolha = montarEscolha(textoParam(params.plano), textoParam(params.ciclo), modulos);
   if (!escolha) redirect("/assinar");
   const upsell = params.seguir === "1" ? null : upsellParaCompleto(escolha);
+  const aqui = new URLSearchParams();
+  for (const [chave, valor] of Object.entries(params)) [valor ?? []].flat().forEach((v) => aqui.append(chave, v));
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 space-y-8 px-4 py-12">
@@ -40,6 +43,7 @@ export default async function Escolher({ searchParams }: PageProps<"/assinar/esc
         </Link>
       </div>
 
+      <FaixaCupom voltar={`/assinar/escolher?${aqui}`} escolha={escolha} />
       {upsell ? <Upsell escolha={escolha} {...upsell} /> : <Resumo escolha={escolha} />}
 
       <p className="text-center text-xs text-slate-500">

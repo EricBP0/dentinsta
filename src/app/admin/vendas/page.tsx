@@ -148,6 +148,12 @@ export default async function Vendas({ searchParams }: PageProps<"/admin/vendas"
         >
           Leads e carrinhos abandonados
         </Link>
+        <Link
+          href="/admin/vendas/perfis"
+          className="inline-flex items-center rounded-full border-2 border-lima px-4 py-2 text-sm font-bold text-lima hover:bg-lima hover:text-tinta"
+        >
+          Perfis dos clientes
+        </Link>
       </CabecalhoPagina>
 
       {typeof aviso === "string" && (
