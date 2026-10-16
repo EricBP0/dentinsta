@@ -15,6 +15,7 @@ export const config = {
     "/assinar/:path*",
     "/renovar/:path*",
     "/pagamento/:path*",
+    "/parceiro/:path*",
     "/entrar",
     "/redefinir-senha",
   ],

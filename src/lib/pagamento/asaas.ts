@@ -64,3 +64,20 @@ export function atualizarValorAssinatura(gatewayAssinaturaId: string, valorCenta
 export function cancelarAssinaturaAsaas(gatewayAssinaturaId: string) {
   return chamar<{ deleted: boolean }>(`/subscriptions/${encodeURIComponent(gatewayAssinaturaId)}`, undefined, "DELETE");
 }
+
+export type TransferenciaAsaas = { id: string; status: string; value: number };
+
+/**
+ * Pix para o afiliado (saque aprovado). O resultado chega pelo webhook
+ * (TRANSFER_DONE / TRANSFER_FAILED). externalReference = id do saque.
+ */
+export function transferirPix(params: { valorCentavos: number; chave: string; tipoChave: string; descricao: string; saqueId: string }) {
+  return chamar<TransferenciaAsaas>("/transfers", {
+    value: params.valorCentavos / 100,
+    operationType: "PIX",
+    pixAddressKey: params.chave,
+    pixAddressKeyType: params.tipoChave,
+    description: params.descricao.slice(0, 140),
+    externalReference: params.saqueId,
+  });
+}

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Download } from "lucide-react";
 import { BarraBusca, FiltroSelect, Paginacao, ResumoLista } from "@/components/listagem";
 import { CabecalhoPagina } from "@/components/sistema";
@@ -11,7 +12,7 @@ const POR_PAGINA = 20;
 type Resumo = { perfil: PerfilCliente | null; etiquetas: string[]; nota_anual: number; aceita_contato: boolean; etapa2_em: string | null };
 
 /** Respostas do formulário de mapeamento: quem são os compradores e de onde vieram. */
-export default async function Perfis({ searchParams }: PageProps<"/admin/perfis">) {
+export default async function Perfis({ searchParams }: PageProps<"/admin/vendas/perfis">) {
   const params = await searchParams;
   const { supabase } = await exigirAdmin();
   const filtros = lerFiltros(params);
@@ -39,6 +40,9 @@ export default async function Perfis({ searchParams }: PageProps<"/admin/perfis"
 
   return (
     <div className="space-y-8">
+      <Link href="/admin/vendas" className="text-sm font-semibold text-slate-600 hover:text-tinta">
+        ← Vendas
+      </Link>
       <CabecalhoPagina
         tom="tinta"
         rotulo="Backoffice · Clientes"
@@ -46,7 +50,7 @@ export default async function Perfis({ searchParams }: PageProps<"/admin/perfis"
         descricao="Respostas do “Personalize sua OdontoLab”: perfil, dores, origem e a nota para o Completo anual."
       >
         <a
-          href={`/admin/perfis/csv${montarQuery(filtros)}`}
+          href={`/admin/vendas/perfis/csv${montarQuery(filtros)}`}
           className="inline-flex items-center gap-1.5 rounded-full border-2 border-lima px-4 py-2 text-sm font-bold text-lima hover:bg-lima hover:text-tinta"
         >
           <Download className="size-4" /> Exportar CSV
@@ -67,7 +71,7 @@ export default async function Perfis({ searchParams }: PageProps<"/admin/perfis"
 
       <section className="space-y-3">
         <BarraBusca
-          acao="/admin/perfis"
+          acao="/admin/vendas/perfis"
           busca={filtros.q}
           placeholder="Buscar por nome ou e-mail"
           limpar={Object.values(filtros).some(Boolean)}
@@ -125,7 +129,7 @@ export default async function Perfis({ searchParams }: PageProps<"/admin/perfis"
             </li>
           ))}
         </ul>
-        <Paginacao acao="/admin/perfis" pagina={pagina} totalPaginas={totalDePaginas(count, POR_PAGINA)} params={filtros} />
+        <Paginacao acao="/admin/vendas/perfis" pagina={pagina} totalPaginas={totalDePaginas(count, POR_PAGINA)} params={filtros} />
       </section>
     </div>
   );

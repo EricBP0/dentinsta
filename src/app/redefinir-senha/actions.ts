@@ -14,6 +14,9 @@ export async function definirNovaSenha(_: EstadoForm, formData: FormData): Promi
   const { data, error } = await supabase.auth.updateUser({ password: senha });
   if (error) return { erro: "Não foi possível salvar a nova senha. Peça um novo link." };
   // Conta criada no pagamento: agora tem senha.
-  await criarClienteAdmin().from("perfis").update({ senha_pendente: false }).eq("id", data.user.id);
-  redirect("/aluno");
+  const admin = criarClienteAdmin();
+  await admin.from("perfis").update({ senha_pendente: false }).eq("id", data.user.id);
+  // Afiliado (conta criada pelo backoffice) vai para a área de parceiros.
+  const { data: afiliado } = await admin.from("afiliados").select("id").eq("usuario_id", data.user.id).maybeSingle();
+  redirect(afiliado ? "/parceiro" : "/aluno");
 }

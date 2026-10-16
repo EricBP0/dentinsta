@@ -78,3 +78,18 @@ export async function enviarLinkDeSenha(email: string) {
   });
   if (error) console.error("Falha ao enviar o e-mail de senha", { email, error: error.message });
 }
+
+/** Conta de login do afiliado: usa a existente do e-mail ou cria uma sem senha. */
+export async function contaDoAfiliado(email: string, nome: string): Promise<string> {
+  const admin = criarClienteAdmin();
+  const { data: existente } = await admin.from("perfis").select("id").eq("email", email).maybeSingle<{ id: string }>();
+  if (existente) return existente.id;
+  const { data, error } = await admin.auth.admin.createUser({
+    email,
+    email_confirm: true,
+    user_metadata: { nome, primeiro_nome: nome.split(" ")[0] },
+  });
+  if (error || !data.user) throw new Error(`Não foi possível criar a conta: ${error?.message ?? "sem usuário"}`);
+  await admin.from("perfis").update({ senha_pendente: true }).eq("id", data.user.id);
+  return data.user.id;
+}
